@@ -1,25 +1,23 @@
 \RequirePackage[l2tabu,orthodox]{nag}
 
-% TODO: decide if one-sided/two-sided
-%\documentclass[headsepline,footsepline,footinclude=false,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc,BCOR=12mm,DIV=12]{scrbook} % two-sided
-\documentclass[headsepline,footsepline,footinclude=false,oneside,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc]{scrbook} % one-sided
+% decide if one-sided/two-sided
+%\documentclass[headsepline,footinclude=false,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc,BCOR=12mm,DIV=12]{scrbook} % two-sided
+\documentclass[headsepline,footinclude=false,oneside,fontsize=11pt,paper=a4,listof=totoc,bibliography=totoc]{scrbook} % one-sided
 
-% TODO: change citation style in settings
 \input{settings}
 
 % Import generated TUM logo (taken from http://www11.in.tum.de/lehre/thesis/latex)
 \input{logos/tumlogo.tex}
 
-% TODO: change thesis information
 \newcommand*{\getUniversity}{Technische Universität München}
 \newcommand*{\getFaculty}{Department of Informatics}
-\newcommand*{\getTitle}{Thesis title}
-\newcommand*{\getTitleGer}{Titel der Abschlussarbeit}
-\newcommand*{\getAuthor}{Author}
-\newcommand*{\getDoctype}{Thesis type (Bachelor's Thesis in Informatics, Master's Thesis in Robotics, \ldots)}
-\newcommand*{\getSupervisor}{Supervisor}
-\newcommand*{\getAdvisor}{Advisor}
-\newcommand*{\getSubmissionDate}{Submission date}
+\newcommand*{\getTitle}{Application of Deep Learning for Understanding of Image Sequences in Computer Vision}
+\newcommand*{\getTitleGer}{Anwendung von Deep Learning für Bildsequenz-Verstehen in der Computer Vision}
+\newcommand*{\getAuthor}{Benjamin Sautermeister}
+\newcommand*{\getDoctype}{Master's Thesis in Informatics}
+\newcommand*{\getSupervisor}{Prof. Dr. Daniel Cremers}
+\newcommand*{\getAdvisor}{Philip Häusser}
+\newcommand*{\getSubmissionDate}{\nth{17} October, 2016} % American format: https://www.englishclub.com/vocabulary/time-date.htm
 \newcommand*{\getSubmissionLocation}{Munich}
 
 \begin{document}
