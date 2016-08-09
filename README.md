@@ -4,6 +4,16 @@ Master Thesis "Application of Deep Learning for Understanding of Image Sequences
 
 This latex document and its formattings is based on the [LaTeX template for TUM theses](https://github.com/fwalch/tum-thesis-latex), including some adjustments. For more details, read the sections below.
 
+## TexMaker configuration
+
+To use this template, please configure TexMaker as follows:
+
+ * Commands:
+   * Check 'Use a "build" subdirectory for output files'
+   * Bib(la)tex: biber build/%
+ * Quick Build:
+   * Use 'PdfLaTex + Bib(la)tex + PdfLaTeX (x2) + View Pdf' 
+
 
 # LaTeX template for TUM theses
 
