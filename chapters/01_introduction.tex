@@ -1,17 +1,35 @@
 % !TeX root = ../main.tex
 
 
-\chapter{Introduction}\label{chapter:introduction}
+\chapter{Introduction} \label{chapter:introduction}
 
-
+Before diving straight into the theoretical fundamentals, the main topic and  our experimental results , let us start with the motivation behind the overall subject. This introduction touches on some topics and technical terms that will be explained in the subsequent chapter \ref{chapter:fundamentals} in much more detail. Furhtermore, we would like to give a brief overview regarding each of the following chapers.
 
 \section{Motivation}
 
-Bla bla...
+Even during the classical era, people have dreamed of inventing machines that can act and think like humans. This opened the field of \textit{artificial intelligence} (AI), which is still and active research topic and is used in many practical applications. While the main focus of AI in early days was to solve problems that are hard do solve for humans, such as finding the shortest path to an arbitrary destination using the well-known \textit{Dijkstra algorithm}\footnote{Also known as uniform-cost search}. Ironically, it turned out that problems than can be solved by humans using pure intuition are actually extremely hard to solve for computers. As an example, it is hard or even impossible to write a program from scratch that is able to detect objects in pictures, recognize words in spoken text or to describe the events in a video scene. The reason is that classical computer programs in contrast have to be algorithmically expressed as a sequence of commands or a list of mathematical rules \parencite{deep_learning}. But it is quite hard to apply this on multi-dimensional data such as pictures or videos that consists of a incoherent set of pixels with different color channels with a lot of noise and countless possibilities. 
 
-\section{Deep Learning}
+Humans handle this kind of data differently. They learn to recognize objects by experience and implicitely build hierachies of relationships in their mind. This basic principle opened a new subfield, known as \textit{machine learning} (ML). It covers a methodology where knowledge is aquired by extracting patterns from raw data and consequently allows to make make reasonable descitions \parencite{deep_learning}. But while this is able to cover many previously unsolvable problems, it requires that one can tell which features we would like to investigate, for instance to build a decision tree out of it. Coming back to our previous example, this is still hard to be applied on image or video data, where we might know which features we are looking for, but still can not formally describe how these are represented. A field that deals with this issue but not beeing further discussed here is called \textit{representation learning}, which tries to build the representation by itself.
 
-Bla bla...
+But by having just a high-level representations might still not be enough. To devide and conquer this even further, \textit{artificial neural networks} (ANN) have been introduced which are biologically inspired by the structre of the human brain \parencite{ann} and can be trained to learn hierachies of of representations. For object recognition on images, we can think of edges that are detected on a very low level, which will be further composed to curves or shapes. Further, these simple structures might be compound in a specific way that the neural network can identify distinct complex objects. The rise of computational power allowes to create networks that are even deeper and therefore learn more and more complex representations hierachies. This priniple caused its name called \textit{deep learning}.
+
+In recent years, the field of deep learning achieved considerable success and according to its underlying philiosophy, ``if we have a reasonable end-to-end model and sufficient data for training it, we are close to solving the problem.'' \parencite{conv_lstm_nowcasting}. But while there has been done a lot of studies and practical application of object recognition on static images or speech recognition, applying these concepts on video data is just about to make its first steps in research. 
+
+First deep learning approaches dealing with video data or simple sequences of images address problems like human action recognition \parencite{conv3d_action_class}, \parencite{two_stream_action}, \parencite{longterm_rec_recog}, video classification \parencite{large_video_class} and optical flow prediction \parencite{flownet}. Most of these approaches require lots of labeled data to be able to train a network, such as when which action is taking place at which timespan, or how the ground truth optical flow looks like. The effortful labeling-process and thus low availability of such data might be the reason why this topic has not been covered that well so far.
+
+On the contrary, online services like \textit{YouTube} provide a seemingly endless, but unlabled source videos to learn from. This raises the question whether deep learning techniques can be successfully applied to learn a meaningful internal representation and therefore understand the image sequence of any given video. In detail, we would like to examine if such a representation is suited to continue a video even after is has finished, hence to learn a notion of spatial and temporal evolution within a sequence of images as well as get an idea of motion. Such an high-level understanding would be helpful for autonomous intelligent agents that have to act and therefore understand our environment including its phyisical and temporal constrains \parencite{unsup_learn_lstm}. Other application areas might be for instance video compression \parencite{frame_interpol}, visual systems for autonomous cars or as a replacement for optical flow in causal video segmentation \parencite{causal_video_seg}.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.5]{figures/placeholder.png} 
+	\caption{Example of an image sequence with unknown future.} \label{tab:intro-seq}
+\end{figure}
+
+As in our example of object recognition in static pictures, this task again sounds trivial for humans, since we have already built such an intuition about motion. When we have a look at the image sequence in Figure \ref{intro-seq}, we have a strong idea about how this sequence might continue. At least for a couple of time steps.
+% describe in 1 sentence what actually happens in this picture
+
+Developping an approach to tackle this problem is indeed a non-trivial task, as it has to model both, spatial and temoral features in combination. Additionally, we will have to deal with issues like developing an effective training process and the discrepancy in image similarity of our predicted frames and the ground truth.
+
 
 \section{Outline}
 
