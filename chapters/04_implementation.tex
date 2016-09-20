@@ -1,0 +1,49 @@
+\chapter{A Fully-Convolutional LSTM-Autoencoder for Frame Prediction}
+
+- Present our model/implementation/architecture
+
+- References on which other models/ideas everything is based
+
+\section{2D convolutional LSTM}
+
+Explain it mathematically (compared to classical LSTM).
+Also explain the introduced Batch-Normalization (based on the other paper).
+We used with peepholes.
+
+
+\section{Architecture/Model}
+
+
+\subsection{Image Percepts}
+
+Why we use image percepts and not the raw image.
+(Memory?, Makes the model deeper, ...)
+
+\subsection{Schedules Sampling}
+
+Explain schedules sampling and the problem why it is needed. Compare it agains "Always sampling".
+
+
+\section{Training procedure}
+
+OR IS THIS A SEPARETE CHAPTER (Model Evaluation) and our Evaluation Chapter is "Analysis"
+
+\subsection{Preprocessing}
+
+\subsection{Loss function}
+
+- Squared error, cross-entroy, MS-SSIM?
+
+- Compare these, what are its pros and cons
+
+- Why is  selecting the loss function so important?
+
+\subsection{Hyperparameters}
+
+\section{TensorFlow}
+
+We implemented our model in TensorFlow v0.10, CUDA 7.5.18 and cuDDN 4.
+
+
+
+
