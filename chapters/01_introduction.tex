@@ -13,7 +13,7 @@ Humans handle this kind of data differently. They learn to recognize objects by 
 
 But by having just a high-level representations might still not be enough. To devide and conquer this even further, \textit{artificial neural networks} (ANN) have been introduced which are biologically inspired by the structre of the human brain \parencite{ann} and can be trained to learn hierachies of of representations. For object recognition on images, we can think of edges that are detected on a very low level, which will be further composed to curves or shapes. Further, these simple structures might be compound in a specific way that the neural network can identify distinct complex objects. The rise of computational power allowes to create networks that are even deeper and therefore learn more and more complex representations hierachies. This priniple caused its name called \textit{deep learning}.
 
-In recent years, the field of deep learning achieved considerable success and according to its underlying philiosophy, ``if we have a reasonable end-to-end model and sufficient data for training it, we are close to solving the problem.'' \parencite{conv_lstm_nowcasting}. But while there has been done a lot of studies and practical application of object recognition on static images or speech recognition, applying these concepts on video data is just about to make its first steps in research. 
+In recent years, the field of deep learning achieved considerable success and according to its underlying philiosophy, ``\textit{if we have a reasonable end-to-end model and sufficient data for training it, we are close to solving the problem.}'' \parencite{conv_lstm_nowcasting}. But while there has been done a lot of studies and practical application of object recognition on static images or speech recognition, applying these concepts on video data is just about to make its first steps in research. 
 
 First deep learning approaches dealing with video data or simple sequences of images address problems like human action recognition \parencite{conv3d_action_class}, \parencite{two_stream_action}, \parencite{longterm_rec_recog}, video classification \parencite{large_video_class} and optical flow prediction \parencite{flownet}. Most of these approaches require lots of labeled data to be able to train a network, such as when which action is taking place at which timespan, or how the ground truth optical flow looks like. The effortful labeling-process and thus low availability of such data might be the reason why this topic has not been covered that well so far.
 
@@ -21,18 +21,32 @@ On the contrary, online services like \textit{YouTube} provide a seemingly endle
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.5]{figures/placeholder.png} 
-	\caption{Example of an image sequence with unknown future.} \label{tab:intro-seq}
+	\includegraphics[scale=0.25]{figures/ucf-intro/serie1.png} 
+	\caption{Example of an image sequence with unknown future.} \label{fig:intro-seq}
 \end{figure}
 
-As in our example of object recognition in static pictures, this task again sounds trivial for humans, since we have already built such an intuition about motion. When we have a look at the image sequence in Figure \ref{intro-seq}, we have a strong idea about how this sequence might continue. At least for a couple of time steps.
-% describe in 1 sentence what actually happens in this picture
+Like in our first example of object recognition on static pictures, this task might again be trivial for humans, since we already have built such an intuition regarding motion and our environment. When we have a look at the image sequence in Figure \ref{fig:intro-seq}, we have a strong idea about how this sequence will continue. At least for a couple of time steps. The boy in the foreground probably will lilft his left foot towards the ball, while ball continues to fall down due to gravitation. In contrast, the background will stay almost unchanged.
 
-Developping an approach to tackle this problem is indeed a non-trivial task, as it has to model both, spatial and temoral features in combination. Additionally, we will have to deal with issues like developing an effective training process and the discrepancy in image similarity of our predicted frames and the ground truth.
+Developping a deep learning approach to tackle this is indeed a non-trivial task, as it has to model both, spatial and temoral features in combination. Additionally, we will have to deal with issues like developing an effective training process or the fundamental problem of quantifying the perceptual similarity between predicted frames and the ground truth.
 
 
 \section{Outline}
 
-Bla bla...
+This subsequent chapter of this thesis are structured as follows:
+
+\textbf{Chapter \ref{chapter:fundamentals}} covers the theoretical concepts that are required to understand our final implementations and its consecutive evaluation. We will have a deeper look into neural networks and explain how they are trained. Further, we will explore more advanced neural network architectures, namely \textit{convolutional neural networks} (CNN) for spatial learning, and \textit{recurrent neural network} (RNN) models for sequential learning. Afterwards, we conclude this chapter with the investigation of some modern techniques that are used to improve the overall learning process, and merics for perceptial motivated image similarity assessment.
+
+In \textbf{chapter \ref{chapter:relatedwork}}, we take a closer look at existing approaches that are suitable for spatio-temporal learning and frame prediction. We briefly discuss their strenght and weaknesses, as well as how they influenced the design descitions regarding the architecture of our final neural network model. These presented models build the baselines in our evaluation.
+
+Afterwards, we present our neural network model in \textbf{chapter \ref{chapter:implementation}}, including its architecture and implementation details. Moreover, we introduce a quite recently introduced and barely studied variant of recurrent network cell for spatio-temporal learning, namely \textit{convolutional LSTM}, which builds the central element of our model. We also suggest a special learning strategy for RNNs, which speeds up the training process and enables the improvement of the overall performance.
+
+\textbf{Chapter \ref{chapter:datasets}} gives a brief overview of the used video datasets within this thesis. All in all, we have chosen three different datasets with increasing complexity, namely \textit{MovingMNIST}, \textit{MsPacman} and \textit{UCF-101}.
+
+Next, \textbf{chapter \ref{chapter:evaluation}} illustrates many experimental results on the previously named datasets. We investigate how changes in the model or hyperparameters do affect the model's performance, as well as compare our results with other existing approaches in detail.
+
+With \textbf{chapter \ref{chapter:contribution}}, we would like to shortly present a light-weight, high-level and open-source framework for \textit{TensorFlow}, a side contribution that has grown out of this project.
+
+In the end, we conclude this thesis in \textbf{chapter \ref{chapter:conclusion}} by summarizing our results and outcomes, as well as highlight the identified improvements for future work.
+
 
 
