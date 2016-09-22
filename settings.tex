@@ -21,6 +21,12 @@
 \usepackage{tikz}
 \usepackage{pgfplots}
 \usepackage{pgfplotstable}
+
+\usetikzlibrary{shapes.misc}
+\tikzset{cross/.style={cross out, draw=black, minimum size=2*(#1-\pgflinewidth), inner sep=0pt, outer sep=0pt},
+%default radius will be 1pt. 
+cross/.default={1pt}}
+
 \usepackage{booktabs}
 \usepackage[final]{microtype}
 \usepackage{caption}
@@ -55,3 +61,6 @@
   keywordstyle=\bfseries\color{MediumBlue},
   stringstyle=\color{DarkGreen}
 }
+
+% Completely prevent breaking of footnotes over multiple pages
+\interfootnotelinepenalty=10000 
