@@ -184,7 +184,7 @@ As already stated, our goal is to find a representation that generalizes well. O
 	6     4      a 
 	7     4      a 
 	};
-	\addlegendentry{data points of f(x)};
+	\addlegendentry{measured data points};
 	\addplot [mark=none,draw=red,smooth,ultra thick, domain=0:8] {
 		-0.0000000003717474*x^0
    		+14.921428855475133*x^1
@@ -217,24 +217,86 @@ A second regularization approach is known as \textit{dropout}. Instead of modify
 
 \section{Convolutional Neural Networks}
 
-Networks for spatial learning...
+In the previous section, we have discovered neural networks that exhibits a full connection of neuros from one layer to the next. While this allows to learn complex representions on the one hand, it comes with a couple of downside on the other hand as well. For example, data such as images would require the nework's layers to become large. Consequently, the number of connections between these layers would increase exponentially and thus the amound of trainable parameters as well. At the bottom line, this could end up in a network that is either time-consuming to train, or we are even not able to store it in memory. In addition, we would not not take any advantage of local image properties into account.
 
-\subsubsection{History}
-Short history as intro LeCun, OCR, ...
+Therefore, a new network type found attention in recent years that are known as \textit{convolutional neural networks} (CNN). It is inspired by the animals visual cortex, has already been used in the late nineties to solve optical character recognition tasks (OCR) \parencite{lecun_conv}, but received its main attention after beating proven methods in the ImageNet competition by a large margin \parencite{imagenet}. The structure of a convolutional network, the detailed benefits and its mathematical formulation is described in the following sections.
 
-\subsection{Benefits}
 
-(1) Param sharing, (2) sparsity, (3) ...
+\subsection{Structure}
 
-\subsection{Convolutional Operation}
+A network is called CNN, when it consists of at least one convolutional layer. In other words, ``\textit{convolutional networks are simply neural networks that use convolution in place of general matrix multiplication in at least one of their layers.}'' \parencite{deep_learning}. The definition of the convolution operation follows in section \ref{sec:conv-op}. Simply put, imagine a small window that slides across the input data. In every iteration, it attempts to extract features that are only dependent on a small neighbouring region with the size of this window. Moreover, the location of features that it tries to detect is not fixed to any specific spot, as it treats every patch in the same way. In every convolutional layer, this process is repeated several times, resulting in multiple feature maps. Figure \ref{fig:cnn-structure} visualizes the described structure of a simplified convolutional neural network.
 
-Explain the conv op
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.35]{figures/cnn_structure.png}
+	\caption[Structure of a CNN]{Example of a simplified CNN structure with two convolutional layers for image classification.} \label{fig:cnn-structure}
+\end{figure}
+
+The window mentioned before is called \textit{kernel} and holds the randomly initialized parameters that the network can learn. The kernel acts as a filter that is applied to each location in a regular steps. In the two dimensional case, the kernal has a specified width and height, denoted as \textit{kernel size}. Several kernals are used to extract multiple feature maps in each convolutional layer, but each output feature map is computed with its own kernel. This number of kernels is specified with its \textit{kernel depth}. Furthermore, the step range the filter is moved in each dimension is called \textit{stride} \parencite{conv_guide}.
+
+Each convolutioal layers is usually followed by a non-liner acitivation function, preferably a rectifier. The reason is that the convolution is an affine transformation and it therefore linear. Stacking multiple linear operations could be mathematically reduced to as single one. Optionally, an additional \textit{pooling layer} can be applied that performs a subsampling onto the feature maps. Several pooling variants exist, while \textit{max pooling} is probably the most frequently used of them. It allows the representation to become roughly invariant to small rotations or translations of the input \parencite[p. 343]{deep_learning} by only using the maximum value.
+
+
+\subsection{Convolutional Operation} \label{sec:conv-op}
+
+Generally speaking, the convolution in an mathematical operation on two functions $f(x)$ and $g(x)$. Its operator is typically denoted with an asterisk \parencite[p. 332]{deep_learning} and is defined as:
+
+\begin{equation} \label{eq:conv-general}
+  (f \ast g)(x) = \int f(\tau)g(x-\tau) d\tau
+\end{equation}
+
+In terminology of convolutional networks, the function $f$ is termed as the \textit{input} and the filter $g$ is referred to as the \textit{kernel}. Moreover, the output of $ (f \ast g)(x) $ is called the \textit{feature map}.
+
+As we are dealing with discrete 2D-images in this thesis, the formulation of equation \ref{eq:conv-general} can be discritized and reformulated as:
+
+\begin{equation} \label{eq:conv-2d}
+  (I \ast K)(x,y) = \sum\limits_{r=0}^{h-1} \sum\limits_{c=0}^{w-1} I(c,r)K(x-c,y-r)
+\end{equation}
+
+with an input $ I $ of size $w \times h$ and a two-dimensional kernel $ K $. Depending on the size of the kernel with $ k \times k $ and the chosen stride $ s $, the shape of the convolved output changes. This is why in input is often enriched with a \textit{zero-padding} to have more control regarding the resulting output size. The use of no padding ($p=0$) is also called \textit{valid padding} (Figure \ref{fig:conv_valid}). Also, when a padding of $p=\floor{k/2}$ is used with a kernal size, it is referred to as \textit{same padding} because the input and output size stay unchanged in case of $ s=1 $ (Figure \ref{fig:conv_same}). 
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/conv_valid.png}
+  \caption{$p=0$ (valid), $s=1$}
+  \label{fig:conv_valid}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/conv_same.png}
+  \caption{$p=1$ (same), $s=2$}
+  \label{fig:conv_same}
+\end{subfigure}
+\caption[Convolution operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride.}
+\label{fig:conv}
+\end{figure}
+
+
 
 \subsection{Transposed Convolutional Operation}
 
+To get bigger, not smaller....
 What is the conv-t op. Foot comment: Should not be called deconv
+Use another graphics here, so we do not have to explain the plus 1 extra padding!
 
-\subsection{Fully-convolutional Networks}
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.4]{figures/conv_tp.png}
+	\caption[Transposed convolution operation]{Transposition of convolving an $6 \times 6$ input using a $3 \times 3$ kernel using $p=1$ and $s=2$. This is equivalent to performing an convolution using zero-space $3 \times 3$ input with $p=1$ and $s=1$.} \label{fig:conv_tp}
+\end{figure}
+
+
+
+\subsection{Advantages}
+
+(1) Param sharing, (2) sparsity, (3) equiv  representation
+Motiviation: in deep-learning book
+
+
+\subsection{Fully-Convolutional Networks}
 
 What are FCNs and what is their benefit?
 
@@ -276,11 +338,6 @@ How does this suspensate the drawbacks of RNNs (gates, ...)
 \section{Autoencoder Networks}
 
 What are autoencoder networks?
-
-
-\section{Parameter initialization}
-
-Explain why they are randomly initialized. Why xavier method? How is xavier-init defined?
 
 
 \section{Batch Normalization}

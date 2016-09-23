@@ -36,6 +36,8 @@ cross/.default={1pt}}
 \usepackage{amssymb}
 \usepackage{mathrsfs}
 \usepackage{breqn}
+\usepackage{caption}
+\usepackage{subcaption}
 %\usepackage{showframe} % use this for debugging the layout
 
 % adjust default page margins
@@ -64,3 +66,7 @@ cross/.default={1pt}}
 
 % Completely prevent breaking of footnotes over multiple pages
 \interfootnotelinepenalty=10000 
+
+% Math commands
+\newcommand\floor[1]{\lfloor#1\rfloor}
+\newcommand\ceil[1]{\lceil#1\rceil}
