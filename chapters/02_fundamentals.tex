@@ -24,7 +24,7 @@ Even that its formulation is that simple, it can represent complex decision-maki
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.35]{figures/mlp.png} % TODO: highlight perceptron in BOLD
+	\includegraphics[scale=0.8]{figures/mlp.pdf}
 	\caption[Multilayer perceptron]{Example of a MLP. A single perceptron is highlighted in bold.} \label{fig:mlp}
 \end{figure}
 
@@ -228,7 +228,7 @@ A network is called CNN, when it consists of at least one convolutional layer. I
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.35]{figures/cnn_structure.png}
+	\includegraphics[scale=0.45]{figures/cnn_structure.png}
 	\caption[Structure of a CNN]{Example of a simplified CNN structure with two convolutional layers for image classification.} \label{fig:cnn-structure}
 \end{figure}
 
@@ -290,17 +290,23 @@ The application of the previously presented convolutional operation usually tran
 
 To sum up the benefits of an convolutional network, the three central design ideas are \textit{sparse connections}, \textit{parameter sharing} and \textit{equivariance to translation} \parencite[p. 336ff.]{deep_learning}.
 
+\subsubsection*{Sparse Connections}
+The kernel used in a convolution is smaller than in input. Consequently, we have to store fewer parameters, as well as can take advantage of local relationships present in the data. This also leads to a higher training efficiency and a radical reduction of memory requirements.
+
+\subsubsection*{Parameter Sharing}
+To handle all regions of the input data in the same manner, the parameters are reused at every location as well. This is implemented by making use of only a single kernel which holds all learnable parameters.  Additionally, this decreases the number of parameters even further. To that end, figure \ref{fig:conv_vs_fc} compares the connection pattern  and the sharing of model parameters of fully-connected layers against the convolutional case.
+
 \begin{figure}[htpb]
 \centering
 \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=.9\linewidth]{figures/placeholder.png}
+  \includegraphics[width=.8\linewidth]{figures/fc2.pdf}
   \caption{}
   \label{fig:conv_vs_fc_fc}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=0.9\linewidth]{figures/placeholder.png}
+  \includegraphics[width=0.8\linewidth]{figures/param_share.pdf}
   \caption{}
   \label{fig:conv_vs_fc_conv}
 \end{subfigure}
@@ -308,19 +314,10 @@ To sum up the benefits of an convolutional network, the three central design ide
 \label{fig:conv_vs_fc}
 \end{figure}
 
-\subsubsection*{Sparse Connections}
-
-The kernel used in a convolution is smaller than in input. Consequently, we have to store fewer parameters, as well as can take advantage of local relationships present in the data. This also leads to a higher training efficiency and a radical reduction of memory requirements.
-
-\subsubsection*{Parameter Sharing}
-
-To handle all regions of the input data in the same manner, the parameters are reused at every location as well. This is implemented by making use of only a single kernel which holds all learnable parameters.  Additionally, this decreases the number of parameters even further. To that end, figure \ref{fig:conv_vs_fc} compares the connection pattern  and the sharing of model parameters of fully-connected layers against the convolutional case.
-
 \subsubsection*{Equivariance to Translation}
-
 The sharing of parameters leads to the third advantage. Because the kernel and its paramters are reused at every position, the model learns the same representations at every position \parencite[p. 339]{deep_learning}. For example, if an input image wis translated by a fixed number of pixels, the network would handle it in the same way.
 
-Unfortunately, convolutions are not tolerant to other transformations like rotation from the ground up. But to counteract this, other techniques exist such as a subsequent pooling stage as already introduced before.
+Unfortunately, convolutions are not tolerant to other transformations from the ground up. But to counteract this, other techniques exist such as a subsequent pooling stage to enable slight rotation invariance, as already introduced before.
 
 
 \subsection{Fully-Convolutional Networks}
