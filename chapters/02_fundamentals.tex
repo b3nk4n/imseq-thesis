@@ -15,7 +15,7 @@ The perceptron itself is has quite a simple structure. It is usually visualized 
 
 \begin{equation} \label{eq:mlp}
   y = \begin{cases}
-    1, & \text{if $ \sum\limits_{i=1}^n \, w_{i}x_{i} + b > 0$}.\\
+    1, & \text{if $ \sum\limits_{i=1}^n \, w_{i}x_{i} + b > 0$},\\
     0, & \text{otherwise}.
   \end{cases}
 \end{equation}
@@ -273,14 +273,11 @@ with an input $ I $ of size $w \times h$ and a two-dimensional kernel $ K $. Dep
 \label{fig:conv}
 \end{figure}
 
-
+It must be noted that the size of the kernel, padding and stride does not have to be equal in each dimension. But nevertheless, this is the case in most practical applications.
 
 \subsection{Transposed Convolutional Operation}
 
-To get bigger, not smaller....
-What is the conv-t op. Foot comment: Should not be called deconv
-Use another graphics here, so we do not have to explain the plus 1 extra padding!
-
+The application of the previously presented convolutional operation usually transforms the input into lower-dimensional feature maps. However, there are use cases where we would like to go the other way round, while keeping the connectivity pattern of a convolution. One example is an convolutional autoencoder which is explained in further detail in section \ref{sec:autoencoder}. This operation is referred to as \textit{transposed convolution}\footnote{Mistakenly, the transposed convolution is often called \textit{deconvolution}. But because it is not actually performing the reverse effect of a convolution, which is meant by the mathematical term of a deconvolution, it is strongly discouraged to name it so.}, which exchanges the forward and backward passes of a normal convolution. It is also called \textit{fractionally strided convolution}, because it can be emulated with a direct convolution using a zero-spaced input \cite[p. 19]{conv_guide}. Such an implementation is less efficient, but it supports the intuition of how the resulting output shape looks like. Figure \ref{fig:conv_tp} shows an example of a transposed convolution.
 
 \begin{figure}[htpb]
 	\centering
@@ -289,16 +286,48 @@ Use another graphics here, so we do not have to explain the plus 1 extra padding
 \end{figure}
 
 
-
 \subsection{Advantages}
 
-(1) Param sharing, (2) sparsity, (3) equiv  representation
-Motiviation: in deep-learning book
+To sum up the benefits of an convolutional network, the three central design ideas are \textit{sparse connections}, \textit{parameter sharing} and \textit{equivariance to translation} \parencite[p. 336ff.]{deep_learning}.
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \includegraphics[width=.9\linewidth]{figures/placeholder.png}
+  \caption{}
+  \label{fig:conv_vs_fc_fc}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \includegraphics[width=0.9\linewidth]{figures/placeholder.png}
+  \caption{}
+  \label{fig:conv_vs_fc_conv}
+\end{subfigure}
+\caption[Sparse connections and parameter sharing in a CNN]{Comparison of the connection pattern and usage of parameters between (a) fully-connected layers and (b) convolutional layers.}
+\label{fig:conv_vs_fc}
+\end{figure}
+
+\subsubsection*{Sparse Connections}
+
+The kernel used in a convolution is smaller than in input. Consequently, we have to store fewer parameters, as well as can take advantage of local relationships present in the data. This also leads to a higher training efficiency and a radical reduction of memory requirements.
+
+\subsubsection*{Parameter Sharing}
+
+To handle all regions of the input data in the same manner, the parameters are reused at every location as well. This is implemented by making use of only a single kernel which holds all learnable parameters.  Additionally, this decreases the number of parameters even further. To that end, figure \ref{fig:conv_vs_fc} compares the connection pattern  and the sharing of model parameters of fully-connected layers against the convolutional case.
+
+\subsubsection*{Equivariance to Translation}
+
+The sharing of parameters leads to the third advantage. Because the kernel and its paramters are reused at every position, the model learns the same representations at every position \parencite[p. 339]{deep_learning}. For example, if an input image wis translated by a fixed number of pixels, the network would handle it in the same way.
+
+Unfortunately, convolutions are not tolerant to other transformations like rotation from the ground up. But to counteract this, other techniques exist such as a subsequent pooling stage as already introduced before.
 
 
 \subsection{Fully-Convolutional Networks}
 
-What are FCNs and what is their benefit?
+The complete use of convolutional layers implicates a fourth advantage over fully-connected layers. Since the kernel size in each layer is independent regarding its input, the overall network could be feed with data of different dimension. In contrary, this is not possible anymore as soon as a single FC-layer is used at inference because its fixed-sized weight matrix has to be applied to the entire input, not just a local region. Nevertheless, this does not imply that no fully-connected layer can be used when training the network. Depending on the architecture, FC-layers can be used in components of the network that are only used during training. This advantage is for example taken into account when training a \textit{deep convolutional generative adversarial network} (DCGAN)\footnote{Novel network training strategy for generative networks, where a generator network G competes agains a second discriminator network D in an alternating fashion. Further details in \parencite{gan}.}, whose discriminator network is only used while training.
+
+Regarding the problem of frame prediction we want to solve within this thesis, we have to deal with a huge amount of data in every training iteration. Therefore, we take advantage from this \textit{fully-convolutional network} (FCN) approach and design our architecture in such a way that we are able train neural network model on small image patches only. Afterwards, we can theoratically perform frame prediction on the whole image given a sequence of frames.
 
 
 \section{Recurrent Neural Networks}
@@ -335,7 +364,7 @@ Show differences to classical RNNs
 How does this suspensate the drawbacks of RNNs (gates, ...)
 
 
-\section{Autoencoder Networks}
+\section{Autoencoder Networks} \label{sec:autoencoder}
 
 What are autoencoder networks?
 
