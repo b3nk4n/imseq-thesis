@@ -63,7 +63,7 @@ Parameters beside $ w $ and $ b $ that are not learned during this process are c
 
 \subsubsection{Neurons and Activations}
 
-At this point, we face the fundamental problem of perceptrons. Because in order find the best set of parameters, we have to do small changes in $ w $ and $ b $ to justify the output into the right direction of the desired outcome. But since the perceptron's output is discrete, a small change can cause a sudden flip in the overall output. To overcome this issue, we replace these perceptrons with \textit{neurons}:
+At this point, we face the fundamental problem of perceptrons. In order find the best set of parameters, we have to do small changes in $ w $ and $ b $ to justify the output into the right direction of the desired outcome. But since the perceptron's output is discrete, a small change can cause a sudden flip in the overall output. To overcome this issue, we replace these perceptrons with \textit{neurons}:
 
 \begin{equation}
 \begin{aligned}
@@ -72,7 +72,15 @@ y &= a(z)
 \end{aligned}
 \end{equation}
 
-which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \textit{activation function} $ a(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $. These are displayed in figure \ref{fig:activations}.
+which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \textit{activation function} $ a(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $ (see Figure \ref{fig:activations}). The examplary structre of a neuron is illustrated in Figure \ref{fig:neuron}.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.6]{figures/neuron.pdf}
+	\caption[Schematic neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $a(z)$.} \label{fig:neuron}
+\end{figure}
+
+Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even its shape looks much simpler, it became the most favorable activation function for intermediate layers in deep neural networks, as it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanising gradient (see \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
 
 \begin{figure}[htpb]
   \centering
@@ -99,8 +107,6 @@ which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \te
   \end{tikzpicture}
   \caption[Activation functions]{Diagram showing the most common activation functions in neural networks.}\label{fig:activations}
 \end{figure}
-
-Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even its shape looks much simpler, it became the most favorable activation function for intermediate layers in deep neural networks, as it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons will have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanising gradient (see \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
 
 \subsubsection{Initialization}
 
@@ -237,7 +243,7 @@ The window mentioned before is called \textit{kernel} and holds the randomly ini
 Each convolutioal layers is usually followed by a non-liner acitivation function, preferably a rectifier. The reason is that the convolution is an affine transformation and it therefore linear. Stacking multiple linear operations could be mathematically reduced to as single one. Optionally, an additional \textit{pooling layer} can be applied that performs a subsampling onto the feature maps. Several pooling variants exist, while \textit{max pooling} is probably the most frequently used of them. It allows the representation to become roughly invariant to small rotations or translations of the input \parencite[p. 343]{deep_learning} by only using the maximum value.
 
 
-\subsection{Convolutional Operation} \label{sec:conv-op}
+\subsection{Convolution Operation} \label{sec:conv-op}
 
 Generally speaking, the convolution in an mathematical operation on two functions $f(x)$ and $g(x)$. Its operator is typically denoted with an asterisk \parencite[p. 332]{deep_learning} and is defined as:
 
@@ -275,7 +281,7 @@ with an input $ I $ of size $w \times h$ and a two-dimensional kernel $ K $. Dep
 
 It must be noted that the size of the kernel, padding and stride does not have to be equal in each dimension. But nevertheless, this is the case in most practical applications.
 
-\subsection{Transposed Convolutional Operation}
+\subsection{Transposed Convolution Operation}
 
 The application of the previously presented convolutional operation usually transforms the input into lower-dimensional feature maps. However, there are use cases where we would like to go the other way round, while keeping the connectivity pattern of a convolution. One example is an convolutional autoencoder which is explained in further detail in section \ref{sec:autoencoder}. This operation is referred to as \textit{transposed convolution}\footnote{Mistakenly, the transposed convolution is often called \textit{deconvolution}. But because it is not actually performing the reverse effect of a convolution, which is meant by the mathematical term of a deconvolution, it is strongly discouraged to name it so.}, which exchanges the forward and backward passes of a normal convolution. It is also called \textit{fractionally strided convolution}, because it can be emulated with a direct convolution using a zero-spaced input \cite[p. 19]{conv_guide}. Such an implementation is less efficient, but it supports the intuition of how the resulting output shape looks like. Figure \ref{fig:conv_tp} shows an example of a transposed convolution.
 
@@ -367,6 +373,27 @@ What are autoencoder networks?
 
 
 \section{Batch Normalization}
+
+Learning a deep neural network model is said to be very hard. One reason for this is that every layer not just has to learn the overall representation directly from the beginning, but also has to master the change in distribution of its inputs, given all preceding layers. As an example, consider one layer in the middle of a deep network. At training time, its adjustments to the model parameters depend on its inputs, which is equivalent to the output of the previous layer. But the fact that the previous layer learns and modifies its weights and biases as well follows that the intput to the following layer can change over time significantly, especially at the very beginning of the training due to random initialization. This ongoing change in the feature's distribution during training is known as \textit{internal covariance shift} \parencite{rnn-batchnorm}.
+
+One modern practice that tries to overcome this issue by minimizing the covariate shift is called \textit{batch normalization} \parencite{batchnorm}. It performans a normalizaton on the inputs to a layer and transforms it to have a mean of zero and a standard deviation of one. Its mathematical formulation is:
+
+\begin{equation} \label{eq:bn}
+  BN(\textbf{x}; \gamma, \beta) = \beta + \gamma \frac{\textbf{x} - \mathbb{E}(\textbf{x})}{\sqrt{Var(\textbf{x}) + \epsilon}}
+\end{equation}
+
+where $ \textbf{x} \in \rm I\!R^d $ is the output of the previous layer to be normalized, $\gamma \in \rm I\!R^d $ and $\beta \in \rm I\!R^d $ the shift and scale of the distribution that are learned, as well as $\epsilon \in \rm I\!R $ that serves as a regularization parameter and to avoid dividing by zero \parencite{rnn-batchnorm}.
+
+When batch normalization is applied, we have to consider two different modes during training and inference. On the one hand at training time, batch normalization takes advantage of two simplifications, because full whitening of inputs is very expensive. First, each feature dimension is normalized independently. Secondly, the statistics of $ \mathbb{E}(\textbf{x}) $ and $ Var(\textbf{x}) $ are estimated using the sample mean and sample variance based on each mini-batch of stochastic gradient training. On the other hand during inference, the statistics have to be assessed using the entire training data. One way to do so is to track to track the moving averaged mean and variance parameters of each batch-estimate while training the model, and finally use these averages when a prediction is performed. That is the way how batch normalization is used throughout this work.
+
+The advantages of batch normalization are versatile:
+
+\begin{itemize}
+\item Compensation against internal covariate shift to achieve a stable distribution of activation values.
+\item Separate normalization of individual feature dimensions, so that features are not decorrelated.
+\item Faster learning, because it allows to use higher learning rates.
+\item Practice has shown that even a higher accuracy can be achieved compared to non-batch-normalized versions of a network model \parencite[p. 7]{batchnorm}.
+\end{itemize}
 
 
 \section{Perceptuall Similarity of Images}
