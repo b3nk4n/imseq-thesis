@@ -20,7 +20,7 @@ The perceptron itself is has quite a simple structure. It is usually visualized 
   \end{cases}
 \end{equation}
 
-Even that its formulation is that simple, it can represent complex decision-making when we stack multiple elements togther, known as multilayer perceptrons (MLP). Such a network is illustrated in figure \ref{fig:mlp}.
+Even that its formulation is that simple, it can represent complex decision-making when we stack multiple elements togther, known as multilayer perceptrons (MLP). Such a network forms an directed acyclic graph (DAG) and is illustrated in figure \ref{fig:mlp}.
 
 \begin{figure}[htpb]
 	\centering
@@ -68,16 +68,16 @@ At this point, we face the fundamental problem of perceptrons. In order find the
 \begin{equation}
 \begin{aligned}
 z &= \sum\limits_{i=1}^n \, w_{i}x_{i} + b \\
-y &= a(z)
+y &= \phi(z)
 \end{aligned}
 \end{equation}
 
-which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \textit{activation function} $ a(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $ (see Figure \ref{fig:activations}). The examplary structre of a neuron is illustrated in Figure \ref{fig:neuron}.
+which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \textit{activation function} $ \phi(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $ (see Figure \ref{fig:activations}). The examplary structre of a neuron is illustrated in Figure \ref{fig:neuron}.
 
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[scale=0.6]{figures/neuron.pdf}
-	\caption[Schematic neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $a(z)$.} \label{fig:neuron}
+	\caption[Schematic neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
 \end{figure}
 
 Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even its shape looks much simpler, it became the most favorable activation function for intermediate layers in deep neural networks, as it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanising gradient (see \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
@@ -131,7 +131,7 @@ b_{j}^{(\tau + 1)} &= b_{j}^{(\tau)} - \eta \frac{\partial \mathcal{L}}{\partial
 \end{aligned}
 \end{equation}
 
-where $ \eta > 0 $ is the \textit{learning rate} that determines the size of step we do along the slope in each iteration \parencite{pattern_and_ml}. Doing such a single step by computing the gradients for the whole training set would require to much time and memory resources. Hence, we estimate the gradients over the whole population by using a smaller sample. This technique is called \textit{stochastic gradient descent} (SGD), whereas the size of the sample is known as \textit{batch size}.
+where $ \eta > 0 $ is the \textit{learning rate} that determines the size of step we do along the slope in each iteration \parencite{pattern_and_ml}. In other words, in every training iteration, we proceed backwards through our network and slightly adjust every parameter depending on how much it has contributed to the error. Doing a single step by computing the gradients for the whole training set would require to much time and memory resources. Hence, we estimate the gradients over the whole population by using a smaller sample. This technique is called \textit{stochastic gradient descent} (SGD), whereas the size of the sample is known as \textit{batch size}.
 
 Although this algorithm is really powerful, it comes with some disadvantages that have to be kept in mind. First, the result can converge to any local minimum. In consequence, finding a global minimum is not guaranteed. Secondly, depending on the choice of the learning rate $ \eta $, the algorithm might converge very slowly or even not at all \parencite{ann}.
 
@@ -316,7 +316,7 @@ To handle all regions of the input data in the same manner, the parameters are r
   \caption{}
   \label{fig:conv_vs_fc_conv}
 \end{subfigure}
-\caption[Sparse connections and parameter sharing in a CNN]{Comparison of the connection pattern and usage of parameters between (a) fully-connected layers and (b) convolutional layers.}
+\caption[Sparse connections and parameter sharing in a CNN]{Comparison of the connection pattern and usage of parameters between (a) fully-connected layers and (b) convolutional layers. The use of the same color for interconnections denote the sharing of parameters.}
 \label{fig:conv_vs_fc}
 \end{figure}
 
@@ -335,37 +335,103 @@ Regarding the problem of frame prediction we want to solve within this thesis, w
 
 \section{Recurrent Neural Networks}
 
-Networks for temporal learning...
+All previously presented network architectures suffer from one missing characteristic. Their memory is kind of static and predictions are mostly based on the current inputs only. Consequently, they are hard to be applied on problems where data reveals some sequential or temporal properties. Two examples are handwriting recognition, were the understanding of previous words is required to deduce the current word's context. Also, as in our case the knowledge of the past image frames to be able to predict the future frames that naturally matches to the given previous sequence. A topology that addresses this issue are \textit{recurrent neural networks} (RNN). In this section, we will give an overview about their structure and formal description, as well as present a succession model that addresses its fundamental problems. It is to add that the whole section is mainly inspired by the great explainations in \parencite{understand_lstm}.
 
-\subsection{RNN}
 
-Bla bla...
+\subsection{Basics}
 
-\subsubsection{History}
-Short intro (history) to RNNs
+RNNs are a special class of neural networks that allows its models to form a directed cyclic graph. Thereby, they are able to hold an hidden state that represents the sequential dynamics. Given an input sequence $ X = (x^{(1)}, x^{(2)},..., x^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $x^{(\tau)}$ as its input of this sequence, as well as the hidden state $h^{(\tau-1)}$ of the previous cell. These building blocks are typically referred to as a \textit{cell}. Because the first cell has has no predecessor, its hidden state input $ h^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, we can describe an RNN as follows:
 
-\subsubsection{Architecture}
-explain it in with a small diagram
+\begin{equation} \label{eq:rnn}
+  h^{(\tau)} = \phi(W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b)
+\end{equation}
 
-\subsubsection{BPTT}
-What is BPTT in comparision to back propagation
+where $ W_{h} \in \rm I\!R^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ W_{x} \in \rm I\!R^{d_x \times d_h} $ the weights of the input to hidden transitions and $ b, h^{(0)} \in \rm I\!R^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(z) $ is usually chosen to be tanh.
+
+Like convolutional networks, RNNs take advantage of sharing parameters over different parts of the model \parencite[p. 374]{deep_learning}. But in this case, we share model parameters over the temporal domain. This allows to generalize specific properties across the whole input sequence. Consequently, a model can extract patterns that can occur at any or even multiple positions within the sequence of data.
+
+\subsubsection{Structure}
+
+For a better understanding of how recurrent networks work, it is helpful to take a look on its graphical model that was formally described by equation \ref{eq:rnn}. As it can be seen in Figure \ref{fig:rnn-loop}, the hidden state transition can be compactly visualized using a loop. These loops represent the influence of the past values with respect to the current value. However, to have a representation that is analogous to the already shown model, it is possible to unroll the loop to convert it back to a DAG (see Figure \ref{fig:rnn-unrolled}).
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.25\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{figures/rnn_loop.pdf}
+  \caption{}
+  \label{fig:rnn-loop}
+\end{subfigure}%
+\begin{subfigure}{0.75\textwidth}
+  \centering
+  \includegraphics[scale=0.5]{figures/rnn_unrolled.pdf}
+  \caption{}
+  \label{fig:rnn-unrolled}
+\end{subfigure}
+\caption[Structure of RNN cells]{Structure of recurrent network cells. The compact cyclic graph model in (a) can be unrolled to receive the model (b) that represents the model in form of a acyclic graph.}
+\label{fig:rnn}
+\end{figure}
+
+Moreover, the framework for recurrent models is very flexible as well. Depending on the implementation, it allows to process either a fixed or even a dynamic number of inputs. This extends to the number of outputs as well. In contrary, (convolutional) neural networks require to define the input and output size as design time. Further, they have to process all data in one chunk and do not allows to handle only single elements of the sequence one after the other. Some example modes of recurrent networks are visualized in Figure \ref{fig:rnn-modes}.
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.3\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/one2many.pdf}
+  \caption{}
+  \label{fig:rnn-one2many}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/many2one.pdf}
+  \caption{}
+  \label{fig:rnn-many2one}
+\end{subfigure}
+\begin{subfigure}{0.3\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/many2many.pdf}
+  \caption{}
+  \label{fig:rnn-many2many}
+\end{subfigure}
+\caption[Modes in recurrent networks]{Examples of different modes in recurrent networks: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. (Based on \parencite{rnn-effectiveness})}
+\label{fig:rnn-modes}
+\end{figure}
+
+
+\subsubsection{Backpropagation Trough Time}
+
+Analyzing the RNN structure might raise the question of how this effects the training procedure, because the gradient flows through recurrent cells multiple times while backpropagating the error. It is important to see that recurrent networks are still feed-forward networks with the extension to keep reusing the same weights expanded in time. Consequently, we have to propagate the error backwards starting from the last timestep $ \tau $ like in standard backpropagation. Depending on the length of the sequence and the computational resources, we can proceed until the very beginning, or truncate our view of interest by stopping at a given limit. Additionally, given the shared weights $ w $ of two timesteps $\tau $ and $ \tau+1 $, we have to hold the weight constraint $ w^{(\tau)} = w^{(\tau+1)} $. Therefore, $ \nabla w^{(\tau)} = \nabla w^{(\tau+1)} $ has to be fulfilled as well. We can do so by by computing the gradients for both timesteps independently, but use their average:
+
+\begin{equation} \label{eq:rnn}
+	\frac{\frac{\partial \mathcal{L}}{\partial w^{(\tau)}} + \frac{\partial \mathcal{L}}{\partial w^{(\tau+1)}}}{2}
+\end{equation}
+
+when the final model parameter update is performed using the update rule \parencite{rnn-bptt}. This principle can be extened to the total sequence that is considered by the recurrent network and is referred to as \textit{backpropagation through time} (BPTT).
 
 \subsubsection{Drawbacks} \label{sec:rnn-drawbacks}
-What are the drawbacks of RNNs: vanishing/explosion of gradients problem
 
-\subsection{LSTM}
+Keeping the previously explained weight constraints in mind, the recurrent network has to perform a lot of correlated updates of the same model parametes at once. This is bad for stochastic gradient descent, as it prefers uncorrelated parameters for the stability of the training. Especially when a sequence gets quite long, this can yield mathematical instability due to many multiplications of the same shared weights. On the one side, the gradients can grow exponentially and become infinite. On the other side, the network could learn nothing because the gradients vanish. This issue is known as the \textit{vanishing and exploding gradient problem}. The lack of learning long-term dependencies in recurrent networks has been discovered in \parencite{hochreiter} and \parencite{rnn-vanish}. Fortunately, other RNN variants exist that can deal with long-term depencecies. The currently most prominent version is introduced in the following section.
+
+
+\subsection{Long Short-Term Memory}
 
 Bla bla
-
-\subsubsection{History}
 Short intro (history) to LSTMs (Hochreiter, Schmidhuber)
 
-\subsubsection{Architecture}
+\subsubsection{Structure}
 Show differences to classical RNNs
 
-\subsubsection{Benefits}
-How does this suspensate the drawbacks of RNNs (gates, ...)
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.8]{figures/lstm.pdf}
+	\caption[Structure of a LSLTM cell]{Structure of a LSTM cell. (Based on \parencite{understand_lstm})} \label{fig:cnn-structure}
+\end{figure}
 
+
+\subsubsection{Advantages}
+How does this suspensate the drawbacks of RNNs (gates, ...)
+% learn to forget; remembering is the default setting -> long-term dep.
 
 \section{Autoencoder Networks} \label{sec:autoencoder}
 
@@ -391,7 +457,7 @@ The advantages of batch normalization are versatile:
 \begin{itemize}
 \item Compensation against internal covariate shift to achieve a stable distribution of activation values.
 \item Separate normalization of individual feature dimensions, so that features are not decorrelated.
-\item Faster learning, because it allows to use higher learning rates.
+\item Speed-up training, because it allows to use higher learning rates.
 \item Practice has shown that even a higher accuracy can be achieved compared to non-batch-normalized versions of a network model \parencite[p. 7]{batchnorm}.
 \end{itemize}
 
