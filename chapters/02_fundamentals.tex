@@ -11,7 +11,7 @@ The main concept of neural networks (NN) dates back to the early 1950s, Warren M
 
 \subsection{Basics}
 
-The perceptron itself is has quite a simple structure. It is usually visualized as a node that consists any number of binary inputs $ x_{i} $, as well as a single output $ y $ with $ x_{i}, y \in \{0, 1\} $. In addition, each input is weighted by $ w_{i} \in \rm I\!R $ to express importance of each particular input. The output is determined by the simple rule that the weighted sum of all inputs has to reach a specified threshold to make the perceptron fire its output \parencite{neural_nets_deep_learning}. Usually, this threshold is usually called bias $ b \in \rm I\!R $, defined as the negative threshold. All of this can be expressed as follows:
+The perceptron itself is has quite a simple structure. It is usually visualized as a node that consists any number of binary inputs $ x_{i} $, as well as a single output $ y $ with $ x_{i}, y \in \{0, 1\} $. In addition, each input is weighted by $ w_{i} \in \mathbb{R} $ to express importance of each particular input. The output is determined by the simple rule that the weighted sum of all inputs has to reach a specified threshold to make the perceptron fire its output \parencite{neural_nets_deep_learning}. Usually, this threshold is usually called bias $ b \in \mathbb{R} $, defined as the negative threshold. All of this can be expressed as follows:
 
 \begin{equation} \label{eq:mlp}
   y = \begin{cases}
@@ -39,25 +39,25 @@ The final goal of training such a network is to end up with a model that general
 % TODO: always use loss functions in context of images? Wiki: PSNR defines the MSE pixel-wise
 
 \begin{equation} \label{eq:mae}
-  \mathcal{L}_{MAE}(w, b)=\frac{1}{N} \sum\limits_{x} | y(x) - t(x) | ,
+  \mathcal{L}_{\textrm{mae}}(w, b)=\frac{1}{N} \sum\limits_{x} | y(x) - t(x) | ,
 \end{equation}
 
 \textit{mean squared error} (MSE):
 
 \begin{equation} \label{eq:mse}
-  \mathcal{L}_{MSE}(w, b)=\frac{1}{N} \sum\limits_{x} \| y(x) - t(x) \|^2 ,
+  \mathcal{L}_{\textrm{mse}}(w, b)=\frac{1}{N} \sum\limits_{x} \| y(x) - t(x) \|^2 ,
 \end{equation}
 
 or \textit{binary cross-entropy} (BCE) \parencite{conv_lstm_nowcasting}:
 
 \begin{equation} \label{eq:bce}
-  \mathcal{L}_{BCE}(w, b)= -\frac{1}{N} \sum\limits_{x} t(x) \log{(y(x))} + (1-t(x)) \log{(1-y(x))} ,
+  \mathcal{L}_{\textrm{bce}}(w, b)= -\frac{1}{N} \sum\limits_{x} t(x) \log{(y(x))} + (1-t(x)) \log{(1-y(x))} ,
 \end{equation}
 
 where $ N $ is the number of examples and $ t(x) $ denotes the ground truth target of an input example $x$. Many other functions exist, but these are the main objectives that we use in later chapters. During training our network, we want to find the set of weights $ w $ and biases $ b $ that minimizes our error:
 
 \begin{equation} \label{eq:min-loss}
-  arg\min_{w, b} \mathcal{L}(w, b) .
+  \textrm{arg}\min_{w, b} \mathcal{L}(w, b) .
 \end{equation}
 
 Parameters beside $ w $ and $ b $ that are not learned during this process are called \textit{hyperparameters}. An example of such an non-trainable parameters are the number of layers or the size of each single layer. More hyperparameters will arise in the next sections.
@@ -74,7 +74,7 @@ y &= \phi(z) ,
 \end{aligned}
 \end{equation}
 
-which allow $ x_{i}, y \in \rm I\!R $ by wrapping its term with a non-linear \textit{activation function} $ \phi(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $ (see Figure \ref{fig:activations}). The examplary structre of a neuron is illustrated in Figure \ref{fig:neuron}.
+which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \textit{activation function} $ \phi(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $ (see Figure \ref{fig:activations}). The examplary structre of a neuron is illustrated in Figure \ref{fig:neuron}.
 
 \begin{figure}[htpb]
 	\centering
@@ -117,7 +117,7 @@ Before starting the training process, we have to assign each variables $ w $ and
 For this purpose, some best practices have been developed. One famous example that is used throughout in our final model is \textit{Xavier initialization} (eq. \ref{eq:xavier}). Its formulation is based on the number of input and output neurons and uses sampling from an uniform distribution with zero mean and all biases set to zero \parencite{xavier-init}:
 
 \begin{equation} \label{eq:xavier}
-  W \sim \mathcal{U} \bigg[-\sqrt{\frac{6}{n_{in} + n_{out}}}, \sqrt{\frac{6}{n_{in} + n_{out}}}\bigg] ,
+  W \sim \textrm{U} \bigg[-\sqrt{\frac{6}{n_{in} + n_{out}}}, \sqrt{\frac{6}{n_{in} + n_{out}}}\bigg] ,
 \end{equation}
 
 where $ W $ is the weight matrix at each layer, $ n_{in} $ the number of incoming connections and $ n_{out} $ the number of outgoing connectons to the next layer. This initialization is designed to keep the gradients in all layers within approcimately the same scale.
@@ -348,7 +348,7 @@ RNNs are a special class of neural networks that allows its models to form a dir
   h^{(\tau)} = \phi(W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b) ,
 \end{equation}
 
-where $ W_{h} \in \rm I\!R^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ W_{x} \in \rm I\!R^{d_x \times d_h} $ the weights of the input to hidden transitions and $ b, h^{(0)} \in \rm I\!R^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(z) $ is usually chosen to be tanh.
+where $ W_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ W_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input to hidden transitions and $ b, h^{(0)} \in \mathbb{R}^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(z) $ is usually chosen to be tanh.
 
 Like convolutional networks, RNNs take advantage of sharing parameters over different parts of the model \parencite[p. 374]{deep_learning}. But in this case, we share model parameters over the temporal domain. This allows to generalize specific properties across the whole input sequence. Consequently, a model can extract patterns that can occur at any or even multiple positions within the sequence of data.
 
@@ -432,7 +432,7 @@ h^{(\tau)} &= \sigma(\tilde{o}^{(\tau)}) \odot tanh(C^{(\tau)})
 \end{aligned} ,
 \end{equation}
 
-where $ W_h \in \rm I\!R^{d_h \times 4d_h} $ are the shared weights for the hidden to hidden transitions at timestep $ \tau $, $ W_x \in \rm I\!R^{d_x \times 4d_h} $ the shared weigths for the input to hidden connections, $ b \in \rm I\!R^{4d_h} $ the biases, and $ C^{(0)}, h^{(0)} \in \rm I\!R^{4d_h} $ the initial states of the memory cell and the hidden state, respectively \parencite{rnn-batchnorm}. The last dimension of the weight matrices and biases are multiples of four, because the matrices are concatenations of weights for all three gates and the new candidate cell state for computational efficiency. The input, forget and output gates are labled as $ i, f $ and $ o $. Furthermore, the operator $ \odot $ denotes the Hadamard product\footnote{The Hadamard product defines the entrywise product of two matrices with the same dimension.} and a tilde indicates the term before the corresponding activation is applied, so that for example $ f^{(\tau)} = \sigma(\tilde{f}^{(\tau)}) $.
+where $ W_h \in \mathbb{R}^{d_h \times 4d_h} $ are the shared weights for the hidden to hidden transitions at timestep $ \tau $, $ W_x \in \mathbb{R}^{d_x \times 4d_h} $ the shared weigths for the input to hidden connections, $ b \in \mathbb{R}^{4d_h} $ the biases, and $ C^{(0)}, h^{(0)} \in \mathbb{R}^{4d_h} $ the initial states of the memory cell and the hidden state, respectively \parencite{rnn-batchnorm}. The last dimension of the weight matrices and biases are multiples of four, because the matrices are concatenations of weights for all three gates and the new candidate cell state for computational efficiency. The input, forget and output gates are labled as $ i, f $ and $ o $. Furthermore, the operator $ \odot $ denotes the Hadamard product\footnote{The Hadamard product defines the entrywise product of two matrices with the same dimension.} and a tilde indicates the term before the corresponding activation is applied, so that for example $ f^{(\tau)} = \sigma(\tilde{f}^{(\tau)}) $.
 
 
 \subsubsection{Structure}
@@ -452,7 +452,7 @@ As depicted in Figure \ref{fig:lstm}, the internal structure of an LSTM cell loo
 \end{figure}
 
 As stated before, the fundamental idea of LSTMs is the cell state $C^{(\tau)}$, denoted as a bold line in the graphics above. Frome its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation the the output of the forget gate $f^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, only regulated by in input gate $ i^{(\tau)} $ the new candidate cell state $ g^{(\tau)} $ is added to it. The third gate $ o^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
-The interpretation of how each single gated unit works is the following. Each gate itself is a fully-connected neural network layer, that receives the sum of the input $x^{(\tau)}$ and the previous hidden state $h^{(\tau-1)}$ as its input. That is the reason why they are also often referred to as \textit{FC-LSTM}. Additioanlly, as it can be seen in Figure \ref{fig:lstm}, every gate uses sigmoid as its activation function that is followed by an Hadamard product. Consequently, the output of any gate is in range $ [0, 1] \in \rm I\!R^{d_h \times 4d_h} $, where a value of one means let the whole information flow through, while zero intends to forget everything. 
+The interpretation of how each single gated unit works is the following. Each gate itself is a fully-connected neural network layer, that receives the sum of the input $x^{(\tau)}$ and the previous hidden state $h^{(\tau-1)}$ as its input. That is the reason why they are also often referred to as \textit{FC-LSTM}. Additioanlly, as it can be seen in Figure \ref{fig:lstm}, every gate uses sigmoid as its activation function that is followed by an Hadamard product. Consequently, the output of any gate is in range $ [0, 1] \in \mathbb{R}^{d_h \times 4d_h} $, where a value of one means let the whole information flow through, while zero intends to forget everything. 
 
 \subsubsection{Variants}
 
@@ -477,10 +477,10 @@ Training a deep neural network model is said to be very hard. One reason for thi
 One modern practice that tries to overcome this issue by minimizing the covariate shift is called \textit{batch normalization} \parencite{batchnorm}. It performans a normalizaton on the inputs to a layer and transforms it to have a mean of zero and a standard deviation of one. Its mathematical formulation is:
 
 \begin{equation} \label{eq:bn}
-  BN(\textbf{x}; \gamma, \beta) = \beta + \gamma \frac{\textbf{x} - \mathbb{E}(\textbf{x})}{\sqrt{Var(\textbf{x}) + \epsilon}} ,
+\textrm{BN}(\textbf{x}; \gamma, \beta) = \beta + \gamma \frac{\textbf{x} - \mathbb{E}(\textbf{x})}{\sqrt{Var(\textbf{x}) + \epsilon}} ,
 \end{equation}
 
-where $ \textbf{x} \in \rm I\!R^d $ is the output of the previous layer to be normalized, $\gamma \in \rm I\!R^d $ and $\beta \in \rm I\!R^d $ the shift and scale of the distribution that are learned, as well as $\epsilon \in \rm I\!R $ that serves as a regularization parameter and to avoid dividing by zero \parencite{rnn-batchnorm}.
+where $ \textbf{x} \in \mathbb{R}^d $ is the output of the previous layer to be normalized, $\gamma \in \mathbb{R}^d $ and $\beta \in \mathbb{R}^d $ the shift and scale of the distribution that are learned, as well as $\epsilon \in \mathbb{R} $ that serves as a regularization parameter and to avoid dividing by zero \parencite{rnn-batchnorm}.
 
 When batch normalization is applied, we have to consider two different modes during training and inference. On the one hand at training time, batch normalization takes advantage of two simplifications, because full whitening of inputs is very expensive. First, each feature dimension is normalized independently. Secondly, the statistics of $ \mathbb{E}(\textbf{x}) $ and $ Var(\textbf{x}) $ are estimated using the sample mean and sample variance based on each mini-batch of stochastic gradient training. On the other hand during inference, the statistics have to be assessed using the entire training data. One way to do so is to track to track the moving averaged mean and variance parameters of each batch-estimate while training the model, and finally use these averages when a prediction is performed. That is the way how batch normalization is used throughout this work.
 
@@ -503,27 +503,38 @@ A neural networks main driver in respect to learning a good respresentation is t
 
 \subsection{Naive Approach}
 
-The de facto standard loss function to compare a generated image with its ground truth target has been the \textit{pixel-wise squared error} (or $ \ell_{2} $) that was already mentioned in equation \ref{eq:mse}. It is easy to apply and usually provided by any neural network framework out-of-the-box. But on the other end, it suffers from some well-known limitations such as poor correlation with the human sense of perceptual quality \parencite{loss-func-img-proc}. The reason for this are twofold. First, $ \ell_{2} $ makes the assumption of a Gaussian noise model, which has its downsides when being applied to multimodal distributions. Second, it strongly penaltizes outliers independently from local characteristics of the image, such as contrast or luminance. In contrary, the visual system of humans perceives noise in a different way.
-
-\begin{figure}[htpb]
-	\centering
-	\includegraphics[scale=0.3]{figures/placeholder.png}
-	\caption[Example: Weakness of $ \ell_{2} $]{Example to demonstrate the weakness of $ \ell_{2} $ in context of perceptual image similarity.} \label{fig:chessfield}
-\end{figure}
-
-As an extreme but simple example, consider two images containing a chess field of black and white pixels. From an aerial perspective, both images look completely identical, because it is perceived as an a gray surface. Additionally, even when looking on it from a closer dinstance, we would still evaluate them as quite similar for the very reason that both images provide the same colors, structure, sharpness or contrast. Unfortunately, assessing both images using the given squared error function results in the maximum possible difference. The reason for this is that in considers the squared differences of related pixels only. Even that this fact is not solved by using the $ \ell_{1} $ loss, several studies have shown that the usage of the absolute error function slightly reduces blur effects in image generation networks of natural images \parencite{loss-func-img-proc} \parencite{deep_multiscale_video_pred}{deep}. Some example image reconstructions comparing different loss functions are show in Figure \ref{fig:percept-vs-lp}.
+The de facto standard loss function to compare a generated image with its ground truth target has been the \textit{pixel-wise squared error} (or $ \ell_{2} $) that was already mentioned in equation \ref{eq:mse}. It is easy to apply and usually provided by any neural network framework out-of-the-box. But on the other end, it suffers from some well-known limitations such as poor correlation with the human sense of perceptual quality \parencite{loss-func-img-proc}. The reason for this are twofold. First, $ \ell_{2} $ makes the assumption of a Gaussian noise model, which has its downsides when being applied to multimodal distributions. Second, it strongly penalizes outliers independently from local characteristics of the image, such as contrast or luminance. In contrary, the visual system of humans perceives noise in a different way.
 
 \begin{figure}[htpb]
 \centering
 \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{figures/placeholder.png}
+  \includegraphics[width=.8\linewidth]{figures/chess1.pdf}
   \caption{}
   \label{fig:percept-vs-lp1}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{figures/placeholder.png}
+  \includegraphics[width=.8\linewidth]{figures/chess2.pdf}
+  \caption{}
+  \label{fig:percept-vs-lp1}
+\end{subfigure}
+\caption[Example: Weakness of $ \ell_{2} $]{Example to demonstrate the weakness of $ \ell_{2} $ in context of perceptual image similarity.} \label{fig:chessfield}
+\end{figure}
+
+As an extreme but simple example, consider two images containing a chess field of black and white pixels. From an aerial perspective, both images look completely identical, because it is perceived as an a gray surface. Additionally, even when looking on it from a closer dinstance, we would still evaluate them as quite similar for the very reason that both images provide the same colors, structure, sharpness or contrast. Unfortunately, assessing both images using the given squared error function results in the maximum possible difference. The reason for this is that in considers the squared differences of related pixels only. Even that this specific weakness is not solved by using the $ \ell_{1} $ loss, several studies have shown that the usage of the absolute error function slightly reduces the blur effect on edges in image generation processes of natural images \parencite{loss-func-img-proc} \parencite{deep_multiscale_video_pred}. Some example image reconstructions comparing different loss functions are show in Figure \ref{fig:percept-vs-lp}.
+
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.4\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/img-loss-comp1.png}
+  \caption{}
+  \label{fig:percept-vs-lp1}
+\end{subfigure}%
+\begin{subfigure}{0.4\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/img-loss-comp1.png}
   \caption{}
   \label{fig:percept-vs-lp1}
 \end{subfigure}
@@ -544,13 +555,13 @@ In the following sections, $ \textbf{x} $ will denote the ground truth image and
 A first metric to assess the the similarity of generated images is the \textit{peak signal-to-noise ratoin} (PSNR). It describes the ratio between the maximum possible image intensity and the corrupting noise that affects precision of the reconstruction. Its value is expressed in a logarithmic decibel scale, where a higher value indicates better quality. In terms of human perception, it is an rough approximation to evaluate reconstruction quality because its denominator is still based on MSE. It is computed as follows:
 
 \begin{equation} \label{eq:psnr}
-  PSNR(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \Big(\sum_{c=1}^{w} \sum_{r=1}^{h} (\textbf{x}_{c,r} - \textbf{y}_{c,r})^2 \Big)} ,
+\textrm{PSNR}(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=1}^{w} \sum_{r=1}^{h} (\textbf{x}_{c,r} - \textbf{y}_{c,r})^2 } ,
 \end{equation}
 
 where $ \textbf{y}_{max} $ is the maximum \textit{possible} intensity of an image of size $ w \times h $.
 
 
-\subsubsection*{SSIM}
+\subsubsection*{Structual Similarity}
 
 For predicting the perceived image quality, the \textit{structural similarity} (SSIM) index invented in \parencite{ssim} can be used as a second assessment criteria. This full reference metric\footnote{Full reference metric (FR) is a quality term that means that the evaluation is based on every pixel of the entire ground truth image as a reference.} is an improvement over PSNR as it is based on assumptions of the human vision system. Therefore, it assesses both images based on luminance $ l(\textbf{x}, \textbf{y}) $ , contrast $ c(\textbf{x}, \textbf{y}) $ and structural similarity $ s(\textbf{x}, \textbf{y}) $ \parencite{ms-ssim}. It as defines as follows:
 
@@ -562,44 +573,70 @@ s(\textbf{x}, \textbf{y}) &= \frac{2 \sigma_{xy} + C_3}{\sigma_x \sigma_y + C_3}
 \end{aligned}
 \end{equation}
 
-where $ \mu_x $, $ \sigma_x $ and $ \sigma_{xy} $ is the mean, standard deviation and covariance of $ x $ and $ y $, respectively. Further, $ C_1 = (K_1 L)^2 $, $ C_2 = (K_2 L)^2 $ and $ C_3 = \frac{C_2}{2} $ are small constants for numerical stability, $K_1 = 0.01$ and $ K_2 = 0.03 $ by default and $ L=255 $ the typical dynamic range of pixel-values for 8-bit gray-scale images. These terms can be combined to define the SSIM index given by:
+where $ \mu_x $, $ \sigma_x $ and $ \sigma_{xy} $ is the mean, standard deviation and covariance of $ x $ and $ y $, respectively. Further, $ C_1 = (K_1 L)^2 $, $ C_2 = (K_2 L)^2 $ and $ C_3 = \frac{C_2}{2} $ are small constants for numerical stability, $K_1 = 0.01$ and $ K_2 = 0.03 $ by default and $ L=255 $ the typical dynamic range of pixel-values for 8-bit \textit{gray-scale} images. These terms can be combined to define the SSIM index given by:
 
 \begin{equation} \label{eq:ssim-combined}
-SSIM(\textbf{x}, \textbf{y}) = \big[ l(\textbf{x}, \textbf{y})\big]^{\alpha} \cdot \big[c(\textbf{x}, \textbf{y}) \big]^{\beta} \cdot \big[ s(\textbf{x}, \textbf{y}) \big]^{\gamma} ,
+\textrm{SSIM}(\textbf{x}, \textbf{y}) = \big[ l(\textbf{x}, \textbf{y})\big]^{\alpha} \cdot \big[c(\textbf{x}, \textbf{y}) \big]^{\beta} \cdot \big[ s(\textbf{x}, \textbf{y}) \big]^{\gamma} ,
 \end{equation}
 
 where $ \alpha $, $ \beta $ and $ \gamma $ parameterize the relative relative importance of all three components, typically $ \alpha = \beta = \gamma = 1 $. The terms for contrast and structure can be further simplified to $ cs(\textbf{x}, \textbf{y}) $ \parencite[p. 5]{loss-func-img-proc}, resulting in:
 
 \begin{equation} \label{eq:ssim-simplified}
 \begin{aligned}
-SSIM(\textbf{x}, \textbf{y}) &= \frac{2 \mu_x \mu_y + C_1}{\mu_x^2 + \mu_y^2 + C_1} \cdot \frac{2 \sigma_{xy} + C_2}{\sigma_x^2 + \sigma_y^2 + C_2} \\
+\textrm{SSIM}(\textbf{x}, \textbf{y}) &= \frac{2 \mu_x \mu_y + C_1}{\mu_x^2 + \mu_y^2 + C_1} \cdot \frac{2 \sigma_{xy} + C_2}{\sigma_x^2 + \sigma_y^2 + C_2} \\
 &= l(\textbf{x}, \textbf{y}) \cdot cs(\textbf{x}, \textbf{y}) .
 \end{aligned}
 \end{equation}
 
 The SSIM index can be computed using a sliding window approach \parencite{ssim-slide}. Therefore, a square kernel of size $ 11 \times 11 $\footnote{The initial paper states to use an $ 8 \times 8 $ window. But many open source libraries, and even the MATLAB implementation of the paper's author itself use a kernel size of $ 11 \times 11 $.} and \textit{valid} padding is used that moves over the whole image, pixel by pixel. The index is then calculated in every local region and finally averaged to recieve the overall image quality for evaluation. The metric value is in range $ SSIM(\textbf{x}, \textbf{y}) \in [0, 1] $, where a higher value indicates more similarity.
 
-%\subsubsection*{MS-SSIM}
-% skip this? because we probably do not use it. Or just mention it's existence and why we do not use it --> only applicible to large images.
-%Bla bla...
+\subsubsection*{Multi-Scale Structural Similarity}
+
+Further studies have shown that the viewing conditions can have a tremendous influence on the perceived image similarity. Therefore, there SSIM index has been extended to incorporate the image on $ M $ different scale, where $ M=1 $ indicates the full-size image that is iteratively downsampled by a factor of two. This metric is known as the \textit{multi-scale structural similarity} (MS-SSIM) index for images \parencite{ms-ssim}. It is given by:
+
+\begin{equation} \label{eq:ms-ssim}
+\textrm{MS-SSIM}(\textbf{x}, \textbf{y}) = \big[ l_M(\textbf{x}, \textbf{y})\big]^{\alpha_M} \cdot \prod\limits_{j=1}^{M} \big[c_j(\textbf{x}, \textbf{y}) \big]^{\beta_j} \cdot \big[ s_j(\textbf{x}, \textbf{y}) \big]^{\gamma_j} ,
+\end{equation}
+
+where the exponents $ \alpha_M $, $ \beta_j $ and $ \gamma_j $ parameterize the relative importance of each component. The luminance $ l_M(\textbf{x}, \textbf{y}) $ difference is only computed for the smallest image size at scale $ M $. As a simple standard selection for the exponents, we can use $ \alpha_M = \beta_j = \gamma_j $ and $ \sum_{j=1}^{M} \gamma_j = 1 $. But by performing an empirical study in \parencite{ms-ssim}, the authors propose to use $ \beta_1 = \gamma_1 = 0.0448 $, $ \beta_2 = \gamma_2 = 0.2856 $, $ \beta_3 = \gamma_3 = 0.3001 $, $ \beta_4 = \gamma_4 = 0.2363 $ and $ \alpha_5 = \beta_5 = \gamma_5 = 0.1333 $ by incorporating $ M=5 $ scales. As a downside, evaluating multiple scales can be computational expensive. Additionally, the selected window size has to be smaller than the image at scale $ M $, and has to have an appropriate minimum image size due to the algorithms iterative downsampling.
+
 
 \subsubsection*{Sharpness Difference}
 
 To quantatatively evaluate the difference in sharpness between two images, we take use of the \textit{sharpness difference} metric proposed in \parencite{deep_multiscale_video_pred}. It is based on the formulation of PSNR (eq. \ref{eq:psnr}) with a modified denominator. Instead of using the squared error to quantify the pixel-wise differences, it measures the difference of gradients between the ground truth and its reconstruction:
 
 \begin{equation} \label{eq:sharpdiff}
-  SharpDiff(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \Big(\sum_{c=2}^{w} \sum_{r=2}^{h} |(\nabla_{left} \, \textbf{x} + \nabla_{top} \, \textbf{x})-(\nabla_{left} \, \textbf{y} + \nabla_{top} \, \textbf{y})|\Big)} ,
+\textrm{SharpDiff}(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=2}^{w} \sum_{r=2}^{h} \big|(\nabla_{left} \, \textbf{x} + \nabla_{top} \, \textbf{x})-(\nabla_{left} \, \textbf{y} + \nabla_{top} \, \textbf{y})\big|} ,
 \end{equation}
 
 where $ \nabla_{left} \, \textbf{x} = |\textbf{x}_{c,r} - \textbf{x}_{c-1, r}| $ and $ \nabla_{top} \, \textbf{x} = |\textbf{x}_{c,r} - \textbf{x}_{c, r-1}| $ are the gradient differences to the left and top pixel.
 
 \subsection{Perceptual Motivated Loss Functions}
-% Due to the lack of sharpness...
 
-% GDL (+L1)
-% MS-SSIM (+L1)
+Due to the lacking consideration of human perceptional qualities like sharpness, constrast or structure of standard error functions, new forms of losses have to be considered when a neural network is trained to solve image processing tasks.
 
+\subsubsection*{Structural Loss}
 
-%%% Metrics (SSIM/MS-SSIM/PSNR/Sharp-Diff)
-%%% Loss functions (GDL)
-%Introduce perceptual similarity and explain some metrics (SSIM, PSNR, GDL?) %which we will use in evaluation.
+The differentiability of the SSIM index makes it a well suited candiate to be used in neural network training. However, due to the fact that $ \textrm{SSIM}(\textbf{x}, \textbf{x}) = 1 $, it does not fulfill all required properties  of a loss function. Fortunately, this can be rectified by exchanging the minimum and maximum value of the metric:
+
+\begin{equation} \label{eq:sharpdiff}
+\mathcal{L}_{\textrm{ssim}}(\textbf{x}, \textbf{y}) = 1 - \textrm{SSIM}(\textbf{x}, \textbf{y}).
+\end{equation}
+
+Of course, the same priciple can be applied to end up with the multi-scale structural loss function:
+
+\begin{equation} \label{eq:sharpdiff}
+\mathcal{L}_{\textrm{ms-ssim}}(\textbf{x}, \textbf{y}) = 1 - \textrm{MS-SSIM}(\textbf{x}, \textbf{y}).
+\end{equation}
+
+Both error functions have been evaluated in context of image generation super-resolution and JPEG artifact removal in \parencite{learning-perc-sim} and \parencite{loss-func-img-proc}. The latter suggests to combine each of them with $ \ell_1 $ to get the best of both worlds.
+
+\subsubsection*{Gradient Difference Loss}
+
+Using the same criteria of the sharpness difference metric (see eq. \ref{eq:sharpdiff}), a strategy to further sharpen the image is to penalize the gradient differences in image space. This loss function is referred to as \textit{gradient difference loss} (GDL) and was proposed in \parencite{deep_multiscale_video_pred}. Combined with another error function, it can serve as an additional bias to deliver sharper results. To be more specific, the authores suggest to combine it with an $ \ell_1 $ loss function. The per-pixel GDL function to assess the ground truth with its corresponding reconstruction is defined as follows:
+
+\begin{equation} \label{eq:sharpdiff}
+\mathcal{L}_{\textrm{gdl}}(\textbf{x}, \textbf{y}) = \frac{1}{w \, h} \sum_{c=2}^{w} \sum_{r=2}^{h} \Big(\big|\nabla_{left} \, \textbf{y} - \nabla_{left} \, \textbf{x}\big|^{\alpha} + \big|\nabla_{top} \, \textbf{x} - \nabla_{top} \, \textbf{y}\big|^{\alpha}\Big) ,
+\end{equation}
+
+where $ \alpha \in \mathbb{N}^{+} $ is a parmeter to adjust the exponent. Typically, $ \alpha = 1 $ is chosen when combined with $ \ell_1 $ loss and $ \alpha = 2 $ in combination with $ \ell_2 $. With training efficiency in mind, the function describes the most simple image gradient by only considering the the intensitiy difference of the direct neighbor.
