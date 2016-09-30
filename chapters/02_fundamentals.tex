@@ -15,7 +15,7 @@ The perceptron itself is has quite a simple structure. It is usually visualized 
 
 \begin{equation} \label{eq:mlp}
   y = \begin{cases}
-    1, & \text{if $ \sum\limits_{i=1}^n \, w_{i}x_{i} + b > 0$},\\
+    1, & \text{if $ \sum\limits_{i=1}^n \, w_{i} \, x_{i} + b > 0$},\\
     0, & \text{otherwise}.
   \end{cases}
 \end{equation}
@@ -24,8 +24,8 @@ Even that its formulation is that simple, it can represent complex decision-maki
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.8]{figures/mlp.pdf}
-	\caption[Multilayer perceptron]{Example of a MLP. A single perceptron is highlighted in bold.} \label{fig:mlp}
+	\includegraphics[width=.7\linewidth]{figures/mlp.pdf}
+	\caption[Multilayer perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold.} \label{fig:mlp}
 \end{figure}
 
 The first and last layer of such a network are refered as \textit{input layer} and \textit{output layer} and their number is determined by the given problem to solve. In case we want to train a network that identifies human faces in colored pictures with height and width of 100 pixels, it would require our input layer to have $ n_{input}=3000 $ perceptrons, as well as a single output. In contrary, all intermediate layers are known as \textit{hidden layers} and can have any number of elements and depth. When every node from one layer is connected to all nodes of its subsequent layer, we call it \textit{fully connected} (FC).
@@ -34,42 +34,42 @@ Afterwards, we can feed the input layer with a data example and apply equation \
 
 \subsection{Network Training}
 
-The final goal of training such a network is to end up with a model that generalizes on any kind of data from the same class \parencite[p. 2]{pattern_and_ml}. The data that is used during this process is called \textit{training set}, the data that evaluates its generalization capabilites \textit{test set}. Since we know the ground truth outcome of this data example during the training phase, we can quantify the outcome using a loss function\footnote{Also known as cost function, objective function or error function. We use the averaged variants for all presented functions, because therefore we achieve pixel-wise results that are independent regarding the image dimensions later on when performing frame prediction. Additionally, the non-averaged versions of MAE and MSE are known as $ \ell_{1} $ and $ \ell_{2} $.}, such as \textit{mean absolute error} (MAE):
+The final goal of training such a network is to end up with a model that generalizes on any kind of data from the same class \parencite[p. 2]{pattern_and_ml}. The data that is used during this process is called \textit{training set}, the data that evaluates its generalization capabilites \textit{test set}. Since we know the ground truth outcome of this data example during the training phase, we can quantify the outcome using a loss function\footnote{Often called cost function, objective function or error function as well.}, such as \textit{mean absolute error} (MAE)\footnote{Also known as $ \ell_1 $ when we do not average over all examples, but often used as a synonym. In this work, we always use the averaged variants for all presented functions. Additionally, we also average across the image pixels when any loss function is applied on images to achieve pixel-wise results that are independent regarding the image dimensions later on in context of frame prediction.}:
 
 % TODO: always use loss functions in context of images? Wiki: PSNR defines the MSE pixel-wise
 
 \begin{equation} \label{eq:mae}
-  \mathcal{L}_{\textrm{mae}}(w, b)=\frac{1}{N} \sum\limits_{x} | y(x) - t(x) | ,
+  \mathcal{L}_{\textrm{mae}}(\textbf{w}, \textbf{b})=\frac{1}{n} \sum\limits_{\textbf{x}} | y(\textbf{x}) - t(\textbf{x}) | ,
 \end{equation}
 
-\textit{mean squared error} (MSE):
+\textit{mean squared error} (MSE)\footnote{Also referred to as $ \ell_2 $ when no averaging across all examples is performed.}:
 
 \begin{equation} \label{eq:mse}
-  \mathcal{L}_{\textrm{mse}}(w, b)=\frac{1}{N} \sum\limits_{x} \| y(x) - t(x) \|^2 ,
+  \mathcal{L}_{\textrm{mse}}(\textbf{w}, \textbf{b})=\frac{1}{n} \sum\limits_{\textbf{x}} ( y(\textbf{x}) - t(\textbf{x}) )^2 ,
 \end{equation}
 
 or \textit{binary cross-entropy} (BCE) \parencite{conv_lstm_nowcasting}:
 
 \begin{equation} \label{eq:bce}
-  \mathcal{L}_{\textrm{bce}}(w, b)= -\frac{1}{N} \sum\limits_{x} t(x) \log{(y(x))} + (1-t(x)) \log{(1-y(x))} ,
+  \mathcal{L}_{\textrm{bce}}(\textbf{w}, \textbf{b})= -\frac{1}{n} \sum\limits_{\textbf{x}} t(\textbf{x}) \cdot \log{\big(y(\textbf{x})\big)} + \big(1-t(\textbf{x})\big) \cdot \log{\big(1-y(\textbf{x})\big)} ,
 \end{equation}
 
-where $ N $ is the number of examples and $ t(x) $ denotes the ground truth target of an input example $x$. Many other functions exist, but these are the main objectives that we use in later chapters. During training our network, we want to find the set of weights $ w $ and biases $ b $ that minimizes our error:
+where $ n $ is the number of examples and $ t(\textbf{x}) $ denotes a mapping to from an input example $ \textbf{x} $ to its ground truth target. Many other functions exist, but these are the main objectives that we use in later chapters. During training our network, we want to find the set of weights $ \textbf{w} $ and biases $ \textbf{b} $ that minimizes our error:
 
 \begin{equation} \label{eq:min-loss}
-  \textrm{arg}\min_{w, b} \mathcal{L}(w, b) .
+  \textrm{arg}\min_{\textbf{w}, \textbf{b}} \mathcal{L}(\textbf{w}, \textbf{b}) .
 \end{equation}
 
-Parameters beside $ w $ and $ b $ that are not learned during this process are called \textit{hyperparameters}. An example of such an non-trainable parameters are the number of layers or the size of each single layer. More hyperparameters will arise in the next sections.
+Parameters beside $ \textbf{w} $ and $ \textbf{b} $ that are not learned during this process are called \textit{hyperparameters}. An example of such an non-trainable parameters are the number of layers or the size of each single layer. More hyperparameters will arise in the next sections.
 
 
 \subsubsection{Neurons and Activations}
 
-At this point, we face the fundamental problem of perceptrons. In order find the best set of parameters, we have to do small changes in $ w $ and $ b $ to justify the output into the right direction of the desired outcome. But since the perceptron's output is discrete, a small change can cause a sudden flip in the overall output. To overcome this issue, we replace these perceptrons with \textit{neurons}:
+At this point, we face the fundamental problem of perceptrons. In order find the best set of parameters, we have to do small changes in the model's weights $ \textbf{w} $ and biases $ \textbf{b} $ to justify the output into the right direction of the desired outcome. But since the perceptron's output is discrete, a small change can cause a sudden flip in the overall output. To overcome this issue, we replace these perceptrons with \textit{neurons}:
 
 \begin{equation}
 \begin{aligned}
-z &= \sum\limits_{i=1}^n \, w_{i}x_{i} + b \\
+z &= \sum\limits_{i=1}^n \, w_{i} \, x_{i} + b \\
 y &= \phi(z) ,
 \end{aligned}
 \end{equation}
@@ -78,7 +78,7 @@ which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.6]{figures/neuron.pdf}
+	\includegraphics[width=.4\linewidth]{figures/neuron.pdf}
 	\caption[Schematic neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
 \end{figure}
 
@@ -117,19 +117,19 @@ Before starting the training process, we have to assign each variables $ w $ and
 For this purpose, some best practices have been developed. One famous example that is used throughout in our final model is \textit{Xavier initialization} (eq. \ref{eq:xavier}). Its formulation is based on the number of input and output neurons and uses sampling from an uniform distribution with zero mean and all biases set to zero \parencite{xavier-init}:
 
 \begin{equation} \label{eq:xavier}
-  W \sim \textrm{U} \bigg[-\sqrt{\frac{6}{n_{in} + n_{out}}}, \sqrt{\frac{6}{n_{in} + n_{out}}}\bigg] ,
+  \textbf{w} \sim \textrm{U} \bigg[-\sqrt{\frac{6}{n_{in} + n_{out}}}, \sqrt{\frac{6}{n_{in} + n_{out}}}\bigg] ,
 \end{equation}
 
-where $ W $ is the weight matrix at each layer, $ n_{in} $ the number of incoming connections and $ n_{out} $ the number of outgoing connectons to the next layer. This initialization is designed to keep the gradients in all layers within approcimately the same scale.
+where $ \textbf{w} $ is the weight matrix at any network layer, $ n_{in} $ the number of incoming connections and $ n_{out} $ the number of outgoing connectons to the next layer. This initialization is designed to keep the gradients in all layers within approcimately the same scale.
 
 \subsubsection{Backpropagation Learning Algorithm}
 
-To acually train the network by minimizing its error (eq. \ref{eq:min-loss}), we apply a learning alogrithm called \textit{backpropagation}. This algorithm is based on \textit{gradient descent}, which iteratively tries to find the minima of a function by doing small steps towards the negative gradient. Applying this to our loss function results in the \textit{update rule} for all weights and biases:
+To acually train the network by minimizing its error (eq. \ref{eq:min-loss}), we apply a learning alogrithm called \textit{backpropagation}. This algorithm is based on \textit{gradient descent}, which iteratively tries to find the minima of a function by doing small steps towards the negative gradient. Applying this to our loss function results in the \textit{update rule} for any trainable weight and bias parameter:
 
 \begin{equation} \label{eq:gradient_descent}
 \begin{aligned}
-w_{i}^{(\tau + 1)} &= w_{i}^{(\tau)} - \eta \frac{\partial \mathcal{L}}{\partial w_{i}^{(\tau)}} \\
-b_{j}^{(\tau + 1)} &= b_{j}^{(\tau)} - \eta \frac{\partial \mathcal{L}}{\partial b_{j}^{(\tau)}} ,
+w_{i}^{(\tau + 1)} &= w_{i}^{(\tau)} - \eta \cdot \frac{\partial \mathcal{L}}{\partial w_{i}^{(\tau)}} \\
+b_{j}^{(\tau + 1)} &= b_{j}^{(\tau)} - \eta \cdot \frac{\partial \mathcal{L}}{\partial b_{j}^{(\tau)}} ,
 \end{aligned}
 \end{equation}
 
@@ -214,7 +214,7 @@ On the other hand, a reduction of model complexity can also be a false conclusio
 A well known technique to delimitate overfitting is to penetalize high parameter values which cause the oscillation effect that can be seen in figure \ref{fig:overfitting}. Therefore, we extend our loss function with an additional regularization term. This method is called weight decay:
 
 \begin{equation} \label{eq:reg-loss}
-  \mathcal{L}_{total}(w, b)= \mathcal{L}(w, b) + \frac{\lambda}{N} \sum\limits_{w}w^2 ,
+  \mathcal{L}_{total}(\textbf{w}, \textbf{b})= \mathcal{L}(\textbf{w}, \textbf{b}) + \frac{\lambda}{n} \sum\limits_{\textbf{w}}\textbf{w}^2 ,
 \end{equation}
 
 where the coefficient $ \lambda $ controls the influence of the regularization. The example shown in eq. \ref{eq:reg-loss} uses an $ \ell_{2} $ regularizer over all weigths, which strongly penetalizes a high magnitude of values. Together with the learning rate $ \eta $, both define two of the most important hyperparameters in any neural network model. Finding appropriate values is a major task when finetuning the model.
@@ -227,7 +227,7 @@ A second regularization approach is known as \textit{dropout}. Instead of modify
 
 In the previous section, we have discovered neural networks that exhibits a full connection of neuros from one layer to the next. While this allows to learn complex representions on the one hand, it comes with a couple of downside on the other hand as well. For example, data such as images would require the nework's layers to become large. Consequently, the number of connections between these layers would increase exponentially and thus the amound of trainable parameters as well. At the bottom line, this could end up in a network that is either time-consuming to train, or we are even not able to store it in memory. In addition, we would not not take any advantage of local image properties into account.
 
-Therefore, a new network type found attention in recent years that are known as \textit{convolutional neural networks} (CNN). It is inspired by the animals visual cortex, has already been used in the late nineties to solve optical character recognition tasks (OCR) \parencite{lecun_conv}, but received its main attention after beating proven methods in the ImageNet competition by a large margin \parencite{imagenet}. The structure of a convolutional network, the detailed benefits and its mathematical formulation is described in the following sections.
+Therefore, a new network type found attention in recent years that are known as \textit{convolutional neural networks} (CNN). It is inspired by the animals' visual cortex, has already been used in the late nineties to solve optical character recognition tasks (OCR) \parencite{lecun_conv}, but received its main attention after beating proven methods in the ImageNet competition by a large margin \parencite{imagenet}. The structure of a convolutional network, the detailed benefits and its mathematical formulation is described in the following sections.
 
 
 \subsection{Structure}
@@ -236,7 +236,7 @@ A network is called CNN, when it consists of at least one convolutional layer. I
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.45]{figures/cnn_structure.png}
+	\includegraphics[width=1.0\linewidth]{figures/cnn_structure.png}
 	\caption[Structure of a CNN]{Example of a simplified CNN structure with two convolutional layers for image classification.} \label{fig:cnn-structure}
 \end{figure}
 
@@ -250,7 +250,7 @@ Each convolutioal layers is usually followed by a non-liner acitivation function
 Generally speaking, the convolution in an mathematical operation on two functions $f(x)$ and $g(x)$. Its operator is typically denoted with an asterisk \parencite[p. 332]{deep_learning} and is defined as:
 
 \begin{equation} \label{eq:conv-general}
-  (f \ast g)(x) = \int f(\tau)g(x-\tau) d\tau .
+  \big(f \ast g\big)(x) = \int f(\tau)g(x-\tau) d\tau .
 \end{equation}
 
 In terminology of convolutional networks, the function $f$ is termed as the \textit{input} and the filter $g$ is referred to as the \textit{kernel}. Moreover, the output of $ (f \ast g)(x) $ is called the \textit{feature map}.
@@ -258,10 +258,10 @@ In terminology of convolutional networks, the function $f$ is termed as the \tex
 As we are dealing with discrete 2D-images in this thesis, the formulation of equation \ref{eq:conv-general} can be discritized and reformulated as:
 
 \begin{equation} \label{eq:conv-2d}
-  (I \ast K)(x,y) = \sum\limits_{r=0}^{h-1} \sum\limits_{c=0}^{w-1} I(c,r)K(x-c,y-r) ,
+  \big(\textbf{I} \ast \textbf{K}\big)(x,y) = \sum\limits_{r=1}^{h} \sum\limits_{c=1}^{w} \textbf{I}_{c,r} \cdot \textbf{K}_{x-c,y-r} ,
 \end{equation}
 
-with an input $ I $ of size $w \times h$ and a two-dimensional kernel $ K $. Depending on the size of the kernel with $ k \times k $ and the chosen stride $ s $, the shape of the convolved output changes. This is why in input is often enriched with a \textit{zero-padding} to have more control regarding the resulting output size. The use of no padding ($p=0$) is also called \textit{valid padding} (Figure \ref{fig:conv_valid}). Also, when a padding of $p=\floor{k/2}$ is used with a kernal size, it is referred to as \textit{same padding} because the input and output size stay unchanged in case of $ s=1 $ (Figure \ref{fig:conv_same}). 
+with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $ \textbf{K} $. Depending on the size of the kernel with $ k \times k $ and the chosen stride $ s $, the shape of the convolved output changes. This is why in input is often enriched with a \textit{zero-padding} to have more control regarding the resulting output size. The use of no padding ($p=0$) is also called \textit{valid padding} (Figure \ref{fig:conv_valid}). Also, when a padding of $p=\floor{k/2}$ is used with a kernal size, it is referred to as \textit{same padding} because the input and output size stay unchanged in case of $ s=1 $ (Figure \ref{fig:conv_same}). 
 
 \begin{figure}[htpb]
 \centering
@@ -330,7 +330,7 @@ Unfortunately, convolutions are not tolerant to other transformations from the g
 
 \subsection{Fully-Convolutional Networks}
 
-The complete use of convolutional layers implicates a fourth advantage over fully-connected layers. Since the kernel size in each layer is independent regarding its input, the overall network could be feed with data of different dimension. In contrary, this is not possible anymore as soon as a single FC-layer is used at inference because its fixed-sized weight matrix has to be applied to the entire input, not just a local region. Nevertheless, this does not imply that no fully-connected layer can be used when training the network. Depending on the architecture, FC-layers can be used in components of the network that are only used during training. This advantage is for example taken into account when training a \textit{deep convolutional generative adversarial network} (DCGAN)\footnote{Novel network training strategy for generative networks, where a generator network G competes agains a second discriminator network D in an alternating fashion. Further details in \parencite{gan}.}, whose discriminator network is only used while training.
+The complete use of convolutional layers implicates a fourth advantage over fully-connected layers. Since the kernel size in each layer is independent regarding its input, the overall network could be feed with data of different dimension. In contrary, this is not possible anymore as soon as a single FC-layer is used at inference because its fixed-sized weight matrix has to be applied to the entire input, not just a local region. Nevertheless, this does not imply that no fully-connected layer can be used when training the network. Depending on the architecture, FC-layers can be used in components of the network that are only used during training. This advantage is for example taken into account when training a \textit{deep convolutional generative adversarial network} (DCGAN)\footnote{Novel network training strategy for generative networks, where a generator network $ G $ competes agains a second discriminator network $ D $ in an alternating fashion. Further details in \parencite{gan}.}, whose discriminator network is only used while training.
 
 Regarding the problem of frame prediction we want to solve within this thesis, we have to deal with a huge amount of data in every training iteration. Therefore, we take advantage from this \textit{fully-convolutional network} (FCN) approach and design our architecture in such a way that we are able train neural network model on small image patches only. Afterwards, we can theoratically perform frame prediction on the whole image given a sequence of frames.
 
@@ -342,13 +342,13 @@ All previously presented network architectures suffer from one missing character
 
 \subsection{Basics}
 
-RNNs are a special class of neural networks that allows its models to form a directed cyclic graph. Thereby, they are able to hold an hidden state that represents the sequential dynamics. Given an input sequence $ X = (x^{(1)}, x^{(2)},..., x^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $x^{(\tau)}$ as its input of this sequence, as well as the hidden state $h^{(\tau-1)}$ of the previous cell. These building blocks are typically referred to as a \textit{cell}. Because the first cell has has no predecessor, its hidden state input $ h^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, we can describe an RNN as follows:
+RNNs are a special class of neural networks that allows its models to form a directed cyclic graph. Thereby, they are able to hold an hidden state that represents the sequential dynamics. Given an input sequence $ \textbf{X} = (\textbf{x}^{(1)}, \textbf{x}^{(2)},..., \textbf{x}^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $\textbf{x}^{(\tau)}$ as its input of this sequence, as well as the hidden state $\textbf{h}^{(\tau-1)}$ of the previous cell. These building blocks are typically referred to as a \textit{cell}. Because the first cell has has no predecessor, its hidden state input $ \textbf{h}^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, we can describe an RNN as follows:
 
 \begin{equation} \label{eq:rnn}
-  h^{(\tau)} = \phi(W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b) ,
+  \textbf{h}^{(\tau)} = \phi(\textbf{W}_{h} \textbf{h}^{(\tau-1)} + \textbf{W}_{x} \textbf{x}^{(\tau)} + \textbf{b}) ,
 \end{equation}
 
-where $ W_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ W_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input to hidden transitions and $ b, h^{(0)} \in \mathbb{R}^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(z) $ is usually chosen to be tanh.
+where $ \textbf{W}_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ \textbf{W}_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input to hidden transitions and $ \textbf{b}, \textbf{h}^{(0)} \in \mathbb{R}^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(\textbf{z}) $ is usually chosen to be tanh.
 
 Like convolutional networks, RNNs take advantage of sharing parameters over different parts of the model \parencite[p. 374]{deep_learning}. But in this case, we share model parameters over the temporal domain. This allows to generalize specific properties across the whole input sequence. Consequently, a model can extract patterns that can occur at any or even multiple positions within the sequence of data.
 
@@ -403,10 +403,10 @@ Moreover, the framework for recurrent models is very flexible as well. Depending
 
 \subsubsection{Backpropagation Trough Time}
 
-Analyzing the RNN structure might raise the question of how this effects the training procedure, because the gradient flows through recurrent cells multiple times while backpropagating the error. It is important to see that recurrent networks are still feed-forward networks with the extension to keep reusing the same weights expanded in time. Consequently, we have to propagate the error backwards starting from the last timestep $ \tau $ like in standard backpropagation. Depending on the length of the sequence and the computational resources, we can proceed until the very beginning, or truncate our view of interest by stopping at a given limit. Additionally, given the shared weights $ w $ of two timesteps $\tau $ and $ \tau+1 $, we have to hold the weight constraint $ w^{(\tau)} = w^{(\tau+1)} $. Therefore, $ \nabla w^{(\tau)} = \nabla w^{(\tau+1)} $ has to be fulfilled as well. We can do so by by computing the gradients for both timesteps independently, but use the average of their sum:
+Analyzing the RNN structure might raise the question of how this effects the training procedure, because the gradient flows through recurrent cells multiple times while backpropagating the error. It is important to see that recurrent networks are still feed-forward networks with the extension to keep reusing the same weights expanded in time. Consequently, we have to propagate the error backwards starting from the last timestep $ \tau $ like in standard backpropagation. Depending on the length of the sequence and the computational resources, we can proceed until the very beginning, or truncate our view of interest by stopping at a given limit. Additionally, given the shared weights $ \textbf{w} $ of two timesteps $\tau $ and $ \tau+1 $, we have to hold the weight constraint $ \textbf{w}^{(\tau)} = \textbf{w}^{(\tau+1)} $. Therefore, $ \nabla \textbf{w}^{(\tau)} = \nabla \textbf{w}^{(\tau+1)} $ has to be fulfilled as well. We can do so by by computing the gradients for both timesteps independently, but use the average of their sum:
 
 \begin{equation} \label{eq:rnn}
-	\frac{\partial \mathcal{L}}{\partial w^{(\tau)}} + \frac{\partial \mathcal{L}}{\partial w^{(\tau+1)}} ,
+	\frac{\partial \mathcal{L}}{\partial \textbf{w}^{(\tau)}} + \frac{\partial \mathcal{L}}{\partial \textbf{w}^{(\tau+1)}} ,
 \end{equation}
 
 when the final model parameter update is performed using the update rule \parencite{rnn-bptt}. This principle can be extened to the total sequence that is considered by the recurrent network and is referred to as \textit{backpropagation through time} (BPTT).
@@ -420,49 +420,42 @@ Keeping the previously explained weight constraints in mind, the recurrent netwo
 
 Initially introduced by Hochreiter and Schmidhuber, the \textit{long short-term memory} (LSTM) became kind of the default recurrent network implementation as it is capable to deal with long range dependencies. Over the years, it has been revised by a couple of follow-up studies \parencite{lstm_peep} \parencite{lstm_v2} and is used in many practical applications today.
 
-The central advancement of LSTMs over traditional recurrent networks is the so called \textit{memory cell state} $C^{(\tau)}$. While a simple RNN cell overides its state at each timestep, the LSTM's memory cell updates exhibit only minor linear interaction, so that information could flow through very easily. Moreover, this simplifies the gradient flow backwards through time \parencite{rnn-batchnorm}. It follows that an an LSTM cell inverts the core issue it tries to solve. Instead of learning to remember things, it is actually trained to learn what can be forgotten. In this way, keeping information over a longer period of time became its default setting.
+The central advancement of LSTMs over traditional recurrent networks is the so called \textit{memory cell state} $\textbf{C}^{(\tau)}$. While a simple RNN cell overides its state at each timestep, the LSTM's memory cell updates exhibit only minor linear interaction, so that information could flow through very easily. Moreover, this simplifies the gradient flow backwards through time \parencite{rnn-batchnorm}. It follows that an an LSTM cell inverts the core issue it tries to solve. Instead of learning to remember things, it is actually trained to learn what can be forgotten. In this way, keeping information over a longer period of time became its default setting.
 
-To regulate the update of the internal memory state, the LSTM introduces the use of an attentive gating mechanism. At each timestep, it is regulated by three trainable gates in order to accumulate or remove content from its state. Firstly, the \textit{input gate} determines the flow of information from the current input $ x^{(\tau)} $. Secondly, the \textit{forgot gate} regulates to which extend we keep information from the past cell state $C^{(\tau-1)}$. And lastly, the LSTM output state $h^{(\tau)}$ is specified by filtering the cell state using the \textit{output gate}. This mechanism enables constant error flow to build a long-term understanding even when applied to long sequences. It can be formalized as:
+To regulate the update of the internal memory state, the LSTM introduces the use of an attentive gating mechanism. At each timestep, it is regulated by three trainable gates in order to accumulate or remove content from its state. Firstly, the \textit{input gate} determines the flow of information from the current input $ \textbf{x}^{(\tau)} $. Secondly, the \textit{forgot gate} regulates to which extend we keep information from the past cell state $\textbf{C}^{(\tau-1)}$. And lastly, the LSTM output state $\textbf{h}^{(\tau)}$ is specified by filtering the cell state using the \textit{output gate}. This mechanism enables constant error flow to build a long-term understanding even when applied to long sequences. It can be formalized as:
 
 \begin{equation} \label{eq:lstm}
 \begin{aligned}
-\Spvek{\tilde{f}^{(\tau)}; \tilde{i}^{(\tau)}; \tilde{o}^{(\tau)}; \tilde{c}^{(\tau)}} &= W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b \\
-\hat{c}^{(\tau)} &= tanh(\tilde{c}^{(\tau)}) \\
-C^{(\tau)} &= \sigma(\tilde{f}^{(\tau)}) \odot C^{(\tau-1)} + \sigma(\tilde{i}^{(\tau)}) \odot \hat{c}^{(\tau)} \\
-h^{(\tau)} &= \sigma(\tilde{o}^{(\tau)}) \odot tanh(C^{(\tau)})
+\Spvek{\tilde{\textbf{f}}^{(\tau)}; \tilde{\textbf{i}}^{(\tau)}; \tilde{\textbf{o}}^{(\tau)}; \tilde{\textbf{c}}^{(\tau)}} &= \textbf{W}_{h} \, \textbf{h}^{(\tau-1)} + \textbf{W}_{x} \, \textbf{x}^{(\tau)} + \textbf{b} \\
+\hat{\textbf{c}}^{(\tau)} &= tanh(\tilde{\textbf{c}}^{(\tau)}) \\
+\textbf{C}^{(\tau)} &= \sigma(\tilde{\textbf{f}}^{(\tau)}) \odot \textbf{C}^{(\tau-1)} + \sigma(\tilde{\textbf{i}}^{(\tau)}) \odot \hat{\textbf{c}}^{(\tau)} \\
+\textbf{h}^{(\tau)} &= \sigma(\tilde{\textbf{o}}^{(\tau)}) \odot tanh(\textbf{C}^{(\tau)})
 \end{aligned} ,
 \end{equation}
 
-where $ W_h \in \mathbb{R}^{d_h \times 4d_h} $ are the shared weights for the hidden to hidden transitions at timestep $ \tau $, $ W_x \in \mathbb{R}^{d_x \times 4d_h} $ the shared weigths for the input to hidden connections, $ b \in \mathbb{R}^{4d_h} $ the biases, and $ C^{(0)}, h^{(0)} \in \mathbb{R}^{4d_h} $ the initial states of the memory cell and the hidden state, respectively \parencite{rnn-batchnorm}. The last dimension of the weight matrices and biases are multiples of four, because the matrices are concatenations of weights for all three gates and the new candidate cell state for computational efficiency. The input, forget and output gates are labled as $ i, f $ and $ o $. Furthermore, the operator $ \odot $ denotes the Hadamard product\footnote{The Hadamard product defines the entrywise product of two matrices with the same dimension.} and a tilde indicates the term before the corresponding activation is applied, so that for example $ f^{(\tau)} = \sigma(\tilde{f}^{(\tau)}) $.
+where $ \textbf{W}_h \in \mathbb{R}^{d_h \times 4d_h} $ are the shared weights for the hidden to hidden transitions at timestep $ \tau $, $ \textbf{W}_x \in \mathbb{R}^{d_x \times 4d_h} $ the shared weigths for the input to hidden connections, $ \textbf{b} \in \mathbb{R}^{4d_h} $ the biases, and $ \textbf{C}^{(0)}, \textbf{h}^{(0)} \in \mathbb{R}^{4d_h} $ the initial states of the memory cell and the hidden state, respectively \parencite{rnn-batchnorm}. The last dimension of the weight matrices and biases are multiples of four, because the matrices are concatenations of weights for all three gates and the new candidate cell state for computational efficiency. The input, forget and output gates are labled as $ \textbf{i}, \textbf{f} $ and $ \textbf{o} $. Furthermore, the operator $ \odot $ denotes the Hadamard product\footnote{The Hadamard product defines the entrywise product of two matrices with the same dimension.} and a tilde indicates the term before the corresponding activation is applied, so that for example $ \textbf{f}^{(\tau)} = \sigma(\tilde{\textbf{f}}^{(\tau)}) $.
 
 
 \subsubsection{Structure}
-%Show differences to classical RNNs
-% All gates use sigmoid: "0: let nothin through/delete, 1: let everything through"
-
-% g_t: new candiate cell state, that could be added to the cell state (further regulated by the input-gate)
-
-% LSTM = FC-LSTM (and why)
 
 As depicted in Figure \ref{fig:lstm}, the internal structure of an LSTM cell looks way more complex compared to a simple RNN (see Figure \ref{fig:rnn-unrolled}). Nevertheless, the role of each single building block has actually a quite simple interpretation.
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.8]{figures/lstm.pdf}
+	\includegraphics[width=.8\linewidth]{figures/lstm.pdf}
 	\caption[Structure of a LSLTM cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
 \end{figure}
 
-As stated before, the fundamental idea of LSTMs is the cell state $C^{(\tau)}$, denoted as a bold line in the graphics above. Frome its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation the the output of the forget gate $f^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, only regulated by in input gate $ i^{(\tau)} $ the new candidate cell state $ \hat{c}^{(\tau)} $ is added to it. The third gate $ o^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
-The interpretation of how each single gated unit works is the following. Each gate itself is a fully-connected neural network layer, that receives the sum of the input $x^{(\tau)}$ and the previous hidden state $h^{(\tau-1)}$ as its input. That is the reason why they are also often referred to as \textit{FC-LSTM}. Additioanlly, as it can be seen in Figure \ref{fig:lstm}, every gate uses sigmoid as its activation function that is followed by an Hadamard product. Consequently, the output of any gate is in range $ [0, 1] \in \mathbb{R}^{d_h \times 4d_h} $, where a value of one means let the whole information flow through, while zero intends to forget everything. 
+As stated before, the fundamental idea of LSTMs is the cell state $\textbf{C}^{(\tau)}$, denoted as a bold line in the graphics above. Frome its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation the the output of the forget gate $\textbf{f}^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, only regulated by in input gate $ \textbf{i}^{(\tau)} $ the new candidate cell state $ \hat{\textbf{c}}^{(\tau)} $ is added to it. The third gate $ \textbf{o}^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
+The interpretation of how each single gated unit works is the following. Each gate itself is a fully-connected neural network layer, that receives the sum of the input $\textbf{x}^{(\tau)}$ and the previous hidden state $\textbf{h}^{(\tau-1)}$ as its input. That is the reason why they are also often referred to as \textit{FC-LSTM}. Additioanlly, as it can be seen in Figure \ref{fig:lstm}, every gate uses sigmoid as its activation function that is followed by an Hadamard product. Consequently, the output of any gate is in range $ [0, 1] \in \mathbb{R}^{d_h \times 4d_h} $, where a value of one means let the whole information flow through, while zero intends to forget everything. 
 
 \subsubsection{Variants}
 
-The long short-term memory belongs to the family of \textit{gated RNNs} \parencite[p. 411]{deep_learning}. Since its invention, a couple of related implementations have been introduced. One example extends the LSTM by having so called \textit{peephole connections}, proposed in \parencite{lstm_peep}. These additional connections have to purpose that each gating unit has an access to the previous memory cell state $ C^{(\tau-1)} $. The motivation for this is to allow the units to learn when to open or close their gates in order to learn more precise timings based on the cell state \parencite{lstm-space}.
+The long short-term memory belongs to the family of \textit{gated RNNs} \parencite[p. 411]{deep_learning}. Since its invention, a couple of related implementations have been introduced. One example extends the LSTM by having so called \textit{peephole connections}, proposed in \parencite{lstm_peep}. These additional connections have to purpose that each gating unit has an access to the previous memory cell state $ \textbf{C}^{(\tau-1)} $. The motivation for this is to allow the units to learn when to open or close their gates in order to learn more precise timings based on the cell state \parencite{lstm-space}.
 
 Another example is the \textit{gated recurrent unit} (GRU) \parencite{gru}, which also regulates the flow of information comparable to an LSTM, but without having a seperate memory cell. Additionally, its gates for input and output are merged to a single \textit{update gate}, which leads to a similar performance but with a lower memory footprint \parencite{gru-video}. The forgot gate in context of a GRU is called \textit{reset gate}.
 
 A further, novel variant of LSTMs will be presented in chapter \ref{chapter:implementation}, which is inspired by the strengths of convolutional neural networks. Aside from that, it will formalize the implementation of peephole connections as well.
-
 
 
 
@@ -474,12 +467,6 @@ In order to learn useful representations, we have to extract the generic informa
 \subsection{Autoencoders} \label{sec:autoencoder}
 
 An \textit{autoencoder} is a commonly known neural network model that is able to reconstruct its own input. It consists of two components that are usually arranged in a mirrored style. First, an \textit{encoder} $ f(\textbf{x}) = \textbf{z} $ that maps any given input $ \textbf{x} \in \mathbb{R}^d_x $ to its internal representation $ \textbf{z} \in \mathbb{R}^d_z $. Seconds, a \textit{decoder} function $ g(\textbf{z}) = \textbf{x} $ that is able to map the representation back to its input. Due to the analogy to encoding and decoding, the representations is also often referred to as \textit{code}. In addition, the input and output layer of such networks have the same number of nodes. A simplified autoencoder model is visualized in Figure \ref{fig:autoencoder}. 
-
-\begin{figure}[htpb]
-	\centering
-	\includegraphics[scale=0.3]{figures/placeholder.png}
-	\caption[Structure of an Autoencoder]{tbd} \label{fig:autoencoder}
-\end{figure}
 
 The encoder and decoder components can be of any kind. In the most simple case, a neural network with only one single hidden layer can be used. However, it has been shown that deeper networks are able to yield better representations compared to shallow variants \parencite{autoenc_deeper}. Furthermore, the use convolutional layers is usually prefered for image processing tasks, referred to as \textit{convolutional autoencoders}.
 
@@ -499,6 +486,12 @@ On the other side, there are also use cases for \textit{overcomplete} models whe
 
 where $ \lambda $ controls the tradeoff between sparsity and reconstruction and regularizer term $ \Omega(\textbf{h}) $ can be any valid loss function, such as $ \ell_2 $. This sparsity constraint reduces the autoencoder's degrees of freedom and therefore prevents overfitting. To put it another way, the model is virtually undercomplete by having a compactly distributed representation instead of a lower dimensionality. Alternatively, sparsity could be achieved by only using the $ k $ most meaningful activations in a \textit{k-sparse autoencoder} by zeroing out weak hidden units manually \parencite{k-sparse-autoenc} or by using rectifier units in the last encoding layer \parencite{rect-autoenc}.
 
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=.8\linewidth]{figures/encoder_decoder.pdf}
+	\caption[Structure of an Autoencoder]{Simplified structure of a denoising autoencoder in an undercomplete setting to reconstruct images of handwritten numbers from the MNIST dataset.} \label{fig:autoencoder}
+\end{figure}
+
 A seconds regularization strategy is modify the reconstruction term of the loss function itself by adding random noise to the input. These networks are called \textit{denoising autoencoders} and have to learn to correct back the added noise for the purpose of reconstructing the original noise-free image \parencite[p. 507]{deep_learning}. Therefore, the network has to learn an deeper understanding of the input data instead of simply copying its content. As a consequence, it has to minimize:
 
 \begin{equation} \label{eq:autoenc-denoise}
@@ -514,13 +507,13 @@ The general idea of the encoder-decoder framework can also be applied to recurre
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[scale=0.3]{figures/placeholder.png}
-	\caption[Recurrent Autoencoder Model]{tbd} \label{fig:rnn-autoencoder}
-\end{figure} % TODO: graphics for UnSup LSTM paper p. 3
+	\includegraphics[width=.8\linewidth]{figures/rnn_autoencoder.pdf}
+	\caption[Recurrent Autoencoder Model]{Basic structure of a conditional recurrent autoencoder. The inputs (red) are processed by the encoder RNN to learn representation of the data in sequence. Then, the decoder RNN takes over to infer the reconstructions (blue) of the inputs in reverse order.} \label{fig:rnn-autoencoder}
+\end{figure}
 
-The encoder RNN builds the representation based on all inputs of the sequence and therefore takes advantage of its temporal or ordinal structure. Afterwards, the learned representation is used to initialize the hidden state $ \textbf{h}_{\textrm{dec}}^{(0)} $, in opposite to the otherwise customary zero initialization.
+The encoder RNN builds the representation based on all inputs of the sequence and therefore takes advantage of its temporal or ordinal structure. Afterwards, the learned representation is used to initialize the hidden state $ \textbf{h}_{\textrm{dec}}^{(0)} $ of the decoder, in opposite to the otherwise customary zero initialization. The decoder RNN takes then over and outputs the prediction of the target sequence. Obviously, both the encoder and decoder recurrent networks could be extended to consist of multiple layers or bidirectional connections as well.
 
-% TO BE CONTINIUED HERE ...
+There are two possibilities of how the decoder can be designed. Firstly, an unconditional setting where each recurrent cell does not receive the previous output as is its input. Secondly, a conditional setting in which this additional connection from the cell's output to the input of the next element is present. Both have its reasons for and against. On the one side, it can be argued that conditioning on the previous output enables to learn more dynamics in the target sequence distribution. This might be not required in an autoencoder setting, where there is exactly one target sequence. But when this architecture is applied to continue a series of frames in the future, can be cruical to have access to the previous output. As an example, consider the prediction of a series of frames from a video game, where the player can walk either left or right in a specific situation. To properly predict the next outputs afterwards, it is fundamental to know which decision this particular recurrent cell has made. Otherwise, it might end up in averaging over all possible outcomes. On the other side, conditioning on the previous frame could also end up in preventing the network to look deeper inside the encoder network \parencite{unsup_learn_lstm}.
 
 
 \section{Batch Normalization}
@@ -597,7 +590,6 @@ As an extreme but simple example, consider two images containing a chess field o
 
 
 \subsection{Perceptual Quality Metrics}
-% both, some are simple, others are perceptuall motivated ==> will use them in evaluation
 
 The example of the previous section has shown that the consideration of our human visual perception is very important when assessing image similarity. With this in mind, a couple of metrics have been developed in recent years to evaluate image quality differences between two images. These metrics can be used either for a quatitative evaluation of generated results, or even as a loss function by doing some minor modifications to fulfill the required properties. Beside neural network training, these metrics have been invented to measure the quality of image compression codecs such as JPEG.
 
@@ -608,7 +600,7 @@ In the following sections, $ \textbf{x} $ will denote the ground truth image and
 A first metric to assess the the similarity of generated images is the \textit{peak signal-to-noise ratoin} (PSNR). It describes the ratio between the maximum possible image intensity and the corrupting noise that affects precision of the reconstruction. Its value is expressed in a logarithmic decibel scale, where a higher value indicates better quality. In terms of human perception, it is an rough approximation to evaluate reconstruction quality because its denominator is still based on MSE. It is computed as follows:
 
 \begin{equation} \label{eq:psnr}
-\textrm{PSNR}(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=1}^{w} \sum_{r=1}^{h} (\textbf{x}_{c,r} - \textbf{y}_{c,r})^2 } ,
+\textrm{PSNR}(\textbf{x}, \textbf{y}) = 10 \cdot \log_{10} \Bigg( \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=1}^{w} \sum_{r=1}^{h} (\textbf{x}_{c,r} - \textbf{y}_{c,r})^2 } \Bigg) ,
 \end{equation}
 
 where $ \textbf{y}_{max} $ is the maximum \textit{possible} intensity of an image of size $ w \times h $.
@@ -659,7 +651,7 @@ where the exponents $ \alpha_M $, $ \beta_j $ and $ \gamma_j $ parameterize the 
 To quantatatively evaluate the difference in sharpness between two images, we take use of the \textit{sharpness difference} metric proposed in \parencite{deep_multiscale_video_pred}. It is based on the formulation of PSNR (eq. \ref{eq:psnr}) with a modified denominator. Instead of using the squared error to quantify the pixel-wise differences, it measures the difference of gradients between the ground truth and its reconstruction:
 
 \begin{equation} \label{eq:sharpdiff}
-\textrm{SharpDiff}(\textbf{x}, \textbf{y}) = 10 \log_{10} \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=2}^{w} \sum_{r=2}^{h} \big|(\nabla_{left} \, \textbf{x} + \nabla_{top} \, \textbf{x})-(\nabla_{left} \, \textbf{y} + \nabla_{top} \, \textbf{y})\big|} ,
+\textrm{SharpDiff}(\textbf{x}, \textbf{y}) = 10 \cdot \log_{10} \Bigg( \frac{\textbf{y}_{max}^2}{\frac{1}{w \, h} \sum_{c=2}^{w} \sum_{r=2}^{h} \big|(\nabla_{left} \, \textbf{x} + \nabla_{top} \, \textbf{x})-(\nabla_{left} \, \textbf{y} + \nabla_{top} \, \textbf{y})\big|} \Bigg) ,
 \end{equation}
 
 where $ \nabla_{left} \, \textbf{x} = |\textbf{x}_{c,r} - \textbf{x}_{c-1, r}| $ and $ \nabla_{top} \, \textbf{x} = |\textbf{x}_{c,r} - \textbf{x}_{c, r-1}| $ are the gradient differences to the left and top pixel.
