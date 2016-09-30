@@ -25,7 +25,7 @@ Even that its formulation is that simple, it can represent complex decision-maki
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.7\linewidth]{figures/mlp.pdf}
-	\caption[Multilayer perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold.} \label{fig:mlp}
+	\caption[Multilayer perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold. (Based on \parencite{neural_nets_deep_learning})} \label{fig:mlp}
 \end{figure}
 
 The first and last layer of such a network are refered as \textit{input layer} and \textit{output layer} and their number is determined by the given problem to solve. In case we want to train a network that identifies human faces in colored pictures with height and width of 100 pixels, it would require our input layer to have $ n_{input}=3000 $ perceptrons, as well as a single output. In contrary, all intermediate layers are known as \textit{hidden layers} and can have any number of elements and depth. When every node from one layer is connected to all nodes of its subsequent layer, we call it \textit{fully connected} (FC).
@@ -237,7 +237,7 @@ A network is called CNN, when it consists of at least one convolutional layer. I
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=1.0\linewidth]{figures/cnn_structure.png}
-	\caption[Structure of a CNN]{Example of a simplified CNN structure with two convolutional layers for image classification.} \label{fig:cnn-structure}
+	\caption[Structure of a CNN]{Example of a simplified CNN structure with two convolutional layers for image classification. (Based on \parencite[p. 2284]{lecun_conv})} \label{fig:cnn-structure}
 \end{figure}
 
 The window mentioned before is called \textit{kernel} and holds the randomly initialized parameters that the network can learn. The kernel acts as a filter that is applied to each location in a regular steps. In the two dimensional case, the kernal has a specified width and height, denoted as \textit{kernel size}. Several kernals are used to extract multiple feature maps in each convolutional layer, but each output feature map is computed with its own kernel. This number of kernels is specified with its \textit{kernel depth}. Furthermore, the step range the filter is moved in each dimension is called \textit{stride} \parencite{conv_guide}.
@@ -277,7 +277,7 @@ with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $
   \caption{$p=1$ (same), $s=2$}
   \label{fig:conv_same}
 \end{subfigure}
-\caption[Convolution operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride.}
+\caption[Convolution operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride. (From \parencite{conv_guide})}
 \label{fig:conv}
 \end{figure}
 
@@ -285,12 +285,12 @@ It must be noted that the size of the kernel, padding and stride does not have t
 
 \subsection{Transposed Convolution Operation}
 
-The application of the previously presented convolutional operation usually transforms the input into lower-dimensional feature maps. However, there are use cases where we would like to go the other way round, while keeping the connectivity pattern of a convolution. One example is an convolutional autoencoder which is explained in further detail in section \ref{sec:autoencoder}. This operation is referred to as \textit{transposed convolution}\footnote{Mistakenly, the transposed convolution is often called \textit{deconvolution}. But because it is not actually performing the reverse effect of a convolution, which is meant by the mathematical term of a deconvolution, it is strongly discouraged to name it so.}, which exchanges the forward and backward passes of a normal convolution. It is also called \textit{fractionally strided convolution}, because it can be emulated with a direct convolution using a zero-spaced input \cite[p. 19]{conv_guide}. Such an implementation is less efficient, but it supports the intuition of how the resulting output shape looks like. Figure \ref{fig:conv_tp} shows an example of a transposed convolution.
+The application of the previously presented convolutional operation usually transforms the input into lower-dimensional feature maps. However, there are use cases where we would like to go the other way round, while keeping the connectivity pattern of a convolution. One example is an convolutional autoencoder which is explained in further detail in section \ref{sec:autoencoder}. This operation is referred to as \textit{transposed convolution}\footnote{Mistakenly, the transposed convolution is often called \textit{deconvolution}. But because it is not actually performing the reverse effect of a convolution, which is meant by the mathematical term of a deconvolution, it is strongly discouraged to name it so.}, which exchanges the forward and backward passes of a normal convolution. It is also called \textit{fractionally strided convolution}, because it can be emulated with a direct convolution using a zero-spaced input \parencite[p. 19]{conv_guide}. Such an implementation is less efficient, but it supports the intuition of how the resulting output shape looks like. Figure \ref{fig:conv_tp} shows an example of a transposed convolution.
 
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[scale=0.4]{figures/conv_tp.png}
-	\caption[Transposed convolution operation]{Transposition of convolving an $6 \times 6$ input using a $3 \times 3$ kernel using $p=1$ and $s=2$. This is equivalent to performing an convolution using zero-space $3 \times 3$ input with $p=1$ and $s=1$.} \label{fig:conv_tp}
+	\caption[Transposed convolution operation]{Transposition of convolving an $6 \times 6$ input using a $3 \times 3$ kernel using $p=1$ and $s=2$. This is equivalent to performing an convolution using zero-space $3 \times 3$ input with $p=1$ and $s=1$. (From \parencite{conv_guide})} \label{fig:conv_tp}
 \end{figure}
 
 
@@ -370,7 +370,7 @@ For a better understanding of how recurrent networks work, it is helpful to take
   \caption{}
   \label{fig:rnn-unrolled}
 \end{subfigure}
-\caption[Structure of RNN cells]{Structure of recurrent network cells. The compact cyclic graph model in (a) can be unrolled to receive the model (b) that represents the model in form of a acyclic graph.}
+\caption[Structure of RNN cells]{Structure of recurrent network cells. The compact cyclic graph model in (a) can be unrolled to receive the model (b) that represents the model in form of a acyclic graph. (Based on \parencite{understand_lstm})}
 \label{fig:rnn}
 \end{figure}
 
@@ -396,7 +396,7 @@ Moreover, the framework for recurrent models is very flexible as well. Depending
   \caption{}
   \label{fig:rnn-many2many}
 \end{subfigure}
-\caption[Modes in recurrent networks]{Examples of different modes in recurrent networks: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as furhter neural networks, as well as input or output data directly (Based on \parencite{rnn-effectiveness})}
+\caption[Modes in recurrent networks]{Examples of different modes in recurrent networks: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as furhter neural networks, as well as input or output data directly. (Based on \parencite{rnn-effectiveness})}
 \label{fig:rnn-modes}
 \end{figure}
 
