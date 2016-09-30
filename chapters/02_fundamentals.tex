@@ -396,7 +396,7 @@ Moreover, the framework for recurrent models is very flexible as well. Depending
   \caption{}
   \label{fig:rnn-many2many}
 \end{subfigure}
-\caption[Modes in recurrent networks]{Examples of different modes in recurrent networks: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. (Based on \parencite{rnn-effectiveness})}
+\caption[Modes in recurrent networks]{Examples of different modes in recurrent networks: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as furhter neural networks, as well as input or output data directly (Based on \parencite{rnn-effectiveness})}
 \label{fig:rnn-modes}
 \end{figure}
 
@@ -426,8 +426,9 @@ To regulate the update of the internal memory state, the LSTM introduces the use
 
 \begin{equation} \label{eq:lstm}
 \begin{aligned}
-\Spvek{\tilde{f}^{(\tau)}; \tilde{i}^{(\tau)}; \tilde{o}^{(\tau)}; \tilde{g}^{(\tau)}} &= W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b \\
-C^{(\tau)} &= \sigma(\tilde{f}^{(\tau)}) \odot C^{(\tau-1)} + \sigma(\tilde{i}^{(\tau)}) \odot tanh(\tilde{g}^{(\tau)}) \\
+\Spvek{\tilde{f}^{(\tau)}; \tilde{i}^{(\tau)}; \tilde{o}^{(\tau)}; \tilde{c}^{(\tau)}} &= W_{h} h^{(\tau-1)} + W_{x} x^{(\tau)} + b \\
+\hat{c}^{(\tau)} &= tanh(\tilde{c}^{(\tau)}) \\
+C^{(\tau)} &= \sigma(\tilde{f}^{(\tau)}) \odot C^{(\tau-1)} + \sigma(\tilde{i}^{(\tau)}) \odot \hat{c}^{(\tau)} \\
 h^{(\tau)} &= \sigma(\tilde{o}^{(\tau)}) \odot tanh(C^{(\tau)})
 \end{aligned} ,
 \end{equation}
@@ -451,7 +452,7 @@ As depicted in Figure \ref{fig:lstm}, the internal structure of an LSTM cell loo
 	\caption[Structure of a LSLTM cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
 \end{figure}
 
-As stated before, the fundamental idea of LSTMs is the cell state $C^{(\tau)}$, denoted as a bold line in the graphics above. Frome its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation the the output of the forget gate $f^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, only regulated by in input gate $ i^{(\tau)} $ the new candidate cell state $ g^{(\tau)} $ is added to it. The third gate $ o^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
+As stated before, the fundamental idea of LSTMs is the cell state $C^{(\tau)}$, denoted as a bold line in the graphics above. Frome its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation the the output of the forget gate $f^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, only regulated by in input gate $ i^{(\tau)} $ the new candidate cell state $ \hat{c}^{(\tau)} $ is added to it. The third gate $ o^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
 The interpretation of how each single gated unit works is the following. Each gate itself is a fully-connected neural network layer, that receives the sum of the input $x^{(\tau)}$ and the previous hidden state $h^{(\tau-1)}$ as its input. That is the reason why they are also often referred to as \textit{FC-LSTM}. Additioanlly, as it can be seen in Figure \ref{fig:lstm}, every gate uses sigmoid as its activation function that is followed by an Hadamard product. Consequently, the output of any gate is in range $ [0, 1] \in \mathbb{R}^{d_h \times 4d_h} $, where a value of one means let the whole information flow through, while zero intends to forget everything. 
 
 \subsubsection{Variants}
@@ -464,10 +465,62 @@ A further, novel variant of LSTMs will be presented in chapter \ref{chapter:impl
 
 
 
-\section{Autoencoder Networks} \label{sec:autoencoder}
 
-%What are autoencoder networks?
-%Or: Encoder / Decoder Networks
+\section{Encoder-Decoder Networks}
+
+In order to learn useful representations, we have to extract the generic informative content from the given data. But in many cases, we have to deal with a tradeoff between obtaining valuable properties and preserving as much information regarding the inputs as possible. Additionally, we often have to deal with intense overfitting problems when these representatons are learned in a supervised fashion, because an acceptable amount of training data is often not on-hand for this purpose \parencite[p. 527]{deep_learning}. Therefore, this section focuses on concepts that are able to end up with good representations on the basis of unlabled data in an \textit{unsupervised learning} process. 
+
+
+\subsection{Autoencoders} \label{sec:autoencoder}
+
+An \textit{autoencoder} is a commonly known neural network model that is able to reconstruct its own input. It consists of two components that are usually arranged in a mirrored style. First, an \textit{encoder} $ f(\textbf{x}) = \textbf{z} $ that maps any given input $ \textbf{x} \in \mathbb{R}^d_x $ to its internal representation $ \textbf{z} \in \mathbb{R}^d_z $. Seconds, a \textit{decoder} function $ g(\textbf{z}) = \textbf{x} $ that is able to map the representation back to its input. Due to the analogy to encoding and decoding, the representations is also often referred to as \textit{code}. In addition, the input and output layer of such networks have the same number of nodes. A simplified autoencoder model is visualized in Figure \ref{fig:autoencoder}. 
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.3]{figures/placeholder.png}
+	\caption[Structure of an Autoencoder]{tbd} \label{fig:autoencoder}
+\end{figure}
+
+The encoder and decoder components can be of any kind. In the most simple case, a neural network with only one single hidden layer can be used. However, it has been shown that deeper networks are able to yield better representations compared to shallow variants \parencite{autoenc_deeper}. Furthermore, the use convolutional layers is usually prefered for image processing tasks, referred to as \textit{convolutional autoencoders}.
+
+Reconstructing the input might sound trivial in first place. And honestly, a model itself that is able to learn the general mapping $ g(f(\textbf{x})) = \textbf{x} $ and especially its output is not very interesting, since the network just performs a copy operation. Instead, we are more interested in some special properties of the latent variable $ z $. These can be provoked by restricting the encoder, decoder or input with some constrains so that the model is not able to perform a perfect copy. Moreover, the dimensionality of the internal representation can be varied in order to force the model that it learns to prioritize which fraction of the input is worth to have in contemplation. Hence, it learns valuable properties regarding the data, which might even be useful to cope with other related tasks. Autoencoder models received increased attention in recent years, espiecially in relation with \textit{generative models} \parencite[p. 502]{deep_learning}.
+
+\subsubsection*{Undercomplete Autoencoders}
+
+On the one side, in the typical \textit{undercomplete} case where the dimensionality of the representation is smaller than the in and output, so that $ d_z < d_x $, a model can be trained to reconstruct the original data. As an applicaton example, this can yield in an image compression algorithm, where the encoder compresses an input image to another representation of lower size. Afterwards, the decoder network can be used to recover the image data. As a result, depending on how lower the size of the representation and the dissimilarity to of the reconstruction to its original image is, the better is our learned representation. It has learned to preserve image information in a more compact way.
+
+\subsubsection*{Regularized Autoencoders}
+
+On the other side, there are also use cases for \textit{overcomplete} models where the representation's dimensionality could exhibit an equal or even higher dimension than the input and output, so that $ d_z \geq d_x $\footnote{It is to be added that the presented regulariztion strategies can also be used for undercomplete autoencoders.}. But this requires to apply regularization techniques in order to learn useful features with such a high capacity \parencite[p. 504]{deep_learning}. One first possibility is to extend the loss function with an additional sparsity penalty, so that the \textit{sparse autoencoder} network tries to minimize:
+
+\begin{equation} \label{eq:autoenc-sparse}
+	\mathcal{L}(\textbf{x}, g(f(\textbf{x}))) + \lambda \cdot \Omega(\textbf{z}) ,
+\end{equation}
+
+where $ \lambda $ controls the tradeoff between sparsity and reconstruction and regularizer term $ \Omega(\textbf{h}) $ can be any valid loss function, such as $ \ell_2 $. This sparsity constraint reduces the autoencoder's degrees of freedom and therefore prevents overfitting. To put it another way, the model is virtually undercomplete by having a compactly distributed representation instead of a lower dimensionality. Alternatively, sparsity could be achieved by only using the $ k $ most meaningful activations in a \textit{k-sparse autoencoder} by zeroing out weak hidden units manually \parencite{k-sparse-autoenc} or by using rectifier units in the last encoding layer \parencite{rect-autoenc}.
+
+A seconds regularization strategy is modify the reconstruction term of the loss function itself by adding random noise to the input. These networks are called \textit{denoising autoencoders} and have to learn to correct back the added noise for the purpose of reconstructing the original noise-free image \parencite[p. 507]{deep_learning}. Therefore, the network has to learn an deeper understanding of the input data instead of simply copying its content. As a consequence, it has to minimize:
+
+\begin{equation} \label{eq:autoenc-denoise}
+	\mathcal{L}(\textbf{x}, g(f(\tilde{\textbf{x}}))) ,
+\end{equation}
+
+where $ \tilde{x} $ is the randomly currupted version of the ground truth input $ x $.
+
+
+\subsection{Recurrent Encoder-Decoder Models}
+
+The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model has been firstly introduced in \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementation, as well as could be applied in a non-autoencoder fashion, we generalize its name to \textit{recurrent encoder-decoder} model. This name is also used in several follow-up works.}. But since then, it has been applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[scale=0.3]{figures/placeholder.png}
+	\caption[Recurrent Autoencoder Model]{tbd} \label{fig:rnn-autoencoder}
+\end{figure} % TODO: graphics for UnSup LSTM paper p. 3
+
+The encoder RNN builds the representation based on all inputs of the sequence and therefore takes advantage of its temporal or ordinal structure. Afterwards, the learned representation is used to initialize the hidden state $ \textbf{h}_{\textrm{dec}}^{(0)} $, in opposite to the otherwise customary zero initialization.
+
+% TO BE CONTINIUED HERE ...
 
 
 \section{Batch Normalization}
@@ -538,7 +591,7 @@ As an extreme but simple example, consider two images containing a chess field o
   \caption{}
   \label{fig:percept-vs-lp1}
 \end{subfigure}
-\caption[Comparison of Reconstructions with Differnt Loss Functions]{Comparison of Reconstructions with Differnt Loss Functions using images from the STL-10 dataset: (a) where results using a perceptual motivated loss function was ranked first by human judgement, (b) where MAE or MSE was ranked best. (From \parencite{learning-perc-sim})}
+\caption[Comparison of Reconstructions with Differnt Loss Functions]{Comparison of reconstructions with differnt loss functions using images from the STL-10 dataset: (a) where results using a perceptual motivated loss function was ranked first by human judgement, (b) where MAE or MSE was ranked best. (From \parencite{learning-perc-sim})}
 \label{fig:percept-vs-lp}
 \end{figure}
 
