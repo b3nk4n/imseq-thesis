@@ -25,7 +25,7 @@ Even that its formulation is that simple, it can represent complex decision-maki
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.75\linewidth]{figures/mlp.pdf}
-	\caption[Multilayer perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold. (Based on \parencite{neural_nets_deep_learning})} \label{fig:mlp}
+	\caption[Multilayer Perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold. (Based on \parencite{neural_nets_deep_learning})} \label{fig:mlp}
 \end{figure}
 
 The first and last layer of such a network are refered to as \textit{input layer} and \textit{output layer}. Furthermore, their number of nodes is determined by the given problem to solve. In case we want to train a network that identifies human faces in colored pictures with height and width of 100 pixels, it would require our input layer to have $ n_{in}=3000 $ perceptrons, as well as a single output node. In contrary, all intermediate layers are known as \textit{hidden layers} and can have any number of elements and depth. When every node from one layer is connected to all nodes of its subsequent layer, we call it \textit{fully connected} (FC).
@@ -77,7 +77,7 @@ which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.45\linewidth]{figures/neuron.pdf}
-	\caption[Schematic neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
+	\caption[Schematic Neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
 \end{figure}
 
 Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a classical perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even that its shape looks much simpler, it became the most favorable activation function for intermediate layers in deep neural networks. The reasons are that as it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanising gradient (see Section \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
@@ -206,7 +206,7 @@ As already stated, our goal is to find a representation that generalizes well. O
       \addlegendentry{overfitted g(x)};
     \end{axis}
   \end{tikzpicture}
-  \caption[Regularization and overfitting]{Visualization of an overfitted function.}\label{fig:overfitting}
+  \caption[Regularization and Overfitting]{Visualization of an overfitted function.}\label{fig:overfitting}
 \end{figure}
 
 On the other hand, a reduction of model complexity can also be a false conclusion because this limits the potential power of the network. Fortunately, research has originated different methods to master this issue. In the field of machine learning, these methods are referred to as \textit{regularization} techniques.
@@ -277,7 +277,7 @@ with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $
   \caption{$p=1$ (same), $s=2$}
   \label{fig:conv_same}
 \end{subfigure}
-\caption[Convolution operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride. (From \parencite{conv_guide})}
+\caption[Convolution Operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride. (From \parencite{conv_guide})}
 \label{fig:conv}
 \end{figure}
 
@@ -290,7 +290,7 @@ The application of the previously presented convolution operation usually transf
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[scale=0.4]{figures/conv_tp.png}
-	\caption[Transposed convolution operation]{Transposition of convolving an $6 \times 6$ input using a $3 \times 3$ kernel using $p=1$ and $s=2$. This is equivalent to performing a convolution using a zero-spaced $3 \times 3$ input with $p=1$ and $s=1$. (From \parencite{conv_guide})} \label{fig:conv_tp}
+	\caption[Transposed Convolution Operation]{Transposition of convolving an $6 \times 6$ input using a $3 \times 3$ kernel using $p=1$ and $s=2$. This is equivalent to performing a convolution using a zero-spaced $3 \times 3$ input with $p=1$ and $s=1$. (From \parencite{conv_guide})} \label{fig:conv_tp}
 \end{figure}
 
 
@@ -318,7 +318,7 @@ To handle all regions of the input data in the same manner, the parameters are \
   \caption{}
   \label{fig:conv_vs_fc_conv}
 \end{subfigure}
-\caption[Sparse connections and parameter sharing in a CNN]{Comparison of the connection pattern and usage of parameters between (a) fully-connected layers and (b) convolutional layers. The use of the same color for interconnections denotes the sharing of parameters.}
+\caption[Sparse Connections and Parameter Sharing in CNNs]{Comparison of the connection pattern and usage of parameters between (a) fully-connected layers and (b) convolutional layers. The use of the same color for interconnections denotes the sharing of parameters.}
 \label{fig:conv_vs_fc}
 \end{figure}
 
@@ -345,10 +345,13 @@ All previously presented network architectures suffer from one missing character
 RNNs are a special class of neural networks that allows its models to form a directed cyclic graph. Thereby, they are able to hold an hidden state that represents the sequential dynamics of the past. Given an input sequence $ \textbf{X} = (\textbf{x}^{(1)}, \textbf{x}^{(2)},..., \textbf{x}^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $\textbf{x}^{(\tau)}$ as its input of this sequence, as well as the hidden state $\textbf{h}^{(\tau-1)}$ of the previous one. These building blocks are typically referred to as a \textit{cell}. Because the first cell has has no predecessor, its hidden state input $ \textbf{h}^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, we can describe an RNN as follows:
 
 \begin{equation} \label{eq:rnn}
-  \textbf{h}^{(\tau)} = \phi(\textbf{W}_{h} \textbf{h}^{(\tau-1)} + \textbf{W}_{x} \textbf{x}^{(\tau)} + \textbf{b}) ,
+\begin{aligned}
+\textbf{h}^{(\tau)} &= \phi(\textbf{W}_{h} \textbf{h}^{(\tau-1)} + \textbf{W}_{x} \textbf{x}^{(\tau)} + \textbf{b}_1) \\
+\textbf{o}^{(\tau)} &= \textbf{W}_{o} \textbf{h}^{(\tau)} + \textbf{b}_2
+\end{aligned}
 \end{equation}
 
-where $ \textbf{W}_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden to hidden transitions, $ \textbf{W}_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input to hidden transitions and $ \textbf{b}, \textbf{h}^{(0)} \in \mathbb{R}^{d_h} $ the bias weights and initial state, respectively \parencite[p. 2]{rnn-batchnorm}. The activation function $ \phi(\textbf{z}) $ is usually chosen to be a hyperbolic tangents.
+where $ \textbf{W}_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden-to-hidden transitions, $ \textbf{W}_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input-to-hidden connections, $ \textbf{W}_{o} \in \mathbb{R}^{d_h \times d_x} $ the weights of the hidden-to-output transitions and $ \textbf{b}_1, \textbf{h}^{(0)} \in \mathbb{R}^{d_h}, \textbf{b}_2 \in \mathbb{R}^{d_x} $ the biases and initial state, respectively \parencite[p. 2]{rnn-batchnorm}, \parencite[p. 381]{deep_learning}. The activation function $ \phi(\textbf{z}) $ is usually chosen to be a hyperbolic tangents.
 
 Like convolutional networks, RNNs take advantage of sharing parameters over different parts of the model \parencite[p. 374]{deep_learning}. But in this case, model parameters are shared over the temporal domain. This allows the network to generalize specific properties across the whole input sequence. Consequently, a model can extract patterns that can occur at any or even multiple positions within the sequence of data.
 
@@ -358,23 +361,23 @@ For a better understanding of how recurrent networks work, it is helpful to take
 
 \begin{figure}[htpb]
 \centering
-\begin{subfigure}{0.25\textwidth}
+\begin{subfigure}{0.26\textwidth}
   \centering
   \includegraphics[scale=0.5]{figures/rnn_loop.pdf}
   \caption{}
   \label{fig:rnn-loop}
 \end{subfigure}%
-\begin{subfigure}{0.75\textwidth}
+\begin{subfigure}{0.74\textwidth}
   \centering
   \includegraphics[scale=0.5]{figures/rnn_unrolled.pdf}
   \caption{}
   \label{fig:rnn-unrolled}
 \end{subfigure}
-\caption[Structure of RNN cells]{Structure of recurrent network cells. The compact cyclic graph model in (a) can be unrolled to receive the model (b) that represents the model in form of a acyclic graph. (Based on \parencite{understand_lstm})}
+\caption[Structure of Recurrent Cells]{Structure of recurrent network cells. The compact cyclic graph model in (a) can be unrolled to receive the model (b) that represents the model in form of a acyclic graph. (Based on \parencite{understand_lstm})}
 \label{fig:rnn}
 \end{figure}
 
-In addition, the framework for recurrent models is very flexible as well. Depending on the implementation, it allows to process either a fixed or even a dynamic number of inputs. This property extends to the number of outputs as well. In contrary, convolutional or artificial neural networks require to define the input and output size at graph construction time. Further, they have to process all data in one chunk and do not allow to handle only single elements of the sequence one after the other. Some example modes of recurrent networks are visualized in Figure \ref{fig:rnn-modes}.
+In addition, the framework for recurrent models is very flexible as well. Depending on the implementation, it allows to process either a fixed or even a dynamic number of inputs. This property extends to the number of outputs as well. In contrary, convolutional or artificial neural networks require to define the input and output size at graph construction time. Further, they have to process all data in one chunk and do not allow to handle only single elements of the sequence one after the other. Some example input-output modes of recurrent networks are visualized in Figure \ref{fig:rnn-modes}.
 
 \begin{figure}[htpb]
 \centering
@@ -396,14 +399,34 @@ In addition, the framework for recurrent models is very flexible as well. Depend
   \caption{}
   \label{fig:rnn-many2many}
 \end{subfigure}
-\caption[Modes in recurrent networks]{Examples of different recurrent network modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks, or the direct input and output. (Based on \parencite{rnn-effectiveness})}
+\caption[Examples of RNN Input-Output Modes]{Visualization of different recurrent network input-output modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks, or the direct input and output. (Based on \parencite{rnn-effectiveness})}
 \label{fig:rnn-modes}
 \end{figure}
 
-%TODO DEEPER RNN (multi layer + bidirectional + graphics like the ones above!!!)
+Besides the flexibility in the number of inputs and outputs, the recurrent components of the model is very adaptable as well. In common with the use of multiple neural network layers in order to achieve deeper and therefore more powerful models, several recurrent network layers can also be stacked on top of each other to enable a higher temporal depth. Various practical experiments, such as in \parencite{beyond_snippets_video_class}, \parencite{conv_lstm_nowcasting} or \parencite{unsup_learn_lstm}, have shown that \textit{multi-layer RNNs} are able to deliver better results compared to corresponding single-layer variants. Figure \ref{fig:rnn-multilayer} shows an example of a two-layer recurrent network. As a downside, the increase in the number of recurrent layers usually has a tremendouns effect on the memory requirements and the network training time.
 
 
-\subsubsection{Backpropagation Trough Time}
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.3\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/rnn-multilayer.pdf}
+  \caption{}
+  \label{fig:rnn-multilayer}
+\end{subfigure}%
+\begin{subfigure}{0.3\textwidth}
+  \centering
+  \includegraphics[width=.8\linewidth]{figures/rnn-bidirectional.pdf}
+  \caption{}
+  \label{fig:rnn-bidirectional}
+\end{subfigure}
+\caption[Deep Recurrent Network Architectures]{Examples of deeper recurrent network architectures. The figure in (a) shows a two-layer RNN, while (b) shows a single-layer BRNN. Both bidirectional outputs per cell of the latter model are combined and could be further processed by subsequent neural networks. (Based on \parencite{rnn-effectiveness})}
+\label{fig:rnn-modes}
+\end{figure}
+
+Additionally, the input sequence could be processed in both directions. This can be enabled by combining an RNN that starts at the beginning of the sequence with a second RNN starting from the very end backwards through time. In consequence, these so called \textit{bidirectional recurrent neural networks} (BRNN) are also able to have access to its future input information \parencite[p. 394ff.]{deep_learning}. An example of such a bidirectional model is depicted in Figure \ref{fig:rnn-bidirectional}. The same idea could also be extended to a sequential processing of data in two dimensions, which is known as a \textit{grid RNN}.
+
+\subsubsection{Backpropagation Through Time}
 
 Analyzing the RNN structure might raise the question of how this effects the training procedure, because the gradient flows through recurrent cells multiple times while backpropagating the error. It is important to see that recurrent networks are still feed-forward networks with the extension to reuse the same weights expanded in time. Consequently, we still have to propagate the error backwards starting from the last timestep $ \tau $ like in standard backpropagation. Depending on the length of the sequence and the computational resources, we can proceed until the very beginning, or truncate our view of interest by stopping at a given limit. Additionally, given the shared weights $ \textbf{w} $ of two timesteps $\tau $ and $ \tau+1 $, we have to hold the weight constraint $ \textbf{w}^{(\tau)} = \textbf{w}^{(\tau+1)} $. Therefore, $ \nabla \textbf{w}^{(\tau)} = \nabla \textbf{w}^{(\tau+1)} $ has to be fulfilled as well. We can do so by by computing the gradients for both timesteps independently, but use the average of their sum:
 
@@ -445,7 +468,7 @@ As depicted in Figure \ref{fig:lstm}, the internal structure of an LSTM cell loo
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.8\linewidth]{figures/lstm.pdf}
-	\caption[Structure of a LSLTM cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
+	\caption[Structure of a LSLTM Cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
 \end{figure}
 
 As stated before, the fundamental enhancement of LSTMs is the cell state $\textbf{C}^{(\tau)}$, denoted as a bold line in the graphics above. From its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multipliciation with the output of the forget gate $\textbf{f}^{(\tau)}$, a specific part of the previous state can be party or fully deleted. Afterwards, the new candidate cell state $ \hat{\textbf{c}}^{(\tau)} $ is added to it, which is only regulated by the input gate $ \textbf{i}^{(\tau)} $. The third gate $ \textbf{o}^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
@@ -504,11 +527,11 @@ where $ \tilde{x} $ is the randomly corrupted version of the ground truth input 
 
 \subsection{Recurrent Encoder-Decoder Models}
 
-The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model has been firstly introduced in \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementations, as well as could be applied in a non-autoencoder fashion, we generalize its name to \textit{recurrent encoder-decoder} model. This name is also used in several follow-up works.}. But since then, it has been applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
+The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model has been firstly introduced independently from each other in \parencite{brnn_fist} and \parencite{brnn_second}. Further, it has been used in  \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementations, as well as could be applied in a non-autoencoder fashion, we use the more general name \textit{recurrent encoder-decoder} model here as well. This name is also used in several follow-up works.} for the first time in context of image processing. But since then, it has been applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[width=.8\linewidth]{figures/rnn_autoencoder.pdf}
+	\includegraphics[width=.9\linewidth]{figures/rnn_autoencoder.pdf}
 	\caption[Recurrent Autoencoder Model]{Basic structure of a conditional recurrent autoencoder. The inputs (red) are processed by the encoder RNN to learn the representation of the data in sequence. Then, the decoder RNN takes over to infer the reconstructions (blue) of the inputs in reverse order. (Based on \parencite{unsup_learn_lstm})} \label{fig:rnn-autoencoder}
 \end{figure}
 
