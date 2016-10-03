@@ -421,10 +421,10 @@ Besides the flexibility in the number of inputs and outputs, the recurrent compo
   \label{fig:rnn-bidirectional}
 \end{subfigure}
 \caption[Deep Recurrent Network Architectures]{Examples of deeper recurrent network architectures. The figure in (a) shows a two-layer RNN, while (b) shows a single-layer BRNN. Both bidirectional outputs per cell of the latter model are combined and could be further processed by subsequent neural networks. (Based on \parencite{rnn-effectiveness})}
-\label{fig:rnn-modes}
+\label{fig:rnn-advanced}
 \end{figure}
 
-Additionally, the input sequence could be processed in both directions. This can be enabled by combining an RNN that starts at the beginning of the sequence with a second RNN starting from the very end backwards through time. In consequence, these so called \textit{bidirectional recurrent neural networks} (BRNN) are also able to have access to its future input information \parencite[p. 394ff.]{deep_learning}. An example of such a bidirectional model is depicted in Figure \ref{fig:rnn-bidirectional}. The same idea could also be extended to a sequential processing of data in two dimensions, which is known as a \textit{grid RNN}.
+Additionally, the input sequence could be processed in both directions. This can be enabled by combining an RNN that starts at the beginning of the sequence with a second RNN starting from the very end backwards through time. In consequence, these so called \textit{bidirectional recurrent neural networks} (BRNN) are also able to have access to its future input information \parencite[p. 394ff.]{deep_learning}. It is to add that the recurrent weights are not shared in both directions. An example of such a bidirectional model is depicted in Figure \ref{fig:rnn-bidirectional}. The same idea could also be extended to a sequential processing of data in two dimensions, which is known as a \textit{grid RNN}.
 
 \subsubsection{Backpropagation Through Time}
 
