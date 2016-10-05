@@ -1,17 +1,5 @@
 % !TeX root = ../main.tex
 
-% why not Sport M1 dataset
-% why we used crops
-% why we used which input-output length
-% why we used movement-detection (any describe how)
-% how we define an epoch for each
-% dataset details (overview as a table?)
-% why we used these datasets
-
-% UCF / PAC: show patches AND full-images seq. examples :)
-
-
-
 \chapter{Datasets} \label{chapter:datasets}
 
 This chapter presents all datasets that are going to be used in the following evaluation. We have chosen three different video datasets that have been used in related works in order to be able to compare the results and analyze the strength and weaknesses of the different network models. The selected datasets will be introduced one after another ordered by their content's complexitiy with respect to the possible variations in colors, motion and pysical environment. Additionally, random samples from each dataset will be shown to get a better idea of how the data that is fed to the network looks like.
@@ -22,7 +10,7 @@ This chapter presents all datasets that are going to be used in the following ev
 
 We first train our model on a synthetic dataset of black and white images with flying handwritten digits. The \textit{Moving MNIST} was firstly introduced in \parencite{unsup_learn_lstm} and applied in context of video frame prediction. Since then, it was used several times in different follow-up works, such as \parencite{spat_temp_video_autoenc} or \parencite{conv_lstm_nowcasting}. 
 
-\subsection{Data Generation and Characteristics}
+\subsection{Characteristics and Data Generation}
 
 In the proposed setting, each sequence consists of $20$ frame images of size $ 64 \times 64 $ with two random moving digits from the famous MNIST\footnote{MNIST dataset of handwritten digits: \url{http://yann.lecun.com/exdb/mnist/}} dataset in it. One major advantage of this simple dataset is that it exhibits a nearly unlimited size, because it can be generated on the fly. When training a model, we therefore randomly choose two random digits from the first $55,000$ digits of the training set and place them on any location of the first image patch. To generate the subsequent frames, we assign a velocity to each digit, whose direction is chosen uniformly from a unit circle. Further, the simple physical rule is applied that the angle of incidence is equal to the angle of reflection when any digit of size $ 28 \times 28 $ touches the wall. Moreover, this enables other interesting properties of the dataset, such as basic dynamics due to having to predict the right trajectory after bouncing off a wall, as well as multiple occlusion effects of overlapping digits. Consequently, even that the generation process of the dataset is that simple, it is hard for a model to generate accurate predictions on the test set without learning a representation that encodes the internal motion of the system \parencite[p. 6]{conv_lstm_nowcasting}. Last but not least, having a simpler dataset at hand allows us to gain a better understanding of the model's behavior in respect to its hyperparameters. Especially in consideration of the very long training time of several days when more complex or even natural videos are used.
 
@@ -56,7 +44,7 @@ The generation procedure of the validation set is equal to the previously descri
 
 Even that some other works only used a fixed number of pre-generated frame sequences only, we kept up with the on-the-fly generation process of the initial paper for at least three reasons. First, it limits the amound of data and therefore increases the chance of overfitting. Seconds, loading the pre-generated frames from disk takes more time than generating them on the fly; hence it could have a slightly negative impact on the overal performance. And third, it reduces the overall memory requirements in case the whole data would otherwise be pre-loaded into memory in order to eleminate the second mentioned issue.
 
-\subsection{Preprocessing}
+\subsection{Data Preprocessing}
 
 Since the original pixel values of the MNIST dataset are in a range of $[0, 255]$, we perform simple rescaling to $[0, 1]$ in order to normalize the data. Futher, we considered to subtract the mean pixel-values as well, because gray-scale images have the stationarity property\footnote{For example when the statistics for each data dimension follows the same distribution, the data is said to be stationary.}. But due to the fact that this is not often done in practice when the MNIST dataset is used \parencite{stanford_data_pre}, as well as we could not see any noticable improvements when applying it, caused that we did not use mean subtraction while preprocessing the data. Moreover, we belief that since most parts of any image is black (and therefore zero), further processing of the data is not necessarily required.
 
@@ -100,11 +88,13 @@ The action inside each recording has a closed world with various game rules that
 \end{figure}
 
 
-\subsection{Preprocessing and Augmentation} \label{sec:pacman_preprocessing}
+\subsection{Data Preprocessing} \label{sec:pacman_preprocessing}
 
 We rescaled the images of every sequence to be in range of [-1, 1]. To ensure that the predicted outputs outputs exhibit the same value scale, we use a $tanh$ activation function after the last transposed convolutional layer. Since each single image is quite big, we take advantage from our fully-convolutional approach and train the network on random crops of size $ 32 \times 32 $ only. Some random samples of these cropped images are shown in Figure \ref{fig:pacman}. Unfortunately, the usage of small image crops follows that most of the used training sequences show no motion at all.
 
 After we experienced a strong preference of predicting the worlds background only over the single small moving characters, we decided use a techniqe similar to \parencite{deep_multiscale_video_pred}, in order to ensure that each temporal sequence shows enough movement. Therefore, each time when we select a random part of the sequence from the training set, we calculate the $\ell_2$ difference between each consecutive frames. Afterwards, the interatively reject this randomly chosen crop of the sequence until the the overall movement of the input sequence is higher than a given threshold of $25 \cdot n_{frames}$, or we reach a specified limit in order to prevent an endless loop. Additionally, we ensure that there is also movement at the end of the input sequence to ensure that not the whole movement is just taking place at the beginning of the whole sequence only, as well as to reduce the chance that the network has to predict the movement of newly incoming object only which it obviously cannot predict. Last but not least, we have slightly shortened the input and output sequence length compared to the other two datasets to \num{8} frames each. The reason for this is that the motion detection is kind of useless when being applied on too long sequences, because of the high chance that all these fast moving objects within the selected crop have already left the scene. In particular, before the decoder takes over to predict the future frames. However, even that this filtering of the final training examples sounds quite radical, it is to highlight that a high fraction of the input space is still static content. This can be attributed to the use of convolutional layer with small windows sizes that slide over the whole input space.
+
+\subsection{Data Augmentation}
 
 In terms of data augmentation, we did \textit{not} randomly modify the brightness or contrast of the image examples, because it does not make sense in context of this video game. But since the game world is mirrored horizontally, we perform random horizontal flipping in case the chosen crop is not showing any parts of the status display at the bottom. Furthermore, we iterated over all sequences \num{256} times per epoch, reasoned by the fact that the dataset consists of only a few but very long sequences. A second reason is that we only use a very small clip and random crop from from these frame sequences. 
 
@@ -173,11 +163,13 @@ The dataset provides three standards train/test splits intended to be used for e
 \label{fig:ucf}
 \end{figure}
 
-\subsection{Preprocessing and Augmentation}
+\subsection{Data Preprocessing}
 
 The data preprocessing that we perform in UCF-101 is very similar to the procedure describe in Section \ref{sec:pacman_preprocessing}, but with the following differences. First, we cut the width and height of all images in half, resulting in downscaled videos of size $160 \times 120$ using linear interpolation. We do this in order to compensate the noisy, pixelated artefacts in the videos. Also, it increases the chance of finding a random crop of size $ 32 \times 32 $ that actually has some true motion in it, instead of just flickering caused by noise. Seconds, we slightly weaken the constraint regarding motion filtering when selecting the crop region of the randomly selected clip. While we still reject a sequence that has a very low motion in the input frames, we do not dismiss miss a sequence that has no motion at the end. Figure \ref{fig:ucf} shows several cropped sequence examples from the different dataset splits that are fed into our model.
 
 Furthermore, because it is wasteful to load the whole video file into memory, especially in regard that only a very small portion of the data is acutally used to generate a single example for the next batch, we perform an additional offline preprocessing of the data before the actual training process starts. For that reason, we iterate over all raw video files and generate non-overlapping binary video sequences with a length of \num{30} frames each. Fortunately, the generated files can be reused after doing this process once. Finally, we end up with \num{55150} clips for the training set, \num{7183} clips for the validation set and \num{14451} clips for the test set.
+
+\subsection{Data Augmentation}
 
 Regarding data augmentation, we randomly modify the contrast and brightness of the overall image sequence by a delta of $ \pm20\% $, as well as perform random horizonal flipping in the training data. While we do not randomly change the contrast or brightness in the validation or test data, we double their size by using both the normal and flipped instances. Further, we use four crops from every video in each evaluation iteration in order to have a balance between more consistent evaluations and still an acceptable processing time. It is to add that we perform these augmentations on-the-fly. To facilitate this, we use an advanced double-buffered input queue. The first \textit{filename queue} is randomly filled with references to the pre-generated, binary sequence files. Afterward, \num{16} CPU threads enqueue a reference from this queue, load the sequence into memory and then perform all preprocessing steps in parallel, for the purpose of generating a single training example. Finally, this example is then enqueued to the \textit{shuffled batch queue}, from which our model loads its batches from in every iteration. Consequently, there is no waiting time in-between each training step.
 
