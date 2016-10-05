@@ -60,8 +60,7 @@ The video game dataset contains about half a million single images of size $ 160
 
 The action inside each recording has a closed world with various game rules that the network has to learn. Just to name some example, all object follow the path between the walls of the game world, with the two exceptions that the ghosts in the center might exit the cave through the top barrier, as well as that Pacman can teleport himself by leaving the world using its left or right exit. Further, the protagonist opens and closes its mouth, can eat the distributed dots, fruits or blue ghosts. Some recordings from the different dataset splits are depicted in Figure \ref{fig:pacman_full}.
 
-
-\begin{figure}[h!tb]
+\begin{figure}[htb]
 \centering
 \begin{subfigure}{1.0\textwidth}
   \centering
@@ -98,31 +97,6 @@ After we experienced a strong preference of predicting the worlds background onl
 
 In terms of data augmentation, we did \textit{not} randomly modify the brightness or contrast of the image examples, because it does not make sense in context of this video game. But since the game world is mirrored horizontally, we perform random horizontal flipping in case the chosen crop is not showing any parts of the status display at the bottom. Furthermore, we iterated over all sequences \num{256} times per epoch, reasoned by the fact that the dataset consists of only a few but very long sequences. A second reason is that we only use a very small clip and random crop from from these frame sequences. 
 
-\begin{figure}[htpb]
-\centering
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \includegraphics[width=1.0\linewidth]{figures/ds/pac_train_full.png}
-  \caption{Training set}
-  \label{fig:pac_train_full}
-  \vspace{.1cm}
-\end{subfigure}
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \includegraphics[width=1.0\linewidth]{figures/ds/pac_valid_full.png}
-  \caption{Validation set}
-  \label{fig:pac_valid_full}
-  \vspace{.1cm}
-\end{subfigure}
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \includegraphics[width=1.0\linewidth]{figures/ds/pac_test_full.png}
-  \caption{Test set}
-  \label{fig:pac_test_full}
-\end{subfigure}
-\caption[MsPacman Full Image Samples]{Exemplary sequences of game recordings from MsPacman dataset that have been samples randomly from the different splits. Each shown clip has a length of \num{16} frames of size $160 \times 210$.}
-\label{fig:pacman_full}
-\end{figure}
 
 \section{UCF-101}
 
@@ -137,7 +111,12 @@ The average video length of the whole dataset is about \num{6.2} seconds, while 
 
 The dataset provides three standards train/test splits intended to be used for either action recognition or action detection. We have chosen the third standard split for action recognition, because it consists of the most videos for training, as well as allowed the simplest divisibility of the test split. Since we expect that a huge training set is fundamental for the network in order deeply explore the inner dynamics, we descide to take the validation data from the test split instead of the training data as usual. For the avoidance of doubt, other previous works using UCF-101 for frame prediction either used only $ 10\% $ of the test set actually for testing \parencite[p. 12]{deep_multiscale_video_pred}, or made no comment about which parts of the data they choose for validation and testing. Finally, we therefore end up with \num{9624}, \num{1232} and \num{2464} videos for the training, validation and test set, respectively.
 
-\begin{figure}[h!tb]
+
+\subsection{Data Preprocessing}
+
+The data preprocessing that we perform in UCF-101 is very similar to the procedure describe in Section \ref{sec:pacman_preprocessing}, but with the following differences. First, we cut the width and height of all images in half, resulting in downscaled videos of size $160 \times 120$ using linear interpolation. We do this in order to compensate the noisy, pixelated artefacts in the videos. Also, it increases the chance of finding a random crop of size $ 32 \times 32 $ that actually has some true motion in it, instead of just flickering caused by noise. Seconds, we slightly weaken the constraint regarding motion filtering when selecting the crop region of the randomly selected clip. While we still reject a sequence that has a very low motion in the input frames, we do not dismiss miss a sequence that has no motion at the end. Figure \ref{fig:ucf} shows several cropped sequence examples from the different dataset splits that are fed into our model.
+
+\begin{figure}[htb]
 \centering
 \begin{subfigure}{1.0\textwidth}
   \centering
@@ -163,39 +142,9 @@ The dataset provides three standards train/test splits intended to be used for e
 \label{fig:ucf}
 \end{figure}
 
-\subsection{Data Preprocessing}
-
-The data preprocessing that we perform in UCF-101 is very similar to the procedure describe in Section \ref{sec:pacman_preprocessing}, but with the following differences. First, we cut the width and height of all images in half, resulting in downscaled videos of size $160 \times 120$ using linear interpolation. We do this in order to compensate the noisy, pixelated artefacts in the videos. Also, it increases the chance of finding a random crop of size $ 32 \times 32 $ that actually has some true motion in it, instead of just flickering caused by noise. Seconds, we slightly weaken the constraint regarding motion filtering when selecting the crop region of the randomly selected clip. While we still reject a sequence that has a very low motion in the input frames, we do not dismiss miss a sequence that has no motion at the end. Figure \ref{fig:ucf} shows several cropped sequence examples from the different dataset splits that are fed into our model.
-
 Furthermore, because it is wasteful to load the whole video file into memory, especially in regard that only a very small portion of the data is acutally used to generate a single example for the next batch, we perform an additional offline preprocessing of the data before the actual training process starts. For that reason, we iterate over all raw video files and generate non-overlapping binary video sequences with a length of \num{30} frames each. Fortunately, the generated files can be reused after doing this process once. Finally, we end up with \num{55150} clips for the training set, \num{7183} clips for the validation set and \num{14451} clips for the test set.
+
 
 \subsection{Data Augmentation}
 
 Regarding data augmentation, we randomly modify the contrast and brightness of the overall image sequence by a delta of $ \pm20\% $, as well as perform random horizonal flipping in the training data. While we do not randomly change the contrast or brightness in the validation or test data, we double their size by using both the normal and flipped instances. Further, we use four crops from every video in each evaluation iteration in order to have a balance between more consistent evaluations and still an acceptable processing time. It is to add that we perform these augmentations on-the-fly. To facilitate this, we use an advanced double-buffered input queue. The first \textit{filename queue} is randomly filled with references to the pre-generated, binary sequence files. Afterward, \num{16} CPU threads enqueue a reference from this queue, load the sequence into memory and then perform all preprocessing steps in parallel, for the purpose of generating a single training example. Finally, this example is then enqueued to the \textit{shuffled batch queue}, from which our model loads its batches from in every iteration. Consequently, there is no waiting time in-between each training step.
-
-
-\begin{figure}[htpb]
-\centering
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \adjincludegraphics[width=1.0\linewidth,trim={0 {.3333\height} 0 0},clip]{figures/ds/ucf_train_full.png}
-  \caption{Training set}
-  \label{fig:ucf_train_full}
-  \vspace{.1cm}
-\end{subfigure}
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \adjincludegraphics[width=1.0\linewidth,trim={0 0 0 {.3333\height}},clip]{figures/ds/ucf_valid_full.png}
-  \caption{Validation set}
-  \label{fig:ucf_valid_full}
-  \vspace{.1cm}
-\end{subfigure}
-\begin{subfigure}{1.0\textwidth}
-  \centering
-  \adjincludegraphics[width=1.0\linewidth,trim={0 0 0 {.3333\height}},clip]{figures/ds/ucf_test_full.png}
-  \caption{Test set}
-  \label{fig:ucf_test_full}
-\end{subfigure}
-\caption[UCF-101 Full Image Samples]{Randomly chosen and rescaled clip samples of size $160 \times 120$ from the UCF-101 dataset.}
-\label{fig:ucf_full}
-\end{figure}

@@ -63,11 +63,20 @@ cross/.default={1pt}}
 
 % Settings for lstlistings
 \lstset{%
-  basicstyle=\ttfamily,
+  basicstyle=\footnotesize\ttfamily,
   columns=fullflexible,
   autogobble,
   keywordstyle=\bfseries\color{MediumBlue},
-  stringstyle=\color{DarkGreen}
+  stringstyle=\color{DarkRed},
+  backgroundcolor=\color{gray!7},%
+  numbers=left, numberstyle=\tiny,
+  numberstyle=\tiny,
+  tabsize=2,
+  breaklines=true,
+  showtabs=false,
+  captionpos=b
+  stepnumber=1,
+  numbersep=9pt
 }
 
 % Completely prevent breaking of footnotes over multiple pages

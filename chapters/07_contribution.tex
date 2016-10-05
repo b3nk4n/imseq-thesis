@@ -13,38 +13,36 @@ Before concluding this thesis, we would like to present a side contribution that
 
 \section{A High-Level Framework for TensorFlow}
 
-In this section, we present the design goals and key features of the TensorLight\footnote{TensorLight - A lightweight, high-level framework for TensorFlow:\\ \url{https://github.com/bsautermeister/tensorlight}} framework for TensorFlow based projects, as well as visualize its architecture. Additionally, we demonstrate its usage in a short example. 
-
+In this section, we present the design goals and key features of the TensorLight\footnote{TensorLight - A lightweight, high-level framework for TensorFlow:\\ \url{https://github.com/bsautermeister/tensorlight}} framework for TensorFlow based projects. Additionally, we visualize the main pricipal architecture and demonstrate its usage in a short example. We make the code of the project available to the research community under the MIT license.
 
 \subsection{Guiding Principles}
 
-%TODO here (don't forget that the key-features list is a seperate section :) )
+The TensorLight framework is developed under four core principles, namely \textit{simplicity}, \textit{compactness}, \textit{standardization} and \textit{superiority}. These goals are beriefly described in the following list:
 
-% KERAS:
-% ==> Modularity. A model is understood as a sequence or a graph of standalone, fully-configurable modules that can be plugged together with as little restrictions as possible. In particular, neural layers, cost functions, optimizers, initialization schemes, activation functions, regularization schemes are all standalone modules that you can combine to create new models.
-% ==> Minimalism. Each module should be kept short and simple. Every piece of code should be transparent upon first reading. No black magic: it hurts iteration speed and ability to innovate.
-% ==> Easy extensibility. New modules are dead simple to add (as new classes and functions), and existing modules provide ample examples. To be able to easily create new modules allows for total expressiveness, making Keras suitable for advanced research.
-% ==> Work with Python. No separate models configuration files in a declarative format. Models are described in Python code, which is compact, easier to debug, and allows for ease of extensibility.
-
-% SLIM:
-%Allows one to define models much more compactly by eliminating boilerplate code. This is accomplished through the use of argument scoping and numerous high level operations. These tools increase readability and maintainability, reduce the likelihood of an error from copy-and-pasting hyperparameter values and simplifies hyperparameter tuning.
-%Makes developing models simple by providing commonly used loss functions
-
-% TF-Learn:
-% TFlearn is a modular and transparent deep learning library built on top of Tensorflow. It was designed to provide a higher-level API to TensorFlow in order to facilitate and speed-up experimentations, while remaining fully transparent and compatible with it.
-
-%TFLearn features include:
-%==> Easy-to-use and understand high-level API for implementing deep neural networks, with tutorial and examples.
-%==> Fast prototyping through highly modular built-in neural network layers, regularizers, optimizers, metrics...
-%==> Full transparency over Tensorflow. All functions are built over tensors and can be used independently of TFLearn.
-%==> Powerful helper functions to train any TensorFlow graph, with support of multiple inputs, outputs and optimizers.
-%==> Easy and beautiful graph visualization, with details about weights, gradients, activations and more...
-%==> Effortless device placement for using multiple CPU/GPU.
-
+\begin{itemize}
+\item \textbf{Simplicity:} Straigt-forward to use for anybody who has already worked with TensorFlow. Especially, no further learning is required regarding how to define a model's graph definition.
+\item \textbf{Compactness:} Reduce boilerplate code, while keeping the transparency and flexibility of TensorFlow. 
+\item \textbf{Standardization:} Provide a standard way in respect to the implementation of models and and datasets in order to save time. Further, it automates the whole training and validation process, but also provides hooks to maintain customizability.
+\item \textbf{Superiority:} Enable advanced features that are not included in the TensorFlow API, as well as retain its full functionality.
+\end{itemize}
 
 
 \subsection{Key Features}
 
+To highlight the advanced features of TensorFlow, we would like to provide an incomplete list of the ten main functionalities that are not shipped with TensorFlow out-of-the-box. Some of them might even be missing in other high-level APIs. These include:
+
+\begin{itemize}
+\item Transparent lifecycle management of the session and graph definition.
+\item Train or evaluate a model with a single line of code.
+\item Abstracted, runtime-exchangeable input pipelines which either use the simple feeding mechanism with numpy arrays, or even multi-threaded input queues.
+\item Automatic saving and loading of hyperparamters as JSON to simplify the evaluation management of numerous trainings.
+\item Effortless support to train a model symmetrically on multiple GPUs.
+\item Ready-to-use loss functions and metrics, even with latest advances for perceptual motivated image similarity assessment.
+\item Abstract classes for models, datasets and optimizers to provide a reusable plug-and-play support.
+\item Ability to work with other higher-level libraries hand in hand, such as \textit{tf.contrib} or \textit{TF-slim}.
+\item Automatic creation of periodic checkpoints and TensorBoard summaries
+\item Extended recurrent functions to enable scheduled sampling, as well as an implementation of a ConvLSTM cell.
+\end{itemize}
 
 
 \subsection{Architecture}
@@ -53,18 +51,22 @@ In this section, we present the design goals and key features of the TensorLight
 \subsection{Example}
 
 
+Model code \ref{code:model}.
 
-Bla bla...
 
-\begin{itemize}
-\item Design goals
-\item Sketch the architecture
-\item List of key features
-	\begin{itemize}
-	\item Reduce boiler plate code
-	\item modular structure
-	\item hyper-restore
-	\item combined use of input-queu and feed
-	\item ...
-	\end{itemize}
-\end{itemize}
+
+\begin{figure}[htpb]
+  \begin{tabular}{c}
+  \begin{lstlisting}[language=Python]
+	rt = tt.core.MultiGpuRuntime("/tmp/train", gpu_devices=[0, 1])
+	rt.register_model(SimpleAutoencoderModel(5e-4))
+	rt.register_optimizer(tt.training.Optimizer(tt.training.ADAM,
+	                                            0.001, 1000, 0.95))	
+	rt.register_datasets(tt.datasets.mnist.MNISTTrainDataset(),
+	                     tt.datasets.mnist.MNISTValidDataset())
+	rt.build(is_autoencoder=True)
+	rt.train(batch_size=128, epochs=100)
+  \end{lstlisting}
+  \end{tabular}
+  \caption[Example listing]{An example for a source code listing.}\label{code:runtime}
+\end{figure}
