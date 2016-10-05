@@ -1,10 +1,57 @@
 % !TeX root = ../main.tex
 
+
 \chapter{Contribution} \label{chapter:contribution}
 
-Bla Bla
+Before concluding this thesis, we would like to present a side contribution that arised in parallel to this thesis. When we started to work on our implementation, the TensorFlow library for machine intelligence had just published its second public release with version \num{0.7}. Thus, there has not been that much experience and best practices around with TensorFlow, as well as its API is still very low-level for several use cases even today. As a result, there was the desire to create a reusable library to reduce boilerplate code of TensorFlow based projects, as well as to retain best practices of existing examples and also this thesis. A second idea was that future theses or other deep learning projects of the \textit{Computer Visoin Group}\footnote{Computer Vision Group at Technische Universität München: \url{https://vision.in.tum.de/}} at TUM might benefit from such a library. However, this project has grown larger and larger over time and ended up in a powerful high-level framework, that has been developed independently from other high-level APIs for TensorFlow like \textit{TF-Slim}\footnote{TFLearn - Deep learning library featuring a higher-level API for TensorFlow: \url{http://tflearn.org/}} or \textit{Keras}\footnote{Keras - Deep learning library for Theano and TensorFlow: \url{https://keras.io/}}. Ultimately, about $ 99\% $ of the overall code of this thesis has been transferred into this framework, throughout with having abstraction and reusability in mind.
 
-\section{TensorLight - A high-level framework for TensorFlow}
+% features:
+%     - Provides convenient functions to simplify existing TensorFlow functions
+%     - Provides convenient functions for runtime summaries on TensorBoard, such as summaries of convolutional filters, loss summaries, weight histograms, etc.
+% utils: python/numpy related conv. functions: video, image, data, ...
+% visualizations/ui: in context to work also when used in ipyhton notebook
+
+\section{A High-Level Framework for TensorFlow}
+
+In this section, we present the design goals and key features of the TensorLight\footnote{TensorLight - A lightweight, high-level framework for TensorFlow:\\ \url{https://github.com/bsautermeister/tensorlight}} framework for TensorFlow based projects, as well as visualize its architecture. Additionally, we demonstrate its usage in a short example. 
+
+
+\subsection{Guiding Principles}
+
+%TODO here (don't forget that the key-features list is a seperate section :) )
+
+% KERAS:
+% ==> Modularity. A model is understood as a sequence or a graph of standalone, fully-configurable modules that can be plugged together with as little restrictions as possible. In particular, neural layers, cost functions, optimizers, initialization schemes, activation functions, regularization schemes are all standalone modules that you can combine to create new models.
+% ==> Minimalism. Each module should be kept short and simple. Every piece of code should be transparent upon first reading. No black magic: it hurts iteration speed and ability to innovate.
+% ==> Easy extensibility. New modules are dead simple to add (as new classes and functions), and existing modules provide ample examples. To be able to easily create new modules allows for total expressiveness, making Keras suitable for advanced research.
+% ==> Work with Python. No separate models configuration files in a declarative format. Models are described in Python code, which is compact, easier to debug, and allows for ease of extensibility.
+
+% SLIM:
+%Allows one to define models much more compactly by eliminating boilerplate code. This is accomplished through the use of argument scoping and numerous high level operations. These tools increase readability and maintainability, reduce the likelihood of an error from copy-and-pasting hyperparameter values and simplifies hyperparameter tuning.
+%Makes developing models simple by providing commonly used loss functions
+
+% TF-Learn:
+% TFlearn is a modular and transparent deep learning library built on top of Tensorflow. It was designed to provide a higher-level API to TensorFlow in order to facilitate and speed-up experimentations, while remaining fully transparent and compatible with it.
+
+%TFLearn features include:
+%==> Easy-to-use and understand high-level API for implementing deep neural networks, with tutorial and examples.
+%==> Fast prototyping through highly modular built-in neural network layers, regularizers, optimizers, metrics...
+%==> Full transparency over Tensorflow. All functions are built over tensors and can be used independently of TFLearn.
+%==> Powerful helper functions to train any TensorFlow graph, with support of multiple inputs, outputs and optimizers.
+%==> Easy and beautiful graph visualization, with details about weights, gradients, activations and more...
+%==> Effortless device placement for using multiple CPU/GPU.
+
+
+
+\subsection{Key Features}
+
+
+
+\subsection{Architecture}
+
+
+\subsection{Example}
+
 
 
 Bla bla...
