@@ -29,6 +29,8 @@ Throughout this work, we would like to investigate whether deep learning techniq
 Like in the first example of object recognition on static pictures, this task might sound trivial for humans once more, since we already have built an intuition regarding motion and our environment. When we have a look at the image sequence in Figure \ref{fig:intro-seq}, we have a strong idea about how this sequence might continue. At least for a couple of time steps. The boy in the foreground probably will lift his left foot towards the ball, while the ball continues to fall down due to gravitation. In contrast, the background will stay almost unchanged.
 
 Developing a deep learning approach to tackle this is indeed a non-trivial task, as it has to model both, spatial and temporal features in combination. Additionally, related issues like evolving an effective training process or quantifying the perceptual image similarity between predicted and the ground truth frames have to be addressed as well. Moreover, existing state-of-the-art implementations that deal with frame prediction have to be reviewed and analyzed in detail in order to learn from their strength and weaknesses.
+%TODO : non-trivial: multi-step prediction: size of search space grows exponential
+%                    spatio-temoral data: take advantage fo the spatio-temp correlation within the data
 
 
 \section{Contributions}
@@ -42,7 +44,7 @@ The subsequent chapters of this thesis are structured as follows:
 
 \textbf{Chapter \ref{chapter:fundamentals}} covers the theoretical concepts that are required to understand our final implementation and its consecutive evaluation. We will have a deeper look into neural networks and explain how they are trained. Further, we will explore more advanced neural network architectures, namely \textit{convolutional neural networks} (CNN) for spatial learning and \textit{recurrent neural network} (RNN) models for sequential learning. Afterwards, we conclude this chapter with the investigation of some modern techniques that are used to improve the overall learning process, as well as metrics for perceptual motivated image similarity assessment.
 
-In \textbf{Chapter \ref{chapter:relatedwork}}, we take a closer look at existing approaches that are suitable for spatio-temporal learning and frame prediction. We briefly discuss their strength and weaknesses, as well as how they have influenced the design decisions regarding the architecture of our final neural network model. Additionally, these presented models build the baselines in our evaluation.
+In \textbf{Chapter \ref{chapter:relatedwork}}, we take a closer look at existing approaches that are suitable for spatio-temporal learning and frame prediction. We briefly discuss their strength and weaknesses, as well as how they have influenced the design decisions regarding the architecture of our final neural network model. Additionally, these models build the baselines in the evaluation.
 
 Afterwards, we present our neural network model in \textbf{Chapter \ref{chapter:implementation}}, including its architecture and implementation details. Moreover, we introduce a quite recently introduced and barely studied variant of recurrent network cell for spatio-temporal learning, namely \textit{convolutional LSTM}, which builds the central element of our model. We also suggest a special learning strategy for RNNs, which speeds up the training process and enables to improve the overall performance.
 
