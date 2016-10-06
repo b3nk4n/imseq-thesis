@@ -18,6 +18,7 @@
 \usepackage[export]{adjustbox}
 \usepackage{scrhack} % necessary for listings package
 \usepackage{listings}
+\usepackage{accsupp}
 \usepackage{lstautogobble}
 \usepackage{tikz}
 \usepackage{pgfplots}
@@ -62,12 +63,16 @@ cross/.default={1pt}}
 }
 
 % Settings for lstlistings
+\usepackage{inconsolata}
+\usepackage{color}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
 \lstset{%
   basicstyle=\footnotesize\ttfamily,
   columns=fullflexible,
   autogobble,
   keywordstyle=\bfseries\color{MediumBlue},
   stringstyle=\color{DarkRed},
+  commentstyle=\color{DarkGreen}\ttfamily,
   backgroundcolor=\color{gray!7},%
   numbers=left, numberstyle=\tiny,
   numberstyle=\tiny,
@@ -76,8 +81,17 @@ cross/.default={1pt}}
   showtabs=false,
   captionpos=b
   stepnumber=1,
-  numbersep=9pt
+  numbersep=9pt,
+  frame=single,
+  resetmargins=true
 }
+\lstdefinelanguage{PythonEx}{
+  language     = Python,
+  morekeywords = {with, as},
+  moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%}
+}
+
+
 
 % Completely prevent breaking of footnotes over multiple pages
 \interfootnotelinepenalty=10000 
