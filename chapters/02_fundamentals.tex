@@ -529,7 +529,7 @@ A second regularization strategy is to modify the reconstruction term of the los
 where $ \tilde{x} $ is the randomly corrupted version of the ground truth input $ x $.
 
 
-\subsection{Recurrent Encoder-Decoder Models}
+\subsection{Recurrent Encoder-Decoder Models} \label{sec:rnn_enc_dec}
 
 The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model has been firstly introduced independently from each other in \parencite{brnn_fist} and \parencite{brnn_second}. Further, it has been used in  \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementations, as well as could be applied in a non-autoencoder fashion, we use the more general name \textit{recurrent encoder-decoder} model here as well. This name is also used in several follow-up works.} for the first time in context of image processing. But since then, it has been applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
 
