@@ -6,12 +6,12 @@
 
 \chapter{Fundamentals} \label{chapter:fundamentals}
 
-To get a general understanding of how training a neural network works, we have to go through its theoretical concepts first. We start with the structure of simple feed-forward networks, continue with advanced model architectures that take advantage of the data's spatial or temporal properties, and finally end up with recent techniques that we use throughout our final implementation.
+To get a general understanding of how training a neural network works, we have to go through its theoretical concepts first. We start with the structure of simple feed-forward networks, continue with advanced model architectures that take advantage of the data's spatial or temporal properties. And finally we end up with recent techniques that are used throughout the final implementation.
 
 
 \section{Neural Networks}
 
-The main concept of neural networks (NN) dates back to the early 1950s, when Warren McCulloch and Walter Pitts tried to build a mathematical model of information processing in our brain. Inspired by this work, Frank Rosenblatt developed the so called \textit{perceptron} about two decades later \parencite[p. 226]{pattern_and_ml}. 
+The main concept of \textit{neural networks} (NN) dates back to the early 1950s, when Warren McCulloch and Walter Pitts tried to build a mathematical model of information processing in our brain. Inspired by this work, Frank Rosenblatt developed the so called \textit{perceptron} about two decades later \parencite[p. 226]{pattern_and_ml}. 
 
 \subsection{Basics}
 
@@ -32,7 +32,7 @@ Even that its formulation is that simple, it can represent complex decision-maki
 	\caption[Multilayer Perceptron]{Example of a MLP with two hidden layers. A single perceptron is highlighted in bold. (Based on \parencite{neural_nets_deep_learning})} \label{fig:mlp}
 \end{figure}
 
-The first and last layer of such a network are referred to as \textit{input layer} and \textit{output layer}. Furthermore, their number of nodes is determined by the given problem to solve. In case we want to train a network that identifies human faces in colored pictures with height and width of 100 pixels, it would require our input layer to have $ n_{in}=3000 $ perceptrons, as well as a single output node. In contrary, all intermediate layers are known as \textit{hidden layers} and can have any number of elements and depth. When every node from one layer is connected to all nodes of its subsequent layer, we call it \textit{fully connected} (FC).
+The first and last layer of such a network are referred to as \textit{input layer} and \textit{output layer}. Furthermore, their number of nodes is determined by the given problem to solve. In case we want to train a network that identifies human faces in colored pictures with height and width of 100 pixels, it would require our input layer to have $ n_{in}=$ \num{30000} perceptrons, as well as a single output node. In contrary, all intermediate layers are known as \textit{hidden layers} and can have any number of elements and depth. When every node from one layer is connected to all nodes of its subsequent layer, we call it \textit{fully connected} (FC).
 
 Afterwards, we can feed the input layer with a data example and apply equation \ref{eq:mlp} in each node to retrieve our binary result. This prediction step is called \textit{inference}. But in order to retrieve meaningful results, the network has to be trained first.
 
@@ -56,7 +56,7 @@ or \textit{binary cross-entropy} (BCE) \parencite{conv_lstm_nowcasting}:
   \mathcal{L}_{\textrm{bce}}(\textbf{w}, \textbf{b})= -\frac{1}{n} \sum\limits_{\textbf{x}} t(\textbf{x}) \cdot \log{\big(y(\textbf{x})\big)} + \big(1-t(\textbf{x})\big) \cdot \log{\big(1-y(\textbf{x})\big)} ,
 \end{equation}
 
-where $ n $ is the number of examples and $ t(\textbf{x}) $ denotes a mapping from an input example $ \textbf{x} $ to its ground truth target. Many other functions exist and some more will be introduced in Section \ref{sec:perc-loss}. But the above listed formulas are the main objectives that are used in many other works. During training of the network, we want to find the set of weights $ \textbf{w} $ and biases $ \textbf{b} $ that minimizes our error:
+where $ n $ is the number of examples and $ t(\textbf{x}) $ denotes a mapping from an input example $ \textbf{x} $ to its ground truth target. Many other functions exist and some more will be introduced in Section \ref{sec:perc-loss}, but the above listed formulas are the main objectives that are used in many other works. During training of the network, we want to find the set of weights $ \textbf{w} $ and biases $ \textbf{b} $ that minimizes our error:
 
 \begin{equation} \label{eq:min-loss}
   \textrm{arg}\min_{\textbf{w}, \textbf{b}} \mathcal{L}(\textbf{w}, \textbf{b}) .
@@ -114,7 +114,7 @@ Note that the sigmoid function's shape is a smoothed out variant of the \textit{
 
 \subsubsection{Initialization}
 
-Before starting the training process, we have to assign each variables $ \textbf{w} $ and $ \textbf{b} $ an initial value. This is done by pure randomness, using for example a uniform or Gaussian distribution. But if we start with weights that are too small, the signal could decrease so much that it is too small to be useful. On the other side, when we initialize our parameters with high values, the signal can end up to explode while propagating through the network \parencite{understand_xavier}. In consequence, a good initialization has a radical effect on how fast the network will learn useful patterns.
+Before starting the training process, we have to assign each variables $ \textbf{w} $ and $ \textbf{b} $ an initial value. This is done by pure randomness, using for example a uniform or Gaussian distribution. But if we start with weights that are too small, the signal could decrease so much that it is too small to be useful. On the other side, when we initialize our parameters with high values, the signal can end up to explode while propagating through the network \parencite{understand_xavier}. In consequence, a good initialization can have a radical effect on how fast the network will learn useful patterns.
 
 For this purpose, some best practices have been developed. One famous example that is used throughout in our final model is \textit{Xavier initialization}\footnote{Also known as Glorot initialization.} (see eq. \ref{eq:xavier}). Its formulation is based on the number of input and output neurons and uses sampling from a uniform distribution with zero mean and all biases set to zero \parencite{xavier-init}:
 
@@ -124,7 +124,7 @@ For this purpose, some best practices have been developed. One famous example th
 
 where $ \textbf{w} $ is the weight matrix at any network layer, $ n_{in} $ the number of incoming connections and $ n_{out} $ the number of outgoing connections to the next layer. This initialization is designed to keep the gradients in all layers within approximately the same scale.
 
-As an alternative to random initialization and performing a training of the entire network from scratch, it is also possible to reuse parts or even all trained parameters from a different model. A famous example that is often used to pre-initialize a network for image processing tasks is \textit{AlexNet} \parencite{imagenet}. It is pre-trained for several weeks across multiple graphics cards on the large \textit{ImageNet dataset} that contains 1.2 million images.
+As an alternative to random initialization and performing a training of the entire network from scratch, it is also possible to reuse parts or even all trained parameters from a different model. A famous example that is often used to pre-initialize a network for image processing tasks is \textit{AlexNet} \parencite{imagenet}. It is pre-trained for several weeks across multiple graphics cards on the large \textit{ImageNet}\footnote{ImageNet dataset: \url{http://image-net.org/}} dataset that contains 1.2 million images.
 
 \subsubsection{Backpropagation Learning Algorithm}
 
@@ -158,7 +158,7 @@ The training process could basically run endless. Therefore, a rule should be de
 
 \subsection{Regularization}
 
-As already stated, our goal is to find a representation that generalizes well. One common problem that has to be prevented when neural networks are trained is the effect of \textit{overfitting}. This means that even when the training loss decreases further and further, the validation and test error suddenly starts to get worse. One cause might be that the size of the training set is not large enough. But to come up with more data is often not possible. Another reason might be that our \textit{model complexity}, so the total number of trainable parameters is too high. To get an idea about the reason for this, imagine we want to fit a function $g(x)$ using some noisy data points of a ground truth function $f(x)$. When our model exhibits to many parameters, it might come up with a function that perfectly fits to all given data points. Nevertheless, as demonstrated in Figure \ref{fig:overfitting}, this is a bad estimate of the underlying function $f(x)$.
+As already stated, our goal is to find a representation that generalizes well. One common problem that has to be prevented when neural networks are trained is the effect of \textit{overfitting}. This means that even when the training loss decreases further and further, the validation and test error suddenly starts to get worse. One cause might be that the size of the training set is not large enough. But to come up with more data is often not possible. Another reason might be that our \textit{model complexity}\footnote{The complexity of a model is defined by the number of trainable parameters.} is too high. To get an idea about the reason for this, imagine we want to fit a function $g(x)$ using some noisy data points of a ground truth function $f(x)$. When our model exhibits to many parameters, it might come up with a function that perfectly fits to all given data points. Nevertheless, as demonstrated in Figure \ref{fig:overfitting}, this is a bad estimate of the underlying function $f(x)$.
 
 \begin{figure}[htpb]
   \centering
@@ -223,7 +223,7 @@ A well-known technique to delimitate overfitting is to penalize high parameter v
 
 where the coefficient $ \lambda $ controls the influence of the regularization. The term shown in equation \ref{eq:reg-loss} uses an $ \ell_{2} $ regularizer over all weights, which strongly penalizes a high magnitude of values. Together with the learning rate $ \eta $, both define two of the usually most significant hyperparameters in any neural network. Finding appropriate values is a major task when fine-tuning a model.
 
-A second regularization approach is known as \textit{dropout}. Instead of modifying the cost function, it manipulates a specific layer of the model by randomly deactivating a neuron with a probability $p$ in every training step. As a result, the networks learns a robustness against distinct patterns that cause a high activation towards a certain output. Stated differently, the network is forced to not learn any shortcut that could damage generality. It is to add that no neuron is deactivated during inference. But to compensate the larger amount of active neurons within the layer, all weights of outgoing connections will be multiplied by factor $ p $ \parencite[p. 1931]{dropout}
+A second regularization approach is known as \textit{dropout}. Instead of modifying the cost function, it manipulates a specific layer of the model by randomly deactivating a neuron with a probability $p$ in every training step. As a result, the networks gets robust against distinct patterns that cause a high activation towards a certain output. Stated differently, the network is forced to not learn any shortcut that could damage generality. It is appropriate to add that no neuron is deactivated during inference. But to compensate the larger amount of active neurons within the layer, all weights of outgoing connections will be multiplied by factor $ p $ \parencite[p. 1931]{dropout}
 
 
 
@@ -231,7 +231,7 @@ A second regularization approach is known as \textit{dropout}. Instead of modify
 
 In the previous section, we have discovered neural networks that exhibit a full connection of neuros from one layer to the next. While this allows to learn complex representations on the one hand, it comes with a couple of downside on the other hand as well. For example, data such as images would require the layers of the network to become very large, especially in consideration of the input layer. Consequently, the number of connections between these layers would increase exponentially and thus the amount of trainable parameters as well. At the bottom line, this would end up in a network that is either time-consuming to train, or we are even not able to store it in memory. In addition, we would not take any advantage of local image properties into account.
 
-Therefore, a new network type found attention in recent years, which are known as \textit{convolutional neural networks} (CNN). It is inspired by the animals' visual cortex, has already been used in the late nineties to solve optical character recognition tasks (OCR) \parencite{lecun_conv}, but received its main attention after beating proven methods in the \textit{ImageNet} competition by a large margin \parencite{imagenet}. The structure of a convolutional network, the detailed advantages and its mathematical formulation is described in the following sections.
+Therefore, a new network type found attention in recent years, which are known as \textit{convolutional neural networks} (CNN). It is inspired by the animals' visual cortex, has already been used in the late nineties to solve optical character recognition tasks (OCR) \parencite{lecun_conv} and received its main attention after beating proven methods in the \textit{ImageNet} competition by a large margin \parencite{imagenet}. The structure of a convolutional network, the detailed advantages and its mathematical formulation is described in the following sections.
 
 
 \subsection{Structure}
@@ -265,7 +265,7 @@ As we are mainly dealing with discrete 2D images in this thesis, the formulation
   \big(\textbf{I} \ast \textbf{K}\big)(x,y) = \sum\limits_{r=1}^{h} \sum\limits_{c=1}^{w} \textbf{I}_{c,r} \cdot \textbf{K}_{x-c,y-r} ,
 \end{equation}
 
-with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $ \textbf{K} $. Depending on the width and height of the kernel with a windows size of $ k \times k $ and the chosen stride $ s $, the shape of the convolved output changes. This is why the input is often enriched with a \textit{zero-padding}, in order to have more control regarding the resulting output size. The use of no padding ($p=0$) is also called \textit{valid padding}, as depicted in Figure \ref{fig:conv_valid}. Also, when a padding of $p=\floor{k/2}$ is used that is half the kernel size, it is referred to as \textit{same padding}, shown in Figure \ref{fig:conv_same}. The reasons for its name is caused by the fact that the input and output size stay unchanged when a stride of $ s=1 $ is used.
+with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $ \textbf{K} $. Depending on the width and height of the kernel with a windows size of $ k \times k $ and the chosen stride $ s $, the shape of the convolved output changes. This is why the input is often enriched with zeros in order to have more control regarding the resulting output size. Surrounding the data with zeros is also known as \textit{zero-padding}. The use of no padding ($p=0$) is also called \textit{valid padding}, as depicted in Figure \ref{fig:conv_valid}. Also, when a padding of $p=\floor{k/2}$ is used that is half the kernel size, it is referred to as \textit{same padding}, shown in Figure \ref{fig:conv_same}. The reasons for its name is caused by the fact that the input and output size stay unchanged when a stride of $ s=1 $ is used.
 
 \begin{figure}[htpb]
 \centering
@@ -281,7 +281,7 @@ with an input $ \textbf{I} $ of size $w \times h$ and a two-dimensional kernel $
   \caption{$p=1$ (same), $s=2$}
   \label{fig:conv_same}
 \end{subfigure}
-\caption[Convolution Operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride. (From \parencite{conv_guide})}
+\caption[Convolution Operation]{Visualizations of the convolutional operation with an $3 \times 3$ kernel but different settings for padding and stride. The white squares in (b) represent the padded zeros. (From \parencite{conv_guide})}
 \label{fig:conv}
 \end{figure}
 
@@ -403,7 +403,7 @@ In addition, the framework for recurrent models is very flexible as well. Depend
   \caption{}
   \label{fig:rnn-many2many}
 \end{subfigure}
-\caption[Examples of RNN Input-Output Modes]{Visualization of different recurrent network input-output modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks, or the direct input and output. (Based on \parencite{rnn-effectiveness})}
+\caption[Examples of RNN Input-Output Modes]{Visualization of different recurrent network input-output modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks or the direct input and output. (Based on \parencite{rnn-effectiveness})}
 \label{fig:rnn-modes}
 \end{figure}
 
@@ -570,14 +570,14 @@ The advantages of batch normalization are versatile:
 
 \section{Image Similarity Assessment}
 
-The practical use of deep learning in context of image generation tasks received a tremendous increase in recent years. Examples include denoising autoencoders (see Section \ref{sec:autoencoder}) for image reconstruction, semantic image completion \parencite{sem-img-inpainting}, the determination of optical flow \parencite{flownet}, \parencite{flow-static-img} or future  frame prediction of a given image sequence. Last mentioned field of application in is scope of this thesis. 
+The practical use of deep learning in context of image generation tasks received a tremendous increase in recent years. Examples include denoising autoencoders (see Section \ref{sec:autoencoder}) for image reconstruction, semantic image completion \parencite{sem-img-inpainting}, the determination of optical flow \parencite{flownet}, \parencite{flow-static-img} or future  frame prediction of a given image sequence. The last mentioned field of application is in scope of this thesis. 
 
 A neural networks main driver in respect to learning a good representation is the loss layer. Unfortunately, it found only little attention in most existing studies when applied in image processing tasks, at least until this year \parencite{loss-func-img-proc}. Therefore, we provide an overview of the main challenges of image similarity assessment and introduce some approved methods, as well as novel approaches when training neural networks in context of pictures in this section.
 
 
 \subsection{Naive Approach}
 
-The de facto standard loss function to compare a generated image with its ground truth target has been the \textit{pixel-wise squared error} (or $ \ell_{2} $) that was already mentioned in equation \ref{eq:mse}. It is easy to apply and usually provided by any neural network framework out-of-the-box. But on the other end, it suffers from some well-known limitations such as poor correlation with the human sense of perceptual quality \parencite{loss-func-img-proc}. The reason for this are twofold. First, $ \ell_{2} $ makes the assumption of a Gaussian noise model, which has its downsides when being applied to multimodal distributions. Second, it strongly penalizes outliers independently from local characteristics of the image, such as contrast or luminance. In contrary, the visual system of humans perceives noise in a different way.
+The de facto standard loss function to compare a generated image with its ground truth target has been the \textit{pixel-wise squared error} (or $ \ell_{2} $) that was already mentioned in equation \ref{eq:mse}. It is easy to apply and usually provided by any neural network framework out-of-the-box. But as a downside, it suffers from some well-known limitations such as poor correlation with the human sense of perceptual quality \parencite{loss-func-img-proc}. The reason for this are twofold. First, $ \ell_{2} $ makes the assumption of a Gaussian noise model, which has its downsides when being applied to multimodal distributions. Second, it strongly penalizes outliers independently from local characteristics of the image, such as contrast or luminance. In contrary, the visual system of humans perceives noise in a different way.
 
 \begin{figure}[htpb]
 \centering
