@@ -704,7 +704,7 @@ Of course, the same principle can be applied to end up with the multi-scale stru
 
 Both error functions have been evaluated in context of image generation super-resolution or JPEG artifact removal in \parencite{learning-perc-sim} and \parencite{loss-func-img-proc}. The latter suggests to combine each of them with $ \ell_1 $ to get the best of both worlds.
 
-\subsubsection*{Gradient Difference Loss}
+\subsubsection*{Gradient Difference Loss} \label{sec:gdl}
 
 Using the same criteria of the sharpness difference metric (see eq. \ref{eq:sharpdiff}), a strategy to further sharpen the image is to penalize the gradient differences in image space. This loss function is referred to as \textit{gradient difference loss} (GDL) and was proposed in \parencite{deep_multiscale_video_pred}. Combined with another error function, it can serve as an additional bias to deliver sharper results. To be more specific, the authors suggest to combine it with an $ \ell_1 $ loss function. The per-pixel GDL function to assess the ground truth image with its corresponding reconstruction is defined as follows:
 
