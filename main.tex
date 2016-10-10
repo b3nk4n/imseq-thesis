@@ -20,6 +20,10 @@
 \newcommand*{\getSubmissionDate}{\nth{17} October, 2016} % American format: https://www.englishclub.com/vocabulary/time-date.htm
 \newcommand*{\getSubmissionLocation}{Munich}
 
+\input{gloss}
+
+\makeglossaries
+
 \begin{document}
 
 % Set page numbering to avoid "destination with the same identifier has been already used" warning for cover page.
@@ -42,21 +46,31 @@
 \input{chapters/01_introduction}
 \input{chapters/02_fundamentals}
 \input{chapters/03_related_work}
+\skippage
 \input{chapters/04_implementation}
+
 \input{chapters/05_datasets}
+
 \input{chapters/06_evaluation}
+
 \input{chapters/07_contribution}
+
 \input{chapters/08_conclusion}
 
-
 \appendix{}
-
 \input{chapters/99_appendix}
+
+
+\glsaddall
+\printglossary[style=myacro,type=\acronymtype]
+%\printglossary[style=altlist]
+\printglossary[style=mysymbol,type=symbolslist]
 
 \microtypesetup{protrusion=false}
 \listoffigures{}
 \listoftables{}
 \microtypesetup{protrusion=true}
+
 \printbibliography{}
 
 \end{document}

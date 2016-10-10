@@ -76,7 +76,7 @@ y &= \phi(z) ,
 \end{aligned}
 \end{equation}
 
-which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \textit{activation function} $ \phi(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLu) $ max(0, z) $, illustrated in Figure \ref{fig:activations}.
+which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \textit{activation function} $ \phi(z) $. Frequently used examples are the sigmoid function $ \sigma(z) $, hyperbolic tangent $ tanh(z) $ and the rectified linear unit (ReLU) $ max(0, z) $, illustrated in Figure \ref{fig:activations}.
 
 \begin{figure}[htpb]
 	\centering
@@ -106,7 +106,7 @@ Note that the sigmoid function's shape is a smoothed out variant of the \textit{
       \addlegendentry{tanh};
       \addplot[mark=none,draw=black!30!green,ultra thick,smooth,domain=0:3] {x};
 	  \addplot[mark=none,draw=black!30!green,ultra thick,smooth,domain=-3:0] {0};
-      \addlegendentry{ReLu};
+      \addlegendentry{ReLU};
     \end{axis}
   \end{tikzpicture}
   \caption[Activation functions]{Visualization of the most commonly used activation functions in neural networks.}\label{fig:activations}

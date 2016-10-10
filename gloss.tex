@@ -1,0 +1,154 @@
+% commands
+\newcommand{\abk}[1]{\glslink*{#1}{#1}}	% prints acronym
+\newcommand{\addabk}[2]{\newacronym{#1}{#1}{#2}} % adds acronym entry (preamle only)
+
+
+% ACRONYMS
+\addabk{ANN}{\textbf{A}rtificial \textbf{N}eural \textbf{N}etwork}
+\addabk{NN}{\textbf{N}eural \textbf{N}etwork}
+\addabk{CNN}{\textbf{C}onvolutional \textbf{N}eural \textbf{N}etwork}
+\addabk{RNN}{\textbf{R}ecurrent \textbf{N}eural \textbf{N}etwork}
+\addabk{FCN}{\textbf{F}ully-\textbf{C}onvolutional \textbf{N}etwork}
+\addabk{AI}{\textbf{A}rtificial \textbf{I}ntelligence}
+\addabk{ML}{\textbf{M}achine \textbf{L}earning}
+\addabk{LSTM}{\textbf{L}ong \textbf{S}hort-\textbf{T}erm \textbf{M}emory}
+\addabk{FC-LSTM}{\textbf{F}ully-\textbf{C}onnected \textbf{LSTM}}
+\addabk{ConvLSTM}{\textbf{Conv}olutional \textbf{LSTM}}
+\addabk{MLP}{\textbf{M}ulti\textbf{l}ayer \textbf{P}erceptron}
+\addabk{FC}{\textbf{F}ully-\textbf{C}onnected}
+\addabk{RGB}{\textbf{R}ed \textbf{G}reen \textbf{B}lue}
+\addabk{MAE}{\textbf{M}ean \textbf{A}bsolute \textbf{E}rror}
+\addabk{MSE}{\textbf{M}ean \textbf{S}quared \textbf{E}rror}
+\addabk{BCE}{\textbf{B}inary \textbf{C}ross-\textbf{E}ntropy}
+\addabk{ReLU}{\textbf{R}ectified \textbf{L}inear \textbf{U}nit}
+\addabk{SDG}{\textbf{S}tochastic \textbf{G}radient \textbf{D}escent}
+\addabk{OCR}{\textbf{O}ptical \textbf{C}haracter \textbf{R}ecognition}
+\addabk{DCGAN}{\textbf{D}eep \textbf{C}onvolutional \textbf{G}enerative \textbf{A}dversarial \textbf{N}etwork}
+\addabk{GAN}{\textbf{G}enerative \textbf{A}dversarial \textbf{N}etwork}
+\addabk{BRNN}{\textbf{B}idirectional \textbf{R}ecurrent \textbf{N}eural \textbf{N}etwork}
+\addabk{BPTT}{\textbf{B}ack\textbf{p}ropagation \textbf{T}hrough \textbf{T}ime}
+\addabk{GRU}{\textbf{G}ated \textbf{R}ecurrent \textbf{U}nit}
+\addabk{PSNR}{\textbf{P}eak \textbf{S}ignal-to-\textbf{N}oise \textbf{R}atio}
+\addabk{FR}{\textbf{F}ull \textbf{R}eference}
+\addabk{SSIM}{\textbf{S}tructural \textbf{Sim}ilarity}
+\addabk{MS-SSIM}{\textbf{M}ulti-\textbf{S}cale \textbf{S}tructural \textbf{Sim}ilarity}
+\addabk{JPEG}{\textbf{J}oint\textbf{ P}hotographic \textbf{E}xperts \textbf{G}roup}
+\addabk{GDL}{\textbf{G}radient \textbf{D}ifference \textbf{L}oss}
+\addabk{MNIST}{\textbf{M}ixed \textbf{N}ational \textbf{I}nstitute of \textbf{S}tandards and \textbf{T}echnology}
+\addabk{UCF}{\textbf{U}niversity of \textbf{C}entral \textbf{F}lorida}
+\addabk{PCA}{\textbf{P}rinciple \textbf{C}omponent \textbf{A}nalysis}
+\addabk{Adam}{\textbf{Ad}aptive \textbf{M}oments \textbf{E}stimation}
+\addabk{API}{\textbf{A}pplication \textbf{P}rogramming \textbf{I}nterface}
+\addabk{TUM}{\textbf{T}echnische \textbf{U}niversität \textbf{M}ünchen}
+\addabk{MIT}{\textbf{M}assachusetts \textbf{I}nstitute of \textbf{T}echnology}
+\addabk{JSON}{\textbf{J}ava\textbf{S}cript \textbf{O}bject \textbf{N}otation}
+\addabk{GPU}{\textbf{G}raphics \textbf{P}rocessing \textbf{U}nit}
+\addabk{CPU}{\textbf{C}entral \textbf{P}rocessing \textbf{U}nit}
+\addabk{GIF}{\textbf{G}raphics \textbf{I}nterchange \textbf{F}ormat}
+
+
+% GLOSSARY
+%\newglossaryentry{test} {
+%  name={TestTest},
+%  description={The test description gloss entry.},
+%}
+
+
+% MATH SYMBOLS
+\newglossaryentry{hadamard}{name=\ensuremath{\odot},
+        description={Hadamard product},
+		type=symbolslist}
+\newglossaryentry{input}{name=\ensuremath{x_{i}},
+        description={Input element},
+		type=symbolslist}
+\newglossaryentry{output}{name=\ensuremath{y_{i}},
+        description={Output element},
+		type=symbolslist}
+\newglossaryentry{weight}{name=\ensuremath{W_{i}},
+        description={Weight element},
+		type=symbolslist}
+\newglossaryentry{bias}{name=\ensuremath{b},
+        description={Bias (or negative threshold)},
+		type=symbolslist}
+\newglossaryentry{activ}{name=\ensuremath{\phi(x)},
+        description={Activation function},
+		type=symbolslist}
+\newglossaryentry{lr}{name=\ensuremath{\eta},
+        description={Learning rate},
+		type=symbolslist}
+\newglossaryentry{loss}{name=\ensuremath{\mathcal{L}(x)},
+        description={Loss function},
+		type=symbolslist}
+\newglossaryentry{reg}{name=\ensuremath{\lambda},
+        description={Regularization coefficient},
+		type=symbolslist}
+\newglossaryentry{hidden}{name=\ensuremath{h^{(\tau)}},
+        description={Hidden state at time step $\tau$},
+		type=symbolslist}
+\newglossaryentry{cellstate}{name=\ensuremath{C^{(\tau)}},
+        description={Cell state at time step $\tau$},
+		type=symbolslist}
+\newglossaryentry{l_one}{name=\ensuremath{\ell_1},
+        description={Least absolute deviations},
+		type=symbolslist}
+\newglossaryentry{l_two}{name=\ensuremath{\ell_2},
+        description={Least square errors},
+		type=symbolslist}
+\newglossaryentry{conv}{name=\ensuremath{\ast},
+        description={Convolution operation},
+		type=symbolslist}
+\newglossaryentry{sigmoid}{name=\ensuremath{\sigma(x)},
+        description={Sigmoid activation function},
+		type=symbolslist}
+\newglossaryentry{argmin}{name=\ensuremath{\textrm{arg}\min\limits_{x}},
+        description={Value of $x$ for which the minimum is attained},
+		type=symbolslist}
+\newglossaryentry{uniform}{name=\ensuremath{\textrm{U}},
+        description={Uniform distribution},
+		type=symbolslist}
+\newglossaryentry{matr_elem}{name=\ensuremath{\textbf{X}_{c,r}},
+        description={Element at column $c$ and row $r$ of matrix $X$},
+		type=symbolslist}
+\newglossaryentry{grad}{name=\ensuremath{\nabla},
+        description={Gradient},
+		type=symbolslist}
+\newglossaryentry{dim}{name=\ensuremath{d_x},
+        description={Dimensionality of $x$},
+		type=symbolslist}
+\newglossaryentry{reg_term}{name=\ensuremath{\Omega(x)},
+        description={Regularizer term},
+		type=symbolslist}
+\newglossaryentry{var}{name=\ensuremath{Var(x)},
+        description={Variance of $x$},
+		type=symbolslist}
+\newglossaryentry{expvalue}{name=\ensuremath{\mathbb{E}(x)},
+        description={Expectation value of $x$},
+		type=symbolslist}
+\newglossaryentry{max_poss}{name=\ensuremath{\textbf{x}_{max}},
+        description={Maximum possible value of $x$},
+		type=symbolslist}
+\newglossaryentry{mu}{name=\ensuremath{\mu_x},
+        description={Mean value of $x$},
+		type=symbolslist}
+\newglossaryentry{sigma}{name=\ensuremath{\sigma_x},
+        description={Standard deviation of $x$},
+		type=symbolslist}
+\newglossaryentry{stride}{name=\ensuremath{s},
+        description={Stride value},
+		type=symbolslist}
+\newglossaryentry{padding}{name=\ensuremath{p},
+        description={Padding value / probability},
+		type=symbolslist}
+\newglossaryentry{kernel}{name=\ensuremath{k},
+        description={Kernel size value},
+		type=symbolslist}
+\newglossaryentry{time}{name=\ensuremath{\tau},
+        description={Time step},
+		type=symbolslist}
+\newglossaryentry{corrupt}{name=\ensuremath{\tilde{x}},
+        description={Corrupted value of $x$},
+		type=symbolslist}
+		
+
+
+

@@ -122,3 +122,64 @@ cross/.default={1pt}}
 % custom spacing
 \setlength{\parindent}{0em}
 \setlength{\parskip}{0.5em}
+
+% Glossary
+\usepackage[acronym,automake, nonumberlist, toc]{glossaries}
+
+% custom acronym table style:
+\newglossarystyle{myacro}
+{
+	\renewenvironment{theglossary}{}{}
+	\renewcommand*{\glossaryheader}{}
+	\renewcommand*{\glsgroupheading}[1]{}
+	\renewcommand*{\glsgroupskip}{}
+	\renewcommand*{\glossaryentryfield}[5]
+	{
+		\begin{minipage}[t]{0.2\textwidth}
+			\glstarget{##1}{##2}~\dotfill
+		\end{minipage}
+		\begin{minipage}[t]{0.7\textwidth}
+			~##3
+		\end{minipage}
+		\vskip -0.16cm  % Abstand zwischen den Zeilen
+	}
+	\renewcommand*{\glossarysubentryfield}[6]{%
+	\glossaryentryfield{##2}{##3}{##4}{##5}{##6}}%
+}
+
+% custom symbol table style:
+\usepackage{multicol}
+\newglossarystyle{mysymbol}
+{
+	\renewenvironment{theglossary}
+	{\begin{multicols}{2}\noindent}{\end{multicols}}
+	\renewcommand*{\glossaryheader}{}
+	\renewcommand*{\glsgroupheading}[1]{}
+	\renewcommand*{\glsgroupskip}{}
+	\renewcommand*{\glossaryentryfield}[3]
+	{\noindent
+		\begin{minipage}[t]{0.94\columnwidth}
+			\begin{minipage}[t]{0.2\columnwidth}
+				\glstarget{##1}{##2}
+			\end{minipage}
+			\begin{minipage}[t]{0.78\columnwidth}
+				##3
+			\end{minipage}
+		\end{minipage}
+		\vskip 0.01em   % Abstand zwischen den Zeilen
+	}
+	\renewcommand*{\glossarysubentryfield}[3]{%
+	\glossaryentryfield{##2}{##3}}%
+}
+
+% create symbol table
+\newglossary[slg]{symbolslist}{syi}{syg}{List of Symbols}
+% remove auto-dot at the end of every description
+\renewcommand*{\glspostdescription}{}
+
+% Empty pages for cleardoublepage:
+% Start new chapter always on RHS page, so put in an additional
+% blank page only when needed.
+\usepackage{emptypage}
+\newcommand{\skippage}{\newpage{\thispagestyle{empty}\mbox{}}}
+

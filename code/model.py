@@ -30,7 +30,6 @@ class ConvAutoencoderModel(tl.model.AbstractModel):
                                               weight_init=tl.init.bilinear_initializer(), 
                                               regularizer=l2_regularizer(self.weight_decay),
                                               activation=tf.nn.sigmoid)
-    
   %%@tl.utils.attr.override%%
   def loss(self, predictions, targets, device_scope):
     return tl.loss.bce(predictions, targets)
