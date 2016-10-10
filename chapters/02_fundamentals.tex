@@ -351,11 +351,11 @@ RNNs are a special class of neural networks that allows its models to form a dir
 \begin{equation} \label{eq:rnn}
 \begin{aligned}
 \textbf{h}^{(\tau)} &= \phi(\textbf{W}_{h} \textbf{h}^{(\tau-1)} + \textbf{W}_{x} \textbf{x}^{(\tau)} + \textbf{b}_1) \\
-\textbf{o}^{(\tau)} &= \textbf{W}_{o} \textbf{h}^{(\tau)} + \textbf{b}_2
+\textbf{y}^{(\tau)} &= \textbf{W}_{o} \textbf{h}^{(\tau)} + \textbf{b}_2
 \end{aligned}
 \end{equation}
 
-where $ \textbf{W}_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden-to-hidden transitions, $ \textbf{W}_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input-to-hidden connections, $ \textbf{W}_{o} \in \mathbb{R}^{d_h \times d_x} $ the weights of the hidden-to-output transitions and $ \textbf{b}_1, \textbf{h}^{(0)} \in \mathbb{R}^{d_h}, \, \textbf{b}_2, \textbf{x}^{(\tau)}, \textbf{o}^{(\tau)} \in \mathbb{R}^{d_x} $ the biases, initial state, input and output respectively \parencite[p. 2]{rnn-batchnorm}, \parencite[p. 381]{deep_learning}. The activation function $ \phi(\textbf{z}) $ is usually chosen to be a hyperbolic tangent.
+where $ \textbf{W}_{h} \in \mathbb{R}^{d_h \times d_h} $ are the weights of the hidden-to-hidden transitions, $ \textbf{W}_{x} \in \mathbb{R}^{d_x \times d_h} $ the weights of the input-to-hidden connections, $ \textbf{W}_{o} \in \mathbb{R}^{d_h \times d_x} $ the weights of the hidden-to-output transitions and $ \textbf{b}_1, \textbf{h}^{(0)} \in \mathbb{R}^{d_h}$ as well as $\textbf{b}_2, \textbf{x}^{(\tau)}, \textbf{y}^{(\tau)} \in \mathbb{R}^{d_x} $ the biases, initial state, input and output respectively \parencite[p. 2]{rnn-batchnorm}, \parencite[p. 381]{deep_learning}. The activation function $ \phi(\textbf{z}) $ is usually chosen to be a hyperbolic tangent.
 
 Like convolutional networks, RNNs take advantage of sharing parameters over different parts of the model \parencite[p. 374]{deep_learning}. But in this case, model parameters are shared over the temporal domain. This allows the network to generalize specific properties across the whole input sequence. Consequently, a model can extract patterns that can occur at any or even multiple positions within the sequence of data.
 
