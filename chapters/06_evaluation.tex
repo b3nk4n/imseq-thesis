@@ -2,14 +2,17 @@
 
 \chapter{Evaluation} \label{chapter:evaluation}
 
+% performed on: We implemented our model in TensorFlow v0.10, CUDA 7.5.18 and cuDDN 4.
+
 % explore the model on MovingMNIST (layers, scheduled samling, filter depth)
 %      --> fix the main hyper-params
 % small grid search on each model?
 %      --> compare results
 
-\section{Training}
+\section{Training / Training Procedure}
 
-TRAINING AS A SEPERATE CHAPTER ?
+Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um die einzelnen HParams unanbhängig voneinander zu erforschen. Dann: Grid-Search auf den jeweils besten Einstellungen
+
 
 \subsection{Influence of Scheduled Sampling}
 
