@@ -29,7 +29,7 @@ where $ \textbf{W}_h \in \mathbb{R}^{d_h \times 3d_h} $ and $ \textbf{W}_{hc} \i
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=0.7\linewidth]{figures/convlstm.pdf} 
-	\caption[ConvLSTM Cell]{The simplified structure of the batch-normalized ConvLSTM cell. The inputs and previous hidden states are convolved and produce 3D tensors that flow through each cell. Changes to standard FC-LSTM are in red.} \label{fig:convlstm-cell}
+	\caption[ConvLSTM Cell]{The simplified structure of the batch-normalized ConvLSTM cell. The inputs and previous hidden states are convolved and produce 3D tensors that flow through each cell. Changes to standard FC-LSTM are highlighted in red.} \label{fig:convlstm-cell}
 \end{figure}
 
 
@@ -82,7 +82,7 @@ where $i$ indentifies the current training step and $\alpha \geq 1$ controls the
   \caption{}
   \label{fig:sched-sample-process}
 \end{subfigure}
-\caption[Scheduled Sampling]{Illustrations of scheduled sampling, where (a) shows the inverse sigmoid function and (b) the structure of a RNN that uses this approach. The yellow block symbolize the scheduled sampling components, which decide whether the cell conditions ont the ground truth or the previous output by flipping an unbiased coin.} \label{fig:sched-sample}
+\caption[Scheduled Sampling]{Illustrations of scheduled sampling, where (a) shows the inverse sigmoid function and (b) the structure of a RNN that uses this approach. The yellow blocks symbolize the scheduled sampling components, which decide whether the cell conditions ont the ground truth or the previous output by flipping an unbiased coin.} \label{fig:sched-sample}
 \end{figure}
 
 
@@ -102,8 +102,8 @@ Instead of feeding the recurrent encoder with raw image data directly like in \p
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/placeholder.png} 
-	\caption[Spatial Encoder Component]{tbd} \label{fig:comp-spatial_encoder}
+	\includegraphics[width=0.8\linewidth]{figures/comp_spatial_encoder.pdf} 
+	\caption[Spatial Encoder Component]{Spatial encoding network that maps each input image to its feature space representation (purple) using convolutional layers with ReLU activations and subsequent bach normalizations (green). Intermediate tensors (yellow) are denoted with their height, width and depth.} \label{fig:comp-spatial_encoder}
 \end{figure}
 
 No max pooling layers have been used because rotation tolerance would be counter-productive in context of frame prediction. This kind of downsampling could also remove important details that might be required to successfully reconstruct the image. Instead, each frame is downsampled by using a stride of $ s=2 $ in specific convolutioal layers with the motivation that the network itself learns how to perform such a downsampling operation. Additionally, each convolutional layer is activated using ReLUs and followed by a batch normalization layer to compensate the internal covariate shift of such a deep network model. The resulting frame percepts exhibit a shape of $16\times16\times64$.
@@ -114,8 +114,8 @@ The percept tensors that have been produced by the spatial encoder CNN for each 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/placeholder.png} 
-	\caption[Spatio-Temporal Encoding Component]{tbd} \label{fig:comp-spatiotemp_encoder}
+	\includegraphics[width=0.8\linewidth]{figures/comp_spatiotemp_encoder.pdf} 
+	\caption[Spatio-Temporal Encoding Component]{Spatio-temporal encoder network that encodes a motion representation (orange) based on a frame sequence in feature space (purple).} \label{fig:comp-spatiotemp_encoder}
 \end{figure}
 
 \subsubsection{Spatio-Temporal Predictor}
@@ -124,8 +124,8 @@ Initialized by the cell and hidden state of the previous ConvLSTM encoder, the r
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/placeholder.png} 
-	\caption[Spatio-Temporal Predictor Component]{tbd} \label{fig:comp-spatiotemp_predictor}
+	\includegraphics[width=0.7\linewidth]{figures/comp_spatiotemp_decoder.pdf} 
+	\caption[Spatio-Temporal Predictor Component]{Spatio-temporal decoding network that maps a frame in future space to its future representation. The ConvLSTM is initialized with the learned motion representation (orange) produced by the recurrent encoder. Each ConvLSTM cell receives either the ground truth representation or the output of the previous cell as its input while training. This descition is made by the scheduled sampling components (yellow) at each time step.} \label{fig:comp-spatiotemp_predictor}
 \end{figure}
 
 As depicted in Figure \ref{fig:comp-spatiotemp_predictor}, the prediction component utilizes the schedules sampling technique earlier presented in Section \ref{sec:sched_sample} to improve the training performance. By default, the network begins to condition on percepts in feature space of the ground truth frame produced by the spatial encoder component. By decaying the probability of conditioning on the ground truth using an inverse sigmoid function with $\alpha = 1000$, the predictor RNN slowly starts to condition of the previously generated frames as in inference mode. With this setting, it takes about \num{10000} training steps until this component generates future frame representations entirely based on previous outputs. After the entire output sequence has been generated, each single tensor still exhibit a shape of size $16\times16\times64$ and altogether represent the video's future in feature space.
@@ -136,10 +136,9 @@ To map each frame representation back to the original image space, a second CNN 
 
 \begin{figure}[htb]
 	\centering
-	\includegraphics[width=0.6\linewidth]{figures/placeholder.png} 
-	\caption[Spatial Decoder Component]{tbd} \label{fig:comp-spatial_decoder}
+	\includegraphics[width=0.8\linewidth]{figures/comp_spatial_decoder.pdf} 
+	\caption[Spatial Decoder Component]{Spatial decoding network which learns an inverse mapping of the spatial decoder using layers that use transposed convolutions (blue).} \label{fig:comp-spatial_decoder}
 \end{figure}
-
 
 \subsection{Model}
 
@@ -147,8 +146,8 @@ To see everything at a glance, each previously described component is put togeth
 
 \begin{figure}[p]
 	\centering
-	\includegraphics[width=0.8\linewidth]{figures/placeholder.png} 
-	\caption[LSTM Encoder-Predictor Model]{tbd} \label{fig:total_model}
+	\includegraphics[width=0.96\linewidth]{figures/total_model.pdf}
+	\caption[ConvLSTM Encoder-Predictor Model]{The ConvLSTM Encoder-Predictor Model. Weights of the convolutional encoder (green) and decoder (blue) are shared layer-wise across the whole sequence. Spatial encodings of the ground truth frames, scheduled sampling components (yellow) and the loss layer (red) are only used while training.} \label{fig:total_model}
 \end{figure}
 
 % here: add loss - layer as well! (red box?)
