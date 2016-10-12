@@ -2,7 +2,7 @@
 
 \chapter{A Fully-Convolutional LSTM Encoder-Predictor Model} \label{chapter:implementation}
 
-This chapter presents the final model that is used in this thesis for future frame prediction. It combines the insights and strengths of previous works that have been analyzed in the preceding chapter. Each component of it is investigeted in detail and then assembled to end up with the overall network architecture. But beforehand, two cruical techniques are presented which improved the learning of spatio-temporal features the and recurrent training performance.
+This chapter presents the final model that is used in this thesis for future frame prediction. It combines the insights and strengths of previous works that have been analyzed in the preceding chapter. Each component of it is investigeted in detail and then assembled to end up with the overall network architecture. But beforehand, two cruical techniques are presented which improve the learning of spatio-temporal features and the recurrent training performance.
 
 \section{Techniques}
 
@@ -12,7 +12,7 @@ In this section, two important methods are presented that enable recurrent netwo
 
 As discussed in earlier chapters, the standard LSTM cell has the drawback of lacking spatial correlations in the input-to-hidden and hidden-to-hidden transitions, because it operates over sequences of vectors with only one dimension. The LSTM activations are computed based on linear transformations using fully-connected layers and subsequent non-linearities. The authors of \parencite{conv_lstm_nowcasting} propose a variant of the LSTM cell with the core idea to handle all inputs, hidden states, cell or gate outputs as 3D tensors to preserve the spatial data properties. This is realized by exchanging the internal matrix products by convolution operations. The resulting recurrent cell type is called \textit{convolutional LSTM} (ConvLSTM).
 
-In contrast to the realization in \parencite{spat_temp_video_autoenc}, peephole connections are included in our implementation of ConvLSTM. These allow the gated units to have a direct access to the previous memory cell state. In addition, we enable it to use optional batch normalization layers in both input-to-hidden and hidden-to-hidden transitions as proposed in \parencite{rnn-batchnorm} to allow faster learning and to take advantage of other benefits which have been described in section \ref{sec:batch_norm}. All this together can be formulated as:
+In contrast to the realization in \parencite{spat_temp_video_autoenc}, peephole connections are included in our implementation of ConvLSTM. These allow the gated units to have a direct access to the previous memory cell state. In addition, we enable it to use optional batch normalization layers in both input-to-hidden and hidden-to-hidden transitions to allow faster learning and to take advantage of its other benefits which have been described in section \ref{sec:batch_norm}. The same modifications have been proposed for the standard LSTM cells in \parencite{rnn-batchnorm}. All this together can be formulated as:
 
 %TODO maybe correct this formula, since we used conv2d instad of hadamard for peepholes as well.
 \begin{equation} \label{eq:convlstm}
@@ -24,24 +24,24 @@ In contrast to the realization in \parencite{spat_temp_video_autoenc}, peephole 
 \end{aligned}
 \end{equation}
 
-where $ \textbf{W}_h \in \mathbb{R}^{d_h \times 3d_h} $ and $ \textbf{W}_{hc} \in \mathbb{R}^{d_h \times d_h} $ are the shared weights for the hidden-to-hidden transitions at time step $ \tau $, $ \textbf{W}_x \in \mathbb{R}^{d_x \times 3d_h} $ and $ \textbf{W}_{xc} \in \mathbb{R}^{d_x \times d_h} $ the shared weights for the input-to-hidden connections, $ \textbf{W}_{peep} \in \mathbb{R}^{d_x \times 3d_h} $ the shared weights for the peephole connections, $ \textbf{b} \in \mathbb{R}^{3d_h} $ and $ \textbf{b}_c \in \mathbb{R}^{d_h} $ the biases, and $ \textbf{C}^{(0)}, \textbf{h}^{(0)} \in \mathbb{R}^{4d_h} $ the initial states of the memory cell and the hidden state, respectively. Further, $\ast$ denotes the convolution operation and $ \texttt{BN}(\textbf{x}; \gamma, \beta) $ a batch normalization layer with its learned shift $\gamma$ and scale $\beta$. As in \parencite{rnn-batchnorm}, $\beta_h$ and $\beta_x$ are set to zero by default to avoid the unnecessary redundancy with the existing bias terms $\textbf{b}$ and $\textbf{b}_c$. The structure of such a cell is visualized in Figure \ref{fig:convlstm-cell}.
+where $ \textbf{W}_h \in \mathbb{R}^{d_h \times 3d_h} $ and $ \textbf{W}_{hc} \in \mathbb{R}^{d_h \times d_h} $ are the shared weights for the hidden-to-hidden transitions at time step $ \tau $, $ \textbf{W}_x \in \mathbb{R}^{d_x \times 3d_h} $ and $ \textbf{W}_{xc} \in \mathbb{R}^{d_x \times d_h} $ the shared weights for the input-to-hidden connections, as well as $ \textbf{W}_{peep} \in \mathbb{R}^{d_x \times 3d_h} $ the shared weights for the peephole connections. Next, $ \textbf{b} \in \mathbb{R}^{3d_h} $ and $ \textbf{b}_c \in \mathbb{R}^{d_h} $ are the biases, $ \textbf{C}^{(0)}, \textbf{h}^{(0)} \in \mathbb{R}^{4d_h} $ the initial states of the memory cell and the hidden state, respectively. Furthermore, $\ast$ denotes the convolution operation and $ \texttt{BN}(\textbf{x}; \gamma, \beta) $ a batch normalization layer with its learned shift $\gamma$ and scale $\beta$. As in \parencite{rnn-batchnorm}, $\beta_h$ and $\beta_x$ are set to zero by default to avoid the unnecessary redundancy with the existing bias terms $\textbf{b}$ and $\textbf{b}_c$. The structure of such a cell is visualized in Figure \ref{fig:convlstm-cell}.
 
 \begin{figure}[htpb]
 	\centering
-	\includegraphics[width=0.7\linewidth]{figures/convlstm.pdf} 
+	\includegraphics[width=0.65\linewidth]{figures/convlstm.pdf} 
 	\caption[ConvLSTM Cell]{The simplified structure of the batch-normalized ConvLSTM cell including peephole connections. The inputs and previous hidden states are convolved to produce 3D tensors that flow through each cell. Changes to standard FC-LSTM are highlighted in red.} \label{fig:convlstm-cell}
 \end{figure}
 
 
 \subsection{Scheduled Sampling} \label{sec:sched_sample}
 
-When the first recurrent network based models have been tested in the course of this thesis, a discrepancy between training and inference has been discovered. At training time, each cell is usually fed with the ground truth $\textbf{x}^{(\tau-1)}$ of the previous time step in order to generate the current prediction $\hat{\textbf{x}}^{(\tau)}$. In contrast, the generated frame $ \hat{\textbf{x}}^{(\tau-1)}$ of the previous cell is used instead as cell input during inference, because no ground truth is available in that case. Thus, mistakes made early in the sequence flow through all following cells and can quickly amplify since the network has never dealt with such errors at training time. In context of future frame generation, this effect has been identified when the prediction quality has dropped tremendously after the first generated frame. The fact that predicted frames usually look slightly blurry is the clear reason for this, because a network that was fed with ground truth input images only has never seen such pictures with smooth edges.
+When the first recurrent network based models have been tested in the course of this thesis, a discrepancy between training and inference has been discovered. At training time, each cell is usually fed with the ground truth $\textbf{x}^{(\tau-1)}$ of the previous time step in order to generate the current prediction $\hat{\textbf{x}}^{(\tau)}$. In contrast, the generated frame $ \hat{\textbf{x}}^{(\tau-1)}$ of the previous cell is used instead as cell input during inference, because no ground truth is available in that case. Thus, mistakes made earlier in the sequence flow through all following cells and can quickly amplify since the network has never dealt with such errors at training time. In context of future frame generation, this effect has been identified when the prediction quality has dropped tremendously after the first generated frame. The fact that predicted frames usually look slightly blurry is the clear reason for this, because a network that was fed purely with ground truth input images has never seen such pictures with smooth edges.
 
 As a first step, the recurrent cell input during the training process has therefore been adapted to behave in the same way as in inference mode. Therefore, a recurrent cell that is trained to generate a future frame has to condition on the previously generated frame instead of the ground truth. This strategy can be seen as an automatic form of data augmentation and helps the network to learn a robustness against imperfect inputs. However, this comes with the downside that the RNN model converges much slower during the training, because it has to predict the correct output given poor or even wrong input data.
 
-To combine the best of both worlds, we have experimented with a training strategy where each recurrent cell started to condition on the ground truth frame and have slowly changed to the inference mode conditioning using a probability variable $p$ with linear or exponential decay. In this process, a random number $r \in [0, 1]$ is generated at each training step and the RNN cells condition on the generated frame when $r \geq p$. First results have shown positive results where a better performance could be reached compared to both other strategies mentioned earlier. 
+To combine the best of both worlds, we have experimented with a training strategy where each recurrent cell started to condition on the ground truth frame and have slowly changed to the inference mode conditioning using a probability variable $p$ with linear or exponential decay. In this process, a random number $r \in [0, 1]$ is generated at each training step and the RNN cells condition on the generated frame when $r \geq p$. First experiments have shown positive results, because a better performance could be reached compared to both other strategies mentioned earlier. 
 
-Shortly afterwards, we came across \parencite{sched_sample} where the authors propose a similar but even more radical strategy and demonstrate insightful evaluation results. Their so-called \textit{scheduled sampling} training strategy for recurrent networks is based on the same core idea, but instead of generating a single random number $r$ for the whole input sequence only, they propose to do this for every single time step $\tau$. In addition, they suggest to use an inverse sigmoid decay function in order to provide a smooth transition from training mode to inference mode:
+Shortly afterwards, we came across \parencite{sched_sample} where the authors propose a similar but even more radical strategy and demonstrate insightful evaluation results. Their so-called \textit{scheduled sampling} training strategy for recurrent networks is based on the same core idea, but instead of generating only a single random number $r$ for the whole input sequence, they propose to do this for every single time step $\tau$. In addition, they suggest to use an inverse sigmoid decay function in order to provide a smooth transition from training mode to inference mode:
 
 \begin{equation} \label{eq:inverse-sigmoid}
 \sigma_{inv}(i; \alpha) = \frac{\alpha}{\alpha + exp(i / \alpha)} ,
@@ -53,6 +53,8 @@ where $i$ identifies the current training step and $\alpha \geq 1$ controls the 
 \centering
 \begin{subfigure}{0.5\textwidth}
   \centering
+  \hspace*{-0.6cm}
+  {
   \begin{tikzpicture}[scale=0.75]
     \begin{axis}[
         ymin=-0.1,
@@ -65,10 +67,11 @@ where $i$ identifies the current training step and $\alpha \geq 1$ controls the 
         ylabel=GT sampling probability \textit{p},
         xlabel=step \textit{i},
       ]
-      \addplot [mark=none,draw=black!30!yellow,smooth,ultra thick,domain=0:1000] {75/(75+exp(\x / 75))};
+      \addplot [mark=none,draw=LightGoldenrod,smooth,ultra thick,domain=0:1000] {75/(75+exp(\x / 75))};
       \addlegendentry{inverse sigmoid ($\alpha = 75$)};
     \end{axis}
   \end{tikzpicture}
+  }
   \caption{}
   \label{fig:sched-sample-inv-sig}
 \end{subfigure}%
@@ -90,11 +93,11 @@ The final model architecture is based on the RNN encoder-decoder framework intro
 
 \subsection{Components}
 
-Before the entire network model is demonstrated, we would like to go through its main components in detail first. These components for encoding or decoding are ordered according to the flow of data while propagating forward through the network. Afterwards, the loss layer is presented which combines standard error functions with perceptual motivated bias term.
+Before the entire network model is demonstrated, we would like to go through its main components in detail first. These components for encoding or decoding are ordered according to the flow of data while propagating forward through the network. Afterwards, the loss layer is presented which combines standard error functions with perceptual motivated bias terms.
 
 \subsubsection{Spatial Encoder}
 
-Instead of feeding the recurrent encoder directly with raw image data like in \parencite{unsup_learn_lstm} or \parencite{conv_lstm_nowcasting}, each frame flows through a multilayer CNN first in order to project it to an image percept in feature space of lower height and width, but higher depth. This single convolutional network is shared across the entire time domain of the spatio-temporal encoder component described next. The motivation to use this spatial encoder is based on \parencite{spat_temp_video_autoenc} which suggests that a deeper encoding of the input image can yield better results. Furthermore, decreasing the height and width of the image has a positive impact on the overall runtime and memory efficiency. And even that the higher number of feature maps and therefore increased total dimensionality of the convolved frame percepts is higher compared to the original image, it does not harm these two advantages with respect to the total efficiency of the model. This is due the fact that the ConvLSTM cells and their convolutional state-to-state transitions within the following recurrent encoder increase the feature space representation's depth either way. The spatial encoder component is illustrated in Figure \ref{fig:comp-spatial_encoder}.
+Instead of feeding the recurrent encoder directly with raw image data like in \parencite{unsup_learn_lstm} or \parencite{conv_lstm_nowcasting}, each frame flows through a multilayer CNN first. Therefore, it is projected to an image percept in feature space of lower size, but higher depth. This single convolutional network is shared across the entire time domain of the spatio-temporal encoder component described next. The motivation to use this spatial encoder is based on \parencite{spat_temp_video_autoenc} which suggests that a deeper encoding of the input image can yield better results. Furthermore, decreasing the height and width of the image has a positive impact on the overall runtime and memory efficiency. Although the number of feature maps and hence the dimensionality of the convolved frame percepts is higher compared to the original image, it does not harm these two advantages with respect to the total efficiency of the model. This is due the fact that the ConvLSTM cells and their convolutional state-to-state transitions within the following recurrent encoder increase the feature space representation's depth either way. The spatial encoder component is illustrated in Figure \ref{fig:comp-spatial_encoder}.
 
 
 
@@ -111,7 +114,9 @@ No max pooling layers are used because rotation tolerance would be counter-produ
 
 \subsubsection{Spatio-Temporal Encoder}
 
-The percept tensors that have been produced by the spatial encoder CNN for each frame of the sequence then flow unchanged into a recurrent network to preserve sequential correlations and to learn temporal dynamics. To be more precise, ConvLSTM cells are used that retain the spatial structure of the three-dimensional input data. The cell state $C^{(0)}$ and hidden state $h^{(0)}$ of the spatio-temporal encoder network are initialized with zero by default. Moreover, all convolutional layers within the ConvLSTM cells adapt their number of produced features maps according to the input's depth in order to keep all shape sizes constant. After the whole input sequence of about ten frames has been processed, the resulting cell and hidden states of the last unit then encode the learned motion of the sequence. This representation is then transferred to the following prediction component. It should be noted that the hidden outputs of the encoder's ConvLSTM cells are discarted and not used in the subsequent decoding network. The spatio-temporal encoder component is shown in Figure \ref{fig:comp-spatiotemp_encoder}.
+
+
+After each percept tensor has been produced by the spatial encoder CNN, it then flows unchanged into a recurrent network to preserve sequential correlations and to learn temporal dynamics. To be more precise, ConvLSTM cells are used to retain the spatial structure of the three-dimensional input data. The cell state $C^{(0)}$ and hidden state $h^{(0)}$ of the spatio-temporal encoder network are initialized with zero by default. Moreover, all convolutional layers within the ConvLSTM cells adapt their number of produced features maps according to the input's depth in order to keep all shape sizes constant. After the whole input sequence of about ten frames has been processed, the resulting cell and hidden states of the last unit then encode the learned motion of the sequence. This representation is then transferred to the following prediction component. It should be noted that the hidden outputs of the encoder's ConvLSTM cells are discarted and not used in the subsequent decoding network. The spatio-temporal encoder component is shown in Figure \ref{fig:comp-spatiotemp_encoder}.
 
 \begin{figure}[htb]
 	\centering
@@ -138,7 +143,7 @@ To map each frame representation back to the image space, a second CNN is modell
 \begin{figure}[htb]
 	\centering
 	\includegraphics[width=0.9\linewidth]{figures/comp_spatial_decoder.pdf} 
-	\caption[Spatial Decoder Component]{Spatial decoding network which learns to reverse the mapping of the spatial decoder using transposed convolutional layers (blue) to map a feature space representation back to original image space.} \label{fig:comp-spatial_decoder}
+	\caption[Spatial Decoder Component]{Spatial decoding network, which learns to reverse the mapping of the spatial decoder using transposed convolutional layers (blue), to map a feature space representation back to original image space.} \label{fig:comp-spatial_decoder}
 \end{figure}
 
 
@@ -179,7 +184,7 @@ For a better overview regarding the resulting model complexity, Table \ref{tab:m
 
 To see everything at a glance, each component is put together in Figure \ref{fig:total_model} to demonstrate the entire model. It has to be noted that not every depicted building block or connection is used when a future sequence is predicted within an inference step. For example, only half as many frames have to be processes by the spatial encoder, because the feature representations of the ground truth target sequence are obviously not available when an actual future prediction is performed. The same is also true for the scheduled sampling components and the loss layer that are only required to train the model. Additionally, the data tensors of each single frame is processed by a separate CNN. Therefore, the trainable parameters in each convolutional layer of the spatial encoder and decoder has to be shared across the whole input sequence. 
 
-Since the overall architecture follows the concept of an encoder-decoder network, it should be argued why this model is likely to learn useful features. According to the argumentation in \parencite[p. 3f.]{unsup_learn_lstm}, it is unlikely to learn the trivial function for the following two reasons. First, an entire sequence of variable size as well as the temporal dynamics have to be encoded and decoded using a fixed-sized representation. In order accurately predict future frames multiple time steps ahead, the decoder network really has to come up with a learned representation that can distinguish several foreground objects from static background, as well as understand the motion of object and the environmental constraints within a given video scene. Second, the learned motion pattern has to generalize well so that it can be applied to any time step of the sequence. Performing a simple copy of the last state might be almost sufficient when a single frame is predicted only, but not when it has to look further into the future.
+Since the overall architecture follows the concept of an encoder-decoder network, it should be argued why this model is likely to learn useful features. According to the argumentation in \parencite[p. 3f.]{unsup_learn_lstm}, it is unlikely to learn the trivial function for the following two reasons. First, an entire sequence of variable size as well as the temporal dynamics have to be encoded and decoded using a fixed-sized representation. In order to accurately predict future frames multiple time steps ahead, the decoder network really has to come up with a learned representation that can distinguish several foreground objects from static background, as well as understand the motion of object and the environmental constraints within a given video scene. Second, the learned motion pattern has to generalize well so that it can be applied to any time step of the sequence. Performing a simple copy of the last state might be almost sufficient when a single frame is predicted only, but not when it has to look further into the future.
 
 \begin{figure}[p]
 	\centering

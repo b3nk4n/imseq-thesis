@@ -17,49 +17,233 @@
 Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um die einzelnen HParams unanbhängig voneinander zu erforschen. Dann: Grid-Search auf den jeweils besten Einstellungen
 
 
-\subsection{Influence of Scheduled Sampling}
+\begin{figure}[htpb]
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_bce.csv}\modelB
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_loss-BCE_loss-Mean.csv}\modelAA
+  \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_loss-BCE_loss-Mean.csv}\modelBB
+  \hspace*{-1.1cm}
+  {
+  \begin{tikzpicture}
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      % background
+      \addplot[draw=black!10!blue, thin, opacity=0.8] table[x=Step, y=Value]{\modelBB};
+      \addlegendentry{AS (train)};
+      \addplot[draw=black!10!green, thin, opacity=0.8] table[x=Step, y=Value]{\modelAA};
+      \addlegendentry{SS (train)};
+      %foreground
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{AS (valid)};
+      %best
+      \addplot[draw=black!30!green] table[dashed, x=Step, y=Value]{\modelA};
+      \addlegendentry{SS (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+\end{figure}
 
-\subsection{Influence of LSTM-Layers}
-
-\subsection{Influence of LSTM Filter-Depth}
-
-\subsection{Model Selection Strategy}
-
-Diagram: How did we pic our final model?
-Seperate for each dataset?
 
 
-\section{Results}
+\begin{figure}[htpb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_scheduled_sampling.csv}\modelA
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=0,
+        ymax=1,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=GT sampling probability \textit{p},
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=LightGoldenrod] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{Scheduled Sampling};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-bn2-sscurve}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_validation_psnr.csv}\modelA
+  \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_psnr.csv}\modelB
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=10,
+        ymax=20,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=PSNR,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{AS (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{SS (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-bn2-psnr}
+\end{subfigure}
+\caption[TBD]{tbd.} \label{fig:plot-mm-bn2}
+\end{figure}
 
-\subsection{Experiments on MovingMNIST}
-
-\subsubsection{Hyperparameters}
-
-Include a comparison to Other papers (using same images!)
-
-\subsubsection{Prediction Samples}
-
-\subsubsection{Transfer Learning}
-
-1 char / 3 char images
-
-\subsubsection{Visualization of Learned Motion Representation}
 
 
-\subsection{Experiments on UCF-101}
-
-\subsubsection{Hyperparameters}
-
-\subsubsection{Prediction Samples}
 
 
-\subsection{Experiments on MsPacman}
-
-\subsubsection{Hyperparameters}
-
-\subsubsection{Prediction Samples}
 
 
+
+\begin{figure}[htpb]
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212-wd1e-05-MX-tag_validation_bce.csv}\modelB
+  \hspace*{-1.1cm}
+  {
+  \begin{tikzpicture}
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{w/o BN (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{with BN (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+\end{figure}
+
+
+
+
+\begin{figure}[htpb]
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-JK-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelB
+  \hspace*{-1.1cm}
+  {
+  \begin{tikzpicture}
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{$\eta$-decay=0.90 (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{$\eta$-decay=0.95 (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+\end{figure}
+
+
+%\subsection{Influence of Scheduled Sampling}
+
+%\subsection{Influence of LSTM-Layers}
+
+%\subsection{Influence of LSTM Filter-Depth}
+
+%\subsection{Model Selection Strategy}
+
+%Diagram: How did we pic our final model?
+%Seperate for each dataset?
+
+
+%\section{Results}
+
+%\subsection{Experiments on MovingMNIST}
+
+%\subsubsection{Hyperparameters}
+
+%Include a comparison to Other papers (using same images!)
+
+%\subsubsection{Prediction Samples}
+
+%\subsubsection{Transfer Learning} = Out-Domain Tests
+
+%1 char / 3 char images
+
+%\subsubsection{Visualization of Learned Motion Representation}
+
+
+%\subsection{Experiments on UCF-101}
+
+%\subsubsection{Hyperparameters}
+
+%\subsubsection{Prediction Samples}
+
+
+%\subsection{Experiments on MsPacman}
+
+%\subsubsection{Hyperparameters}
+
+%\subsubsection{Prediction Samples}
 
 
 

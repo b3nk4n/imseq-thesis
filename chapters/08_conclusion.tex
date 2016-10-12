@@ -39,45 +39,6 @@ Bla bla...
 
 Bla bla...
 
-
-
-\subsection{Diagram Tests...}
-
-See~\autoref{tab:sample}, \autoref{fig:sample-drawing}, \autoref{fig:sample-plot}, \autoref{fig:sample-listing}.
-
-\begin{table}[htpb]
-  \caption[Example table]{An example for a simple table.}\label{tab:sample}
-  \centering
-  \begin{tabular}{l l l ll}
-    \toprule
-      A & B & C & D \\
-    \midrule
-      1 & 2 & 1 & 2 \\
-      2 & 3 & 2 & 3 \\
-    \bottomrule
-  \end{tabular}
-\end{table}
-
-\begin{figure}[htpb]
-  \centering
-  % This should probably go into a file in figures/
-  \begin{tikzpicture}[node distance=3cm]
-    \node (R0) {$R_1$};
-    \node (R1) [right of=R0] {$R_2$};
-    \node (R2) [below of=R1] {$R_4$};
-    \node (R3) [below of=R0] {$R_3$};
-    \node (R4) [right of=R1] {$R_5$};
-
-    \path[every node]
-      (R0) edge (R1)
-      (R0) edge (R3)
-      (R3) edge (R2)
-      (R2) edge (R1)
-      (R1) edge (R4);
-  \end{tikzpicture}
-  \caption[Example drawing]{An example for a simple drawing.}\label{fig:sample-drawing}
-\end{figure}
-
 \begin{figure}[htpb]
   \centering
 
@@ -114,11 +75,40 @@ See~\autoref{tab:sample}, \autoref{fig:sample-drawing}, \autoref{fig:sample-plot
   \caption[Example plot]{An example for a simple plot.}\label{fig:sample-plot}
 \end{figure}
 
+
+
 \begin{figure}[htpb]
-  \begin{lstlisting}[language=SQL]
-    SELECT * FROM tbl WHERE tbl.str = "str"
-  \end{lstlisting}
-  \caption[Example listing]{An example for a source code listing.}\label{fig:sample-listing}
+  \centering
+
+  \pgfplotstableset{col sep=comma}
+  % This should probably go into a file in data/
+  \pgfplotstableread{data/test/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/test/run_mm-ss-1l3i5hp-c326464k533s212bn-wd1e-05-AF-tag_validation_bce.csv}\modelB
+  % This should probably go into a file in figures/
+  \begin{tikzpicture}
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=100000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=validation loss,
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot table[x=Step, y=Value]{\modelA};
+      \addlegendentry{Example A};
+      \addplot table[x=Step, y=Value]{\modelB};
+      \addlegendentry{Example B};
+    \end{axis}
+  \end{tikzpicture}
+  \caption[Example plot]{An example for a simple plot.}\label{fig:sample-csvplot}
 \end{figure}
+
 
 

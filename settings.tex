@@ -46,8 +46,7 @@ cross/.default={1pt}}
 \usepackage[bottom=4.1cm, top=4.1cm]{geometry}
 
 % package for thousand seperation
-\usepackage{sistyle}
-\SIthousandsep{,}
+\usepackage[group-separator={,}]{siunitx}
 
 
 \bibliography{bibliography}
@@ -186,3 +185,12 @@ cross/.default={1pt}}
 
 % rotate figures
 \usepackage{rotating}
+
+
+
+% global pgf plot settings:
+\pgfplotsset{
+  every tick label/.append style={font=\tiny},
+  label style = {font=\small},
+  legend style = {font=\footnotesize}
+}
