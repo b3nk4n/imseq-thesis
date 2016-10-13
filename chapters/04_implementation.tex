@@ -37,11 +37,11 @@ where $ \textbf{W}_h \in \mathbb{R}^{d_h \times 3d_h} $ and $ \textbf{W}_{hc} \i
 
 When the first recurrent network based models have been tested in the course of this thesis, a discrepancy between training and inference has been discovered. At training time, each cell is usually fed with the ground truth $\textbf{x}^{(\tau-1)}$ of the previous time step in order to generate the current prediction $\hat{\textbf{x}}^{(\tau)}$. In contrast, the generated frame $ \hat{\textbf{x}}^{(\tau-1)}$ of the previous cell is used instead as cell input during inference, because no ground truth is available in that case. Thus, mistakes made earlier in the sequence flow through all following cells and can quickly amplify since the network has never dealt with such errors at training time. In context of future frame generation, this effect has been identified when the prediction quality has dropped tremendously after the first generated frame. The fact that predicted frames usually look slightly blurry is the clear reason for this, because a network that was fed purely with ground truth input images has never seen such pictures with smooth edges.
 
-As a first step, the recurrent cell input during the training process has therefore been adapted to behave in the same way as in inference mode. Therefore, a recurrent cell that is trained to generate a future frame has to condition on the previously generated frame instead of the ground truth. This strategy can be seen as an automatic form of data augmentation and helps the network to learn a robustness against imperfect inputs. However, this comes with the downside that the RNN model converges much slower during the training, because it has to predict the correct output given poor or even wrong input data.
+As a first step, the recurrent cell input during the training process has therefore been adapted to behave in the same way as in inference mode. Therefore, a recurrent cell that is trained to generate a future frame has to condition on the previously generated frame instead of the ground truth\footnote{Always conditioning on the generated outputs while training is called \textit{always sampling} (AS) according to \parencite{sched_sample}.}. This strategy can be seen as an automatic form of data augmentation or a natural regularizer and helps the network to learn a robustness against imperfect inputs. However, this comes with the downside that the RNN model converges much slower during the training, because it has to predict the correct output given poor or even wrong input data.
 
 To combine the best of both worlds, we have experimented with a training strategy where each recurrent cell started to condition on the ground truth frame and have slowly changed to the inference mode conditioning using a probability variable $p$ with linear or exponential decay. In this process, a random number $r \in [0, 1]$ is generated at each training step and the RNN cells condition on the generated frame when $r \geq p$. First experiments have shown positive results, because a better performance could be reached compared to both other strategies mentioned earlier. 
 
-Shortly afterwards, we came across \parencite{sched_sample} where the authors propose a similar but even more radical strategy and demonstrate insightful evaluation results. Their so-called \textit{scheduled sampling} training strategy for recurrent networks is based on the same core idea, but instead of generating only a single random number $r$ for the whole input sequence, they propose to do this for every single time step $\tau$. In addition, they suggest to use an inverse sigmoid decay function in order to provide a smooth transition from training mode to inference mode:
+Shortly afterwards, we came across \parencite{sched_sample} where the authors propose a similar but even more radical strategy and demonstrate insightful evaluation results. Their so-called \textit{scheduled sampling} (SS) training strategy for recurrent networks is based on the same core idea, but instead of generating only a single random number $r$ for the whole input sequence, they propose to do this for every single time step $\tau$. In addition, they suggest to use an inverse sigmoid decay function in order to provide a smooth transition from training mode to inference mode:
 
 \begin{equation} \label{eq:inverse-sigmoid}
 \sigma_{inv}(i; \alpha) = \frac{\alpha}{\alpha + exp(i / \alpha)} ,
@@ -77,7 +77,7 @@ where $i$ identifies the current training step and $\alpha \geq 1$ controls the 
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
   \centering
-  \includegraphics[width=.8\linewidth]{figures/sched_sample.pdf}
+  \includegraphics[width=.7\linewidth]{figures/sched_sample.pdf}
   \caption{}
   \label{fig:sched-sample-process}
 \end{subfigure}
@@ -165,15 +165,16 @@ Additionally, experiments similar to \parencite{gen_img_perc_sim} have been perf
 For a better overview regarding the resulting model complexity, Table \ref{tab:model_params} lists the number of trainable parameters for each network component described previously.
 
 \begin{table}[htpb]
+  \small
   \centering
   \begin{tabular}{l r}
     \toprule
       \textbf{Component} & \textbf{Trainable parameters} \\
     \midrule
-      Spatial encoder \footnotesize{(CNN)} & \num{56416} \\
-      Spatio-temporal encoder \footnotesize{(ConvLSTM)} & \num{864512} \\
-      Spatio-temporal decoder \footnotesize{(ConvLSTM)} & \num{864512} \\
-      Spatial decoder \footnotesize{(CNN)} & \num{56353} \\
+      Spatial encoder \scriptsize{(CNN)} & \num{56416} \\
+      Spatio-temporal encoder \scriptsize{(ConvLSTM)} & \num{864512} \\
+      Spatio-temporal decoder \scriptsize{(ConvLSTM)} & \num{864512} \\
+      Spatial decoder \scriptsize{(CNN)} & \num{56353} \\
     \midrule
     \midrule
       \textbf{Total} & \textbf{\num{1841793}} \\

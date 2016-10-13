@@ -31,7 +31,7 @@ cross/.default={1pt}}
 
 \usepackage{booktabs}
 \usepackage[final]{microtype}
-\usepackage{caption}
+\usepackage[font=small]{caption} % smaller captions
 \usepackage[hidelinks]{hyperref} % hidelinks removes colored boxes around references and links
 \usepackage[super]{nth}
 \usepackage{amsmath}
@@ -94,6 +94,9 @@ cross/.default={1pt}}
 
 % Completely prevent breaking of footnotes over multiple pages
 \interfootnotelinepenalty=10000 
+\clubpenalty = 10000
+\widowpenalty = 10000 
+\displaywidowpenalty = 10000
 
 % Math commands
 \DeclareMathAlphabet\mathbfcal{OMS}{cmsy}{b}{n}

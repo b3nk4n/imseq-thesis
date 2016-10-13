@@ -1,6 +1,5 @@
 % !TeX root = ../main.tex
 
-\iffalse
 \chapter{Contribution} \label{chapter:contribution}
 
 Before concluding this thesis, we would like to present a side contribution that arised in parallel to this thesis. When the implementation of this final project has started, the TensorFlow library for machine intelligence had just published its second public release with version \num{0.7}. Thus, there has not been that much experience and best practices around with TensorFlow, as well as its API is very low-level for several use cases even today. As a result, there has been the desire to create a reusable library to reduce boilerplate code of TensorFlow based projects, as well as to retain best practices of existing examples and also the lessons learned from thesis. A second idea has been that future theses or other deep learning projects of the \textit{Computer Vision Group}\footnote{Computer Vision Group at Technische Universität München: \url{https://vision.in.tum.de/}} at TUM might benefit from such a library. However, this project has grown larger and larger over time and ended up in a powerful high-level framework, that has been developed independently from other high-level APIs for TensorFlow like \textit{TF-Slim}\footnote{TFLearn - Deep learning library featuring a higher-level API for TensorFlow: \url{http://tflearn.org/}} or \textit{Keras}\footnote{Keras - Deep learning library for Theano and TensorFlow: \url{https://keras.io/}}. Ultimately, about $ 99\% $ of the overall code of this thesis has been transferred into this framework, consistently with having abstraction and reusability in mind.
@@ -83,4 +82,3 @@ After the whole training process is complete, the model is ready to get evaluate
   \lstinputlisting[language=PythonEx]{code/runtime_eval.py}
   \caption[Code: Evaluation with TensorLight]{Code sample for testing a model on a single device in TensorLight. Before, it restores the checkpoint file containing all weights, as well as the model's hyperparameters of the previous training.}\label{code:runtime_eval}
 \end{figure}
-\fi

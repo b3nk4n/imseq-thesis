@@ -3,8 +3,6 @@
 % for every dataset-group: tell which loss_main was used by default (if not stated differently)
 % tell we use batch_size of 32 always (without any reason...)
 
-\chapter{Evaluation} \label{chapter:evaluation}
-
 % performed on: We implemented our model in TensorFlow v0.10, CUDA 7.5.18 and cuDDN 4.
 
 % explore the model on MovingMNIST (layers, scheduled samling, filter depth)
@@ -12,22 +10,56 @@
 % small grid search on each model?
 %      --> compare results
 
-\section{Training / Training Procedure}
+%Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um die einzelnen HParams unanbhängig voneinander zu erforschen. Dann: Grid-Search auf den jeweils besten Einstellungen
 
-Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um die einzelnen HParams unanbhängig voneinander zu erforschen. Dann: Grid-Search auf den jeweils besten Einstellungen
+\chapter{Evaluation} \label{chapter:evaluation}
 
+This chapter presents the evaluation results of our model on all datasets of chapter \ref{chapter:datasets}. Since the model exhibits a vast number of hyper parameters and each training can take several days, performing an extensive grid search is not possible. That's why we start to explore the model's substantial hyperparameters independently from each other by using the simplest dataset. Afterwards, the acquired knowledge about our model's behavior can then be transfered to the other datasets in order to to a basic grid search. Beside the quantitative assessment of the model, it is also qualitatively compared to experimental results of related projects at the end of each section.
 
-\begin{figure}[htpb]
+All experiments have been computed on a single Nvidia GeForce GTX Titan X using the TensorFlow open source software library for machine intelligence with version r0.10. This quite new deep learning framework has been developed by Google as a second-generation system based on their experiences on DistBelief \parencite{distbelief}. A computation in TensorFlow is expressed as a statefule dataflow graph, where each node represents a mathematical operation and the graph's edges a data tensor that can flow from one node to the next \parencite{tensorflow2015-whitepaper}. It has gained increasing attention since its first public release in November 2015.
+
+If not stated differently, the model configuration described in Chapter \ref{chapter:implementation} is used, but with a two-layer ConvLSTM using $3\times3$ input-to-hidden and $5\times5$ hidden-to-hidden kernel size in the internal convolutions. Further, we have deactivated the optional BN-layers within these cells for two reasons. Firstly, first tests have not shown any improvements using them. And secondly, the fact that its TensorFlow implementation back then had the issue\footnote{Further details: \url{https://github.com/tensorflow/tensorflow/issues/4361}} of performing batch statistic updates multiple times when being share across time, resulted in an enormous drop in performance. We have therefore kept the use of these batch normalizations of the spatio-temporal encoder and decoder components for future work. Additionally, all weights are initialized using the Xavier method of equation \ref{eq:xavier} and the default weight decay regularization coefficient is set to $\lambda=1e^{-5}$. We use a batch size of 32 during the training process together with Adam optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon =1e^{-8}$) and a default initial learning rate of $\eta = 0.001$. In addition to the learning rate annealing mechanisim of Adam, the learning rate is also manually decreased once per epoch using a stair-case exponential decay function by a factor of $\alpha=0.9$.
+
+Lastly, it has to be menioned that diagrams, which show results of any kind of objective function, are always shown with its y-axis in logarithmic scale so that fine differences become better recognizable. And unless otherwise specified, all losses represent the per-pixel error and averaged across the whole generated future sequence.
+
+\section{Experiments on Moving MNIST}
+
+The synthetic Moving MNIST dataset is used as a starting point for the evaluation of our model. Given an input sequence of ten frames, the network therefore has to understand and encode the motion of this input in order to predict the next ten frames of the future. In this section, we qualitatively and quantitatively compare our results with other network models, because it has been used in several previous works as well. The loss layer used in this section does not use the SSIM term by default.
+
+\subsection{Model Exploration}
+
+The model is incrementally explored in this section in order to understand its behaviour regarding changes in the hyperparameters, as well as to see the effects of the modern techniques used in the training process.
+
+\subsubsection*{Scheduled Sampling}
+
+The consequences of the used scheduled sampling technique is examined first. Figure \ref{fig:plot-mm-asss} visualizes the training and validation binary cross-entropy using our standard model with either scheduled sampling (SS) or always sampling (AS). The latter method means the approach to always sample from the previously generated frame, which is comparable to SS with a constant sampling probability of $p=0$. It can be seen that there is a huge discrepancy between the training and validation error in the starting phase, where the SS-approach mainly trained on input samples taken from the ground truth. The can be explained that sampling on the ground truth in every timestep of the recurrent network tremendously speeds up the convergence of the training loss, because each cell does not have to correct errors of the previous cells. In contrary, the validation loss is very bad in this phase, since the results represent the average out of ten predicted frames and the spatio-temporal decoder suddenly receives its own feature space predictions as input to predict the next frame, which is in contrast to the process while training so far.
+
+\begin{figure}[htb]
   \centering
   \pgfplotstableset{col sep=comma}
   \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_validation_bce.csv}\modelA
   \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_bce.csv}\modelB
   \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_loss-BCE_loss-Mean.csv}\modelAA
   \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_loss-BCE_loss-Mean.csv}\modelBB
-  \hspace*{-1.1cm}
-  {
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_scheduled_sampling.csv}\modelSS
   \begin{tikzpicture}
     \begin{axis}[
+    	axis y line*=right,
+    	hide x axis,
+    	ylabel near ticks,
+        ymin=0,
+        ymax=1,
+        xmin=0,
+        xmax=65000,
+        thick,
+        ylabel=GT sampling probability \textit{p},
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot[draw=LightGoldenrod, thin, opacity=0.8] table[x=Step, y=Value]{\modelSS};\label{mSS}
+    \end{axis}
+    \begin{axis}[
+    	axis y line*=left,
     	ymode=log,
     	log ticks with fixed point,
         ymin=0,
@@ -42,53 +74,59 @@ Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um d
         xlabel=step \textit{i},
         x post scale=1.8,
       ]
+	  \addlegendimage{/pgfplots/refstyle=mSS}\addlegendentry{Scheduled Sampling}    
+      
       % background
       \addplot[draw=black!10!blue, thin, opacity=0.8] table[x=Step, y=Value]{\modelBB};
-      \addlegendentry{AS (train)};
+      \addlegendentry{AS (train)}
       \addplot[draw=black!10!green, thin, opacity=0.8] table[x=Step, y=Value]{\modelAA};
-      \addlegendentry{SS (train)};
+      \addlegendentry{SS (train)}
       %foreground
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{AS (valid)};
+      \addlegendentry{AS (valid)}
       %best
       \addplot[draw=black!30!green] table[dashed, x=Step, y=Value]{\modelA};
-      \addlegendentry{SS (valid)};
+      \addlegendentry{SS (valid)} 
     \end{axis}
+    
   \end{tikzpicture}
-  }
-  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+  \caption[Influences of Scheduled Sampling]{Influences of scheduled sampling regarding the training and validation error in context of recurrent networks and future frames prediction on Moving MNIST.}\label{fig:plot-mm-asss}
 \end{figure}
 
+But the interesting insight here is that as soon as the scheduled sampling component completely changed the input behaviour to inference mode, the achieved prediction performance is continiously better compared to the approach of always sampling from previous generatated frames directly at the very beginning. This behavior could be explained that the SS approach introduces some kind of pre-training phase, where the network can learn to predict the next frame when a perfect current frame is given. Hence, it has not to deal with errors made in the previous time step. By slowly changing this behaviour to the mode as it is used while inference, it then also starts to learn a robustness against imperfect input frames. A similar behavior can be seen when comparing the results of the PSNR metric between AA and SS in Figure \ref{fig:plot-mm-asss2-psnr}. However, when we look at the sharpeness difference metric in Figure \ref{fig:plot-mm-asss2-sdiffcurve}, it can be seen that sharpness of the predictions is continuously better using scheduled sampling.
 
-
-\begin{figure}[htpb]
+\begin{figure}[htb]
 \centering
 \begin{subfigure}{0.5\textwidth}
   \centering
   \pgfplotstableset{col sep=comma}
-  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_scheduled_sampling.csv}\modelA
+  \pgfplotstableread{data/mm/as_ss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-YT-tag_validation_sharpdiff.csv}\modelA
+  \pgfplotstableread{data/mm/as_ss/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_sharpdiff.csv}\modelB
   \hspace*{-0.6cm}
   {
   \begin{tikzpicture}[scale=0.5]
     \begin{axis}[
-        ymin=0,
-        ymax=1,
+        ymin=10,
+        ymax=15,
         xmin=0,
         xmax=65000,
-        legend style={legend pos=north east},
+        legend style={legend pos=south east},
         grid,
         thick,
-        ylabel=GT sampling probability \textit{p},
+        ylabel=SharpDiff,
         xlabel=step \textit{i},
         x post scale=1.6,
       ]
-      \addplot[draw=LightGoldenrod] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{Scheduled Sampling};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{AS (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{SS (valid)};
     \end{axis}
   \end{tikzpicture}
   }
   \caption{}
-  \label{fig:plot-mm-bn2-sscurve}
+  \label{fig:plot-mm-asss2-sdiffcurve}
 \end{subfigure}%
 \begin{subfigure}{0.5\textwidth}
   \centering
@@ -103,7 +141,7 @@ Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um d
         ymax=20,
         xmin=0,
         xmax=65000,
-        legend style={legend pos=north east},
+        legend style={legend pos=south east},
         grid,
         thick,
         ylabel=PSNR,
@@ -119,40 +157,40 @@ Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um d
   \end{tikzpicture}
   }
   \caption{}
-  \label{fig:plot-mm-bn2-psnr}
+  \label{fig:plot-mm-asss2-psnr}
 \end{subfigure}
-\caption[TBD]{tbd.} \label{fig:plot-mm-bn2}
+\caption[Image Metrics Comparing AS and SS]{Comparison of validation results based on a model with either using the scheduled sampling or the always sampling training technique.} \label{fig:plot-mm-asss2}
 \end{figure}
 
 
 
+\subsubsection*{Batch Normalization}
 
+The use of batch normalization in the spatial encoder and decoder components is investigated next. Figure \ref{fig:plot-mm-bn} shows a clear advantage of using BN-layers. It can be argued that our model is able to profit strongly from  batch normalization, because it does not only support the convolutional encoder and decoder to learn faster by compensating the internal covariate shift. Also, both recurrent networks in-between can benefit from this, reasoned by the fact that the frame representations in feature space, that are produced by the spatial encoders, tend to have a more stable distribution. Consequently, the spatio-temporal encoder has fewer problems to extract useful patterns from these representations while consuming them in the course of the training process.
 
-
-
-
-\begin{figure}[htpb]
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
   \centering
   \pgfplotstableset{col sep=comma}
   \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelA
   \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212-wd1e-05-MX-tag_validation_bce.csv}\modelB
-  \hspace*{-1.1cm}
+  \hspace*{-0.6cm}
   {
-  \begin{tikzpicture}
+  \begin{tikzpicture}[scale=0.5]
     \begin{axis}[
-    	ymode=log,
+        ymode=log,
     	log ticks with fixed point,
         ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
-        ytick={0.05,0.075,0.1,0.15,0.2},
         legend style={legend pos=north east},
         grid,
         thick,
         ylabel=BCE loss,
         xlabel=step \textit{i},
-        x post scale=1.8,
+        x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
       \addlegendentry{w/o BN (valid)};
@@ -162,21 +200,74 @@ Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um d
     \end{axis}
   \end{tikzpicture}
   }
-  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+  \caption{}
+  \label{fig:plot-mm-bn-bce}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_sharpdiff.csv}\modelA
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212-wd1e-05-MX-tag_validation_sharpdiff.csv}\modelB
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=10,
+        ymax=15,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SharpDiff,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{w/o BN (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{with BN (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-bn-psnr}
+\end{subfigure}
+\caption[Influences of Batch Normalization]{Comparison of the validation results from two model instances where one uses batch normalization layers in the spatial encoder and decoder components.} \label{fig:plot-mm-bn}
 \end{figure}
 
 
+\subsubsection*{Learning Rate Decay}
 
+The network's learning behavior using two different exponential decay rates is illustrated in Figure \ref{fig:plot-mm-lr}. In this example, the learning rate is slightly decayed after each epoch by a specified factor. Because the Moving MNIST dataset is generated on-the-fly, we specify its total size to be virtually \num{32000}. In this way, the learning rate is effectively decayed after each validation step\footnote{In the course of this evaluation, we assess our model in a full epoch on the validation set every \nth{1000} training step.}, since a batch size of \num{32} is used. The network denoted with blue has a clear disadvantage, because its learning rate at the end became so small that it alsmost stops learning. However, throughout our experiments we determined that a very low learning rate at the end of the training was beneficial regarding the image quality and finer details of the generated images.
 
-\begin{figure}[htpb]
+\begin{figure}[htb]
   \centering
   \pgfplotstableset{col sep=comma}
   \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-JK-tag_validation_bce.csv}\modelA
   \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelB
-  \hspace*{-1.1cm}
-  {
+  \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-JK-tag_learning_rate.csv}\modelLrA
+  \pgfplotstableread{data/mm/lr/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_learning_rate.csv}\modelLrB
   \begin{tikzpicture}
     \begin{axis}[
+    	axis y line*=right,
+    	hide x axis,
+    	ylabel near ticks,
+        ymin=0,
+        ymax=0.001,
+        xmin=0,
+        xmax=65000,
+        thick,
+        ylabel={Learning rate $\eta$},
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot[draw=black!10!blue, very thin, opacity=0.8] table[x=Step, y=Value]{\modelLrB};\label{mB}
+      \addplot[draw=black!10!green, very thin, opacity=0.8] table[x=Step, y=Value]{\modelLrA};\label{mA}
+    \end{axis}
+    \begin{axis}[
+    	axis y line*=left,
     	ymode=log,
     	log ticks with fixed point,
         ymin=0,
@@ -191,16 +282,319 @@ Wie gehen wir beim Training vor: Wegen sehr vielen Hyperparmeter: Nutzen MM um d
         xlabel=step \textit{i},
         x post scale=1.8,
       ]
+	  \addlegendimage{/pgfplots/refstyle=mB}\addlegendentry{$\eta$-decay=0.90 (valid)}
+      \addlegendimage{/pgfplots/refstyle=mA}\addlegendentry{$\eta$-decay=0.95 (valid)}
+      
+      %foreground
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{$\eta$-decay=0.90 (valid)};
+      \addlegendentry{$\eta$-decay=0.90};
+      %best
+      \addplot[draw=black!30!green] table[dashed, x=Step, y=Value]{\modelA};
+      \addlegendentry{$\eta$-decay=0.90};
+    \end{axis}
+  \end{tikzpicture}
+  \caption[Influences of Learning Rate Decay]{Validation losses of two identical network models using different learning rate decay rates in combination with Adam optimizer.}\label{fig:plot-mm-lr}
+\end{figure}
+
+
+\subsubsection*{ConvLSTM Feature Maps}
+
+Next, we investigate the network's behavior with respect to the hidden-to-hidden feature maps in the spatio-temporal decoder and encoder components. Therefore, we adjust the number of feature maps produced by the convolutional layers in the spatial encoder. While a first simpler variant is used that produces (16, 32, 32) feature maps in each layer, another more complex variant is used as well which convolves (64, 128, 128) feature maps. The number feature maps produced by the last layer is then used constantly within the ConvLSTM cells and its temporal transitions. Consequently, the performance of these two model configurations is compared against the standard model with 64 temporal feature maps in Figure \ref{fig:plot-mm-filter}.
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-04-FG-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c163232k533s212bn-wd1e-04-YP-tag_validation_bce.csv}\modelB
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c64128128k533s212bn-wd1e-05-NK-tag_validation_bce.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{32 feature maps (valid)};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{$\eta$-decay=0.95 (valid)};
+      \addlegendentry{64 feature maps (valid)};
+      
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{128 feature maps (valid)};
     \end{axis}
   \end{tikzpicture}
   }
-  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+  \caption{}
+  \label{fig:plot-mm-filter-bce}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-04-FG-tag_validation_ssim.csv}\modelA
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c163232k533s212bn-wd1e-04-YP-tag_validation_ssim.csv}\modelB
+  \pgfplotstableread{data/mm/filters/run_mm-ss-2l3i5hp-c64128128k533s212bn-wd1e-05-NK-tag_validation_ssim.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=0,
+        ymax=1,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SSIM,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{32 feature maps};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{64 feature maps};
+      
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{128 feature maps};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-filter-psnr}
+\end{subfigure}
+\caption[Influences of ConvLSTM Feature Maps]{Impact of the number of feature maps within the ConvLSTM encoder and decoder networks regarding overall frame prediction performance.} \label{fig:plot-mm-filter}
 \end{figure}
+
+As expected, the network with only 32 feature maps performs worse compared to the standard setting. But it is very surprising that the model configuration with 128 feature maps achieves even worse results. One possible reason could be a unfavorable, random initialization of the initial model parameters. However, due to the fact that such a network configuration requires roughly the entire video memory of the GPU, as well as takes twice as long to train, we came to the decision to continue our experiments on 64 feature maps only.
+
+
+\subsubsection*{ConvLSTM Layers}
+
+The number of recurrent layers has a very positive effect in order to generate future frames of better quality. The same behavior has also been mentioned in the practical experiment of \parencite[p. 6]{unsup_learn_lstm}, where they have qualitatively shown that a deeper LSTM is able to generate sharper images. Figure \ref{fig:plot-mm-layer} shows that the improvements of adding a third layer is apparently smaller compared to the difference when a second layer is added. Unfortunately, a 4-layer network could not be tested due to memory limitations of the graphics card. Additionally, it is worthwhile noting that the number of recurrent layers has a huge impact in respect to model complexity, training time and memory requirements.
+
+\begin{figure}[htb] % note: these use triplet loss already!!!
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/layers/run_mm-ss-3l3i5hp-c326464k533s212bn-wd1e-05-triplet-JM-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/layers/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-triplet-CE-tag_validation_bce.csv}\modelB
+  \pgfplotstableread{data/mm/layers/run_mm-ss-1l3i5hp-c326464k533s212bn-wd1e-05-triplet-MK-tag_validation_bce.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{1-layer ConvLSTM};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{2-layer ConvLSTM};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{3-layer ConvLSTM};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-layer-bce}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/layers/run_mm-ss-3l3i5hp-c326464k533s212bn-wd1e-05-triplet-JM-tag_validation_psnr.csv}\modelA
+  \pgfplotstableread{data/mm/layers/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-triplet-CE-tag_validation_psnr.csv}\modelB
+  \pgfplotstableread{data/mm/layers/run_mm-ss-1l3i5hp-c326464k533s212bn-wd1e-05-triplet-MK-tag_validation_psnr.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=10,
+        ymax=20,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=PSNR,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{1-layer ConvLSTM};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{2-layer ConvLSTM};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{3-layer ConvLSTM};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-layer-psnr}
+\end{subfigure}
+\caption[Influences of ConvLSTM Layers]{Validation performance of network models with a varying number of recurrent layers. All three models are trained using the triplet loss function.} \label{fig:plot-mm-layer}
+\end{figure}
+
+
+
+\subsubsection*{Loss Layer}
+
+As a last experiment of our test series, we examine the impact of the different loss terms. Three networks with the identical standard configurations, but different objective functions have therefore been trained. Starting from a network using binary cross-entropy only, perceptual motivated loss terms like GDL and SSIM are added one after another until we end up in the triplet loss described in equation \ref{eq:triplet}. The validation results are depicted in Figure \ref{fig:plot-mm-loss}.
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-mae_only-HE,tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-JK,tag_validation_bce.csv}\modelB
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-triplet-CE,tag_validation_bce.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{BCE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{BCE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{BCE (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-loss-bce}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-mae_only-HE,tag_validation_sharpdiff.csv}\modelA
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-JK,tag_validation_sharpdiff.csv}\modelB
+  \pgfplotstableread{data/mm/loss/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-triplet-CE,tag_validation_sharpdiff.csv}\modelC
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymin=10,
+        ymax=15,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SharpDiff,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{BCE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{BCE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{BCE (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-mm-loss-psnr}
+\end{subfigure}
+\caption[Influences of the Loss Term]{Comparison of the validation loss using different objective functions.} \label{fig:plot-mm-loss}
+\end{figure}
+
+While the network purely trained on the BCE loss function performs best regarding the binary cross-entropy on the validation set, it nevertheless performs worst according to the sharpness difference metric shown in Figure \ref{fig:plot-mm-loss-psnr}. These results are not surprising, because network using a the triplet loss function for example is putting more emphisis on other properties, in contrast to specifically optimizing it regarding to the binary cross-entropy. However, after we have qualitatively analyzed many generated prediction samples in the course of our experiments, we had the impression that results using the simple BCE loss produced the best results. Especially in samples where one handwritten number crosses the other number, the predictions multiple time steps afterwards kept slightly more stable. All in all, perceptual motivated loss terms seem to bo useless or even slightly counter-productive when applied on binary Moving MNIST image frames. 
+
+\subsection{Results}
+
+For the final evaluation of our model with Moving MNIST, we assess the qualitativ and quantitative performance of the best configuration on the test set. Inspired by the findings of our model exploration, as well a rudimentary grid-search, the model for this final test ends up to use the default settings as described earlier, but with an exponential learning rate decay of $\alpha=0.95$ and a loss layer that utilizes no perceptual motivated loss term. We have trained three models of this network with different number of recurrent layers. 
+
+
+
+\subsubsection{Quantitative Results}
+
+
+
+
+\begin{table}[htpb]
+  \small
+  \centering
+  \begin{tabular}{l r r}
+    \toprule
+      \textbf{Model} & \textbf{Trainable parameters} & \textbf{BCE test error} \\
+    \midrule
+      FC-LSTM-Combo(2048-2048) \tiny{\parencite{unsup_learn_lstm}} & \num{214001664} & 0.0855 \\
+      FC-LSTM(2048-2048) \tiny{\parencite{conv_lstm_nowcasting}} & \num{142667776} & 0.1180 \\
+      ConvLSTM(5/128-64-64) \tiny{\parencite{conv_lstm_nowcasting}} & \num{7585296} & 0.0896 \\
+      2enc-ConvLSTM(7/45-45)\footnote{Single frame prediction result, not the average error ofall 10 predicted future frames.} \tiny{\parencite{spat_temp_video_autoenc}} & \num{6132203} & 0.0835 \\
+    \midrule
+      3enc-ConvLSTM-SS(5/64) & \num{1841793} & 0.0524 \\
+      3enc-ConvLSTM-SS(5/64-64) & \num{3570817} & 0.0414 \\
+      3enc-ConvLSTM-SS(5/64-64-64) & \num{1} & \\
+    \bottomrule
+  \end{tabular}
+  \caption[Result Comparison on Moving MNIST]{Comparison with other networks on Moving MNIST. The numbers in brackets identify the amount of hidden units per layer in case of FC-LSTMs, and for ConvLSTMs the hidden-to-hidden kernel size followed by the feature maps per layer are listed.}\label{tab:model_params}
+\end{table}
+
+
+
+
+
+\subsubsection{Qualitative Results}
+
+
+\subsubsection{Out-of-Domain Results}
+
+Additionally, we have verify the model's ability to deal with data that is outside the domain it has been trained for. We therefore take Moving MNIST sequences that use one or three digits instead of two and compare the generated results with predictions generated with other models. It is to highlight that we are not doing cherry-picking in this test, because we take the exact same sequences that have been used in related works.
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=0.6\linewidth]{figures/placeholder.png} 
+	\caption[TBD]{tbd.} \label{fig:mm-out-domain}
+\end{figure}
+
+A remarkable difference is visible when the outcames of our model is qualitatively compared with predictions of existing approaches. The structure of the single digits stays more stable, even after a letter has been overlapped by another. Moreover, our model does not try to image a second number in case of the single digit test.
+
 
 
 %\subsection{Influence of Scheduled Sampling}

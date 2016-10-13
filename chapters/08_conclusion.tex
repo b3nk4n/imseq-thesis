@@ -112,3 +112,36 @@ Bla bla...
 
 
 
+\begin{figure}[htpb]
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelA
+  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212-wd1e-05-MX-tag_validation_bce.csv}\modelB
+  \hspace*{-1.1cm}
+  {
+  \begin{tikzpicture}
+    \begin{axis}[
+    	ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=65000,
+        ytick={0.05,0.075,0.1,0.15,0.2},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=BCE loss,
+        xlabel=step \textit{i},
+        x post scale=1.8,
+      ]
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{w/o BN (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{with BN (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
+\end{figure}
