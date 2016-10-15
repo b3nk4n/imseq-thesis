@@ -604,7 +604,7 @@ Next, several future frame prediction samples are qualitatively compared with re
   \caption{}
   \label{fig:mm-pred-spec-lstm4}
 \end{subfigure}
-\caption[Comparison with LSTM on Moving MNIST]{Qualitative comparison with FC-LSTM-Combo(2048-2048) \parencite{unsup_learn_lstm}. Experiments in (c) and (d) are using a different number of digits than the network was trained for. From top to bottom: inputs sequence; ground truth target sequence; predictions of FC-LSTM-Combo, predictions of our 2-layer model.} \label{fig:mm-pred-spec-lstm}
+\caption[Comparison with LSTM on Moving MNIST]{Qualitative comparison with FC-LSTM-Combo(2048-2048) \parencite{unsup_learn_lstm}. Experiments in (c) and (d) are using a different number of digits than the network was trained for. From top to bottom: inputs sequence; ground truth target sequence; predictions of FC-LSTM-Combo; predictions of our 2-layer model.} \label{fig:mm-pred-spec-lstm}
 \end{figure}
 
 Further predictions of our model, which have been randomly chosen from the Moving MNIST test set, can be found in Figure \ref{fig:mm-pred-random} in the appendix. While most generated results look quite similar to the ground truth future, the sample in Figure \ref{fig:mm-pred-random2} clearly shows that the model still has its issues to preserve details when both digits overlap each other over a longer period.
@@ -628,7 +628,7 @@ Additionally, we verify the model's ability to deal with data that is outside th
   \caption{}
   \label{fig:mm-pred-spec2-clstm2}
 \end{subfigure}
-\caption[Comparison with other ConvLSTM on Moving MNIST]{Qualitative comparison with ConvLSTM(5/128-64-64 \parencite{conv_lstm_nowcasting}. The experiment in (b) uses more digits than the network was trained for. From top to bottom: inputs sequence; ground truth target sequence; prediction results of the competitive model, predictions of our 2-layer ConvLSTM.} \label{fig:mm-pred-spec2-clstm}
+\caption[Comparison with other ConvLSTM on Moving MNIST]{Qualitative comparison with ConvLSTM(5/128-64-64 \parencite{conv_lstm_nowcasting}. The experiment in (b) uses more digits than the network was trained for. From top to bottom: inputs sequence; ground truth target sequence; prediction results of the competitive model; predictions of our 2-layer ConvLSTM.} \label{fig:mm-pred-spec2-clstm}
 \end{figure}
 
 A remarkable difference is visible when the outcames of our model is qualitatively compared with predictions of existing approaches. In case of the samples using three digits in Figures \ref{fig:mm-pred-spec-lstm4} and \ref{fig:mm-pred-spec2-clstm2}, the structure of each digit stays more stable and does not get washed-out, even after a digit has been overlapped by both others. Moreover, it does not try to merge two numbers in order to end up with the same number of digits like the networks have been trained for. A similar behaviour can be seen in Figure \ref{fig:mm-pred-spec-lstm3}, where only a single digit is used. In that scenario, the other network model cearly tries to hallucinate a second fyling number at the end of the future sequence. This misbehavior is not visible in the outputs of our model.
@@ -834,28 +834,28 @@ As a final qualitative comparison regading the differences of these objective fu
   \caption{}
   \label{fig:pac-pred-blurry_sample}
 \end{subfigure}
-\caption[Generated MsPacman Patches using Different Loss Functions]{Two predictions showing a similar scene of a moving ghost. The sequence (a) is predicted using a network trained with the MSE-based triplet loss function, whereas the network in (b) is trained on MAE+GDL loss.} \label{fig:pac-pred-blurry}
+\caption[Generated MsPacman Patches using Different Loss Functions]{Two predictions showing a similar scene of a moving ghost. The sequence in (a) is predicted using a network trained with the MSE-based triplet loss function, whereas the network in (b) is trained on MAE+GDL loss.} \label{fig:pac-pred-blurry}
 \end{figure}
 
 
 \subsection{Results}
 
-Next, we present the results of our best performing two-layer model. This model is configured as described earlier in this section, but takes advantage from the triplet loss function using MSE as its main loss term that produced the most promising results.
+Next, we present the test results of our best performing two-layer model. This model is configured as described earlier in this section. In the qualitative assessments, our network takes advantage from the triplet loss function using MSE as its main loss term which produced the most promising results when we explored the behavior of the model on the MsPacman dataset. It is important to note that the test set is not filtering out random crops that show just few or even no movement at all. That's why it is to expect that the average test results can be much better compared to the validation result, since it is quite easy for the network to predict scenes that only contain the maze's static background with no movement at all.
 
 
 \subsubsection{Quantitative Results}
 
-%TODO run models, note numbers, explain some insight (huge difference between 1st and frame avg?)
+%TODO explain some insight (huge difference between 1st and frame avg?)
 % tell that threre is unfortunately related project that has published results regarding this dataset, but tell the the adv. TF imple used this dataset, and their presented prediction samples seem to produce better results.
 
-% we disable the movement-ensuring for the test set
+The image metric results of our network model using the discussed loss function combinations is shown in Table \ref{tab:pac-comparison}. As it was the case on the validation set, the MSE-based triplet loss function produces the best results in all similarity metrics, regardless of it is about the first predicted frame, or the average of the whole future sequence. However, if we look at the sharpness results, the model instance that utilizes no SSIM term in its objective function is able to produce sharper results according to the metric. This is not surprising, because the GDL term is weighted more in this model, which is the central objective of this metric.
 
 \begin{table}[htb]
   \footnotesize
   \centering
   \begin{tabular}{l | r r | r | r r | r}
     \toprule
-      \textbf{Loss function} & \multicolumn{3}{c}{\textbf{\nth{1} frame}} & \multicolumn{3}{c}{\textbf{sequence avg.}} \\
+      \textbf{Loss function} & \multicolumn{3}{c}{\textbf{\nth{1} frame}} & \multicolumn{3}{c}{\textbf{mean of 8 frames}} \\
       & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} \\
       & PSNR & $\text{SSIM}_{5}$ & SharpDiff & PSNR & $\text{SSIM}_{5}$ & SharpDiff \\
     \midrule
@@ -868,13 +868,16 @@ Next, we present the results of our best performing two-layer model. This model 
   \caption[Metric Results on MsPacman]{Metric results of produced patch sequences using a 2-layer model on MsPacman's test split. The achieved similarity and sharpness of the same model using different loss layers are given for both the first frame only and the average of the whole generated future sequence.}\label{tab:pac-comparison}
 \end{table}
 
+Another interesting fact is that the differences between the image metric results of the first predicted frame and the average of all predicted frames are very marginal. This might be due to the reason that the bigger part of each patch is just static, noise-free content. Hence, the actual interesting parts of each frame that include motion have only little effect on the metric results. Furthermore, it is surprising that the sharpness metric results of the first predicted frame are slightly worse compared to the metric's mean over the whole predicted sequence.
+
+On the other side, the pixel-wise absolute and squared error results in Table \ref{tab:pac-comparison2} appear more plausible. Here, the differences between the frist frame and the average of the sequence are significantly larger. But one fact remains unchanged: the networks trained on the MSE-based triplet loss function is able to produce the best prediction results. Furthermore, it is interesting to see that both networks that utilize a squared error loss term as their main objective are able to outperform both other model instances regarding the MAE error, despite the fact the other who networks are explicitely optimized for this for this objective. This superiority could be reasoned by the characteristics of the MsPacman dataset.
 
 \begin{table}[htb]
   \footnotesize
   \centering
   \begin{tabular}{l | r r | r r }
     \toprule
-      \textbf{Loss function} & \multicolumn{2}{c}{\textbf{\nth{1} frame}} & \multicolumn{2}{c}{\textbf{sequence avg.}} \\
+      \textbf{Loss function} & \multicolumn{2}{c}{\textbf{\nth{1} frame}} & \multicolumn{2}{c}{\textbf{mean of 8 frames}} \\
       & MAE & MSE & MAE & MSE \\
     \midrule
       MAE+GDL & 0.0033 & 0.0009 & 0.0041 & 0.0018 \\
@@ -889,7 +892,7 @@ Next, we present the results of our best performing two-layer model. This model 
 
 \subsubsection{Qualitative Results}
 
-% especially motion in still-standing object is very good captured and continued in the future 
+For a qualitative evaluation of the network, we take a detailed look at some generated future sequences. Starting the the clip in Figure \ref{fig:pac-pred-random1}, the motion of the ghost is predicted very precisely. Moreover, the fine details of the ghost's eyes and zigzag mouth are preserved even until the eighth frame. However, the dynamics of the blue and white blinking effect is not continued in the predicted sequence.
 
 \begin{figure}[h!tb]
 \centering
@@ -905,25 +908,22 @@ Next, we present the results of our best performing two-layer model. This model 
   \caption{}
   \label{fig:pac-pred-random2}
 \end{subfigure}
-\caption[TBD]{tbd one good and one bad example. pac disappreas at the crossing.} \label{fig:pac-pred-random}
+\caption[Random Prediction Samples on MsPacman]{Two random prediction samples on MsPacman that contain at least some motion. From top to bottom: ground truth input and output sequence; predicted sequence of the 2-layer network.} \label{fig:pac-pred-random}
 \end{figure}
 
-% more examples in fig:pac-pred-random_extra
+As a second example, the prediction result shown in Figure \ref{fig:pac-pred-random2} is considered. On the one side, pacman's dynamics are correctly continued in first four generated frames. It correctly moves forward, performs chewing and eats the orange dot, but with some delay. On the other side, the game character suddenly disappears when it arrives the second crossing. We observed such a behavior actually quite often in many other samples as well. As a results, this indicates that the network has its issues to decide what direction the moving objects will take within the maze. This assumption can be further confirmed by some other other observations, such as that objects reaching a crossing are either affected by a loss of opacity, split up into multiple directions, disapper complete as shown in the demonstrated example, or in best case chose any random direction. Moreover, such disappearance effects seldomly take place in corners where there is beside turning around only one other option.
 
-
-
+More predictions on small patches can be found in Figure \ref{fig:pac-pred-random_extra} in the appendix. It is worth noting that still-standing motion is particularly well captured and continued by the network. As an example, pacman's chewing animation in Figure \ref{fig:pac-pred-random_extra1} is kept up in all predicted frames, so that it is looks almost identical at the first glance. The only noticeable difference here is that pacman temporarily changes its direction in the fifth frame for just one time step in the ground truth future.
 
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=1.0\linewidth]{figures/pred/pac/full/pred-00.png} 
-	\caption[TBD]{tbd full fcn.} \label{fig:pac-pred-full1}
+	\caption[Random Full Screen Prediction Sample on MsPacman]{Prediction sample of a full game scene using our 2-layer network, which is trained on small $32 \times 32$ patches only. This is possible due to our FCN approach. From top to bottom: ground truth input and output sequence; predicted game sequence.} \label{fig:pac-pred-full1}
 \end{figure}
-% further full example: fig:pac-pred-full2
 
-% Also long example: fig:pac-pred-full-long
+As explained in section \ref{sec:fcn}, the fully-convolutional approach of our model comes with the advantage that it can be applied on input images of larger size. Therefore, a prediction sample of a sequence showing a full game scene is presented in Figure \ref{fig:pac-pred-full1}. It shows that future frames can indeed be forecasted for the full images with acceptable results as well. For instance, the blinking effect of the large dots in the corners of the maze and the trajectory of the red cherry is predicted almost perfectly. Furthermore, the motion of the game characters is continued quite well, with the exception one ghost that disappears or that both ghosts in the center slightly change their color. A second result showing the full maze can be found in Figure \ref{fig:pac-pred-full2}. in that sample, attention should be paid to the blue ghost in the center, who is correctly predicted to leave the cave instead of going for another spin.
 
-
-
+Finally, the stability of the generated future frames investigated by performing predictions on longer sequences. As it can be seen in Figure \ref{fig:pac-pred-full-long}, some artifacts become visible starting form the \nth{14} forecasted frame. And while all moving game characters gradually disappear, the red cherry object is predicted very precisely until the end of the lengthened sequence.
 
 
 

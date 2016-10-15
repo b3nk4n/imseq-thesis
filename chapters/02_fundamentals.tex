@@ -338,7 +338,7 @@ The sharing of parameters leads to the third advantage. Because the kernel and i
 Unfortunately, convolutions are not tolerant to other transformations from the ground up. But to counteract these, other techniques exist such as a subsequent pooling stage to enable a slight rotation invariance, as already introduced before.
 
 
-\subsection{Fully-Convolutional Networks}
+\subsection{Fully-Convolutional Networks} \label{sec:fcn}
 
 The complete use of convolutional layers implicates a fourth advantage over fully-connected layers. Since the kernel size in each layer is independent regarding its input, the overall network could be fed with data of different dimension. In contrary, this is not possible anymore as soon as a single FC-layer is used at inference because its fixed-sized weight matrix has to be applied to the entire input, not just to a local region. Nevertheless, this does not imply that no fully-connected layer can be used at all when training the network. Depending on the architecture, FC-layers can be used in those parts of the network that are only used during training, but not when a prediction is performed while inference. This advantage is taken into account for example when a \textit{deep convolutional generative adversarial network} (DCGAN)\footnote{Novel network training strategy for generative networks. A generator network $ G $ competes against a second discriminator network $ D $ in an alternating fashion. Further details in \parencite{gan}.} is trained, whose discriminator network is only used in training mode.
 
