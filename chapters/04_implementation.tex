@@ -91,7 +91,7 @@ where $i$ identifies the current training step and $\alpha \geq 1$ controls the 
 
 The final model architecture is based on the RNN encoder-decoder framework introduced in Section \ref{sec:rnn_enc_dec} and both previously presented advancements to improve the learning of spatio-temporal features in video data. This architecture has been chosen because it explicitly models the temporal correlations and is flexible regarding the input and output sequence. Further, previous works demonstrated in Chapter \ref{chapter:relatedwork} have shown promising results using this recurrent framework. The architecture that is presented in this section describes the default version of the network that is used for frame prediction of generated image sequences of animated, handwritten numbers. The following evaluation in Chapter \ref{chapter:evaluation} assesses this model with different settings, such as variations in the network's depth.
 
-\subsection{Components}
+\subsection{Components} \label{sec:impl-components}
 
 Before the entire network model is demonstrated, we would like to go through its main components in detail first. These components for encoding or decoding are ordered according to the flow of data while propagating forward through the network. Afterwards, the loss layer is presented which combines standard error functions with perceptual motivated bias terms.
 

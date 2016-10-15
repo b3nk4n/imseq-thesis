@@ -11,6 +11,9 @@ Bla bla...
 % Discuss the resutls? What is good or bad? And why?
 
 
+% wahl der richtigen loss function spielt eine sehr wichtige rolle. dabei kommt es immer auf die gegebenheiten der daten an. die 3 verschiedenen datensets haben das gezeigt, da jedes set mit einer anderen loss-function am besten abgeschnitten hat.
+
+
 
 \section{Future work}
 
@@ -34,114 +37,3 @@ Bla bla...
 \item Gradient/Cell-clipping?
 \item ...
 \end{itemize}
-
-\section{Just a Test Section}
-
-Bla bla...
-
-\begin{figure}[htpb]
-  \centering
-
-  \pgfplotstableset{col sep=&, row sep=\\}
-  % This should probably go into a file in data/
-  \pgfplotstableread{
-    a & b    \\
-    1 & 1000 \\
-    2 & 1500 \\
-    3 & 1600 \\
-  }\exampleA
-  \pgfplotstableread{
-    a & b    \\
-    1 & 1200 \\
-    2 & 800 \\
-    3 & 1400 \\
-  }\exampleB
-  % This should probably go into a file in figures/
-  \begin{tikzpicture}
-    \begin{axis}[
-        ymin=0,
-        legend style={legend pos=south east},
-        grid,
-        thick,
-        ylabel=Y,
-        xlabel=X
-      ]
-      \addplot table[x=a, y=b]{\exampleA};
-      \addlegendentry{Example A};
-      \addplot table[x=a, y=b]{\exampleB};
-      \addlegendentry{Example B};
-    \end{axis}
-  \end{tikzpicture}
-  \caption[Example plot]{An example for a simple plot.}\label{fig:sample-plot}
-\end{figure}
-
-
-
-\begin{figure}[htpb]
-  \centering
-
-  \pgfplotstableset{col sep=comma}
-  % This should probably go into a file in data/
-  \pgfplotstableread{data/test/run_mm-as-2l3i5hp-c326464k533s212bn-wd1e-05-SE-tag_validation_bce.csv}\modelA
-  \pgfplotstableread{data/test/run_mm-ss-1l3i5hp-c326464k533s212bn-wd1e-05-AF-tag_validation_bce.csv}\modelB
-  % This should probably go into a file in figures/
-  \begin{tikzpicture}
-    \begin{axis}[
-    	ymode=log,
-    	log ticks with fixed point,
-        ymin=0,
-        ymax=0.3,
-        xmin=0,
-        xmax=100000,
-        ytick={0.05,0.075,0.1,0.15,0.2},
-        legend style={legend pos=north east},
-        grid,
-        thick,
-        ylabel=validation loss,
-        xlabel=step \textit{i},
-        x post scale=1.8,
-      ]
-      \addplot table[x=Step, y=Value]{\modelA};
-      \addlegendentry{Example A};
-      \addplot table[x=Step, y=Value]{\modelB};
-      \addlegendentry{Example B};
-    \end{axis}
-  \end{tikzpicture}
-  \caption[Example plot]{An example for a simple plot.}\label{fig:sample-csvplot}
-\end{figure}
-
-
-
-\begin{figure}[htpb]
-  \centering
-  \pgfplotstableset{col sep=comma}
-  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212bn-wd1e-05-XG-tag_validation_bce.csv}\modelA
-  \pgfplotstableread{data/mm/bn/run_mm-ss-2l3i5hp-c326464k533s212-wd1e-05-MX-tag_validation_bce.csv}\modelB
-  \hspace*{-1.1cm}
-  {
-  \begin{tikzpicture}
-    \begin{axis}[
-    	ymode=log,
-    	log ticks with fixed point,
-        ymin=0,
-        ymax=0.3,
-        xmin=0,
-        xmax=65000,
-        ytick={0.05,0.075,0.1,0.15,0.2},
-        legend style={legend pos=north east},
-        grid,
-        thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
-        x post scale=1.8,
-      ]
-      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{w/o BN (valid)};
-      %best
-      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{with BN (valid)};
-    \end{axis}
-  \end{tikzpicture}
-  }
-  \caption[TBD]{tbd.}\label{fig:plot-mm-bn}
-\end{figure}

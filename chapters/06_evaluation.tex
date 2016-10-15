@@ -22,7 +22,7 @@ If not stated differently, the model configuration described in Chapter \ref{cha
 
 Lastly, it has to be menioned that diagrams, which show results of any kind of objective function, are always shown with its y-axis in logarithmic scale so that fine differences become better recognizable. And unless otherwise specified, all losses represent the per-pixel error and averaged across the whole generated future sequence.
 
-\section{Experiments on Moving MNIST}
+\section{Experiments on Moving MNIST} \label{sec:exp-mm}
 
 The synthetic Moving MNIST dataset is used as a starting point for the evaluation of our model. Given an input sequence of ten frames, the network therefore has to understand and encode the motion of this input in order to predict the next ten frames of the future. In this section, we qualitatively and quantitatively compare our results with other network models, because it has been used in several previous works as well. The loss layer used in this section does not use the SSIM term by default.
 
@@ -351,8 +351,8 @@ Next, we investigate the network's behavior with respect to the hidden-to-hidden
   {
   \begin{tikzpicture}[scale=0.5]
     \begin{axis}[
-        ymin=0,
-        ymax=1,
+        ymin=0.5,
+        ymax=1.0,
         xmin=0,
         xmax=65000,
         legend style={legend pos=south east},
@@ -543,16 +543,16 @@ As a last experiment of our test series, we examine the impact of the different 
 \caption[Influences of the Loss Term]{Comparison of the validation loss using different objective functions.} \label{fig:plot-mm-loss}
 \end{figure}
 
-While the network purely trained on the BCE loss function performs best regarding the binary cross-entropy on the validation set, it nevertheless performs worst according to the sharpness difference metric shown in Figure \ref{fig:plot-mm-loss-psnr}. These results are not surprising, because network using a the triplet loss function for example is putting more emphisis on other properties, in contrast to specifically optimizing it regarding to the binary cross-entropy. However, after we have qualitatively analyzed many generated prediction samples in the course of our experiments, we had the impression that results using the simple BCE loss produced the best results. Especially in samples where one handwritten number crosses the other number, the predictions multiple time steps afterwards kept slightly more stable. All in all, perceptual motivated loss terms seem to bo useless or even slightly counter-productive when applied on binary Moving MNIST image frames. 
+While the network purely trained on the BCE loss function performs best regarding the binary cross-entropy on the validation set, it nevertheless performs worst according to the sharpness difference metric shown in Figure \ref{fig:plot-mm-loss-psnr}. These results are not surprising, because network using a the triplet loss function for example is putting more emphisis on other properties, in contrast to specifically optimizing it regarding to the binary cross-entropy. However, after we have qualitatively analyzed many generated prediction samples in the course of our experiments, we had the impression that results using the simple BCE loss produced the best results. Especially in samples where one handwritten number crosses the other number, the predictions multiple time steps afterwards kept slightly more stable. All in all, perceptual motivated loss terms seem to be useless or even slightly counter-productive when applied on binary Moving MNIST image frames. 
 
 \subsection{Results}
 
-For the final evaluation of our model with Moving MNIST, we assess the qualitativ and quantitative performance of the best configuration on the test set. Inspired by the findings of our model exploration, as well a rudimentary grid-search, the model for this final test ends up to use the default settings as described earlier, but with an exponential learning rate decay of $\alpha=0.95$ and a loss layer that utilizes no perceptual motivated loss term. We have trained three models of this network with different number of recurrent layers. 
+For the final evaluation of our model with Moving MNIST, we assess the qualitativ and quantitative performance of the best configuration on the test set. Inspired by the findings of our model exploration, as well a rudimentary grid-search, the model for this final test ends up to use the default settings as described earlier, but with an exponential learning rate decay of $\alpha=0.95$ and a loss layer that utilizes no perceptual motivated loss term. We have trained three models of this network with different numbers of recurrent layers for \num{100000} steps.
 
 
 \subsubsection{Quantitative Results}
 
-A comparison of our best performing model with experimental results of other works is given in Table \ref{tab:mm-comparison}. It can be seen that our model exhibits way less model parameters, especially compared to FC-LSTM approaches. Nevertheless, our ConvLSTM model is able to cut the average pixel-wise test error of the best performing competitive model in halves. The listed results are taken from several published papers. However, we were not able to reproduce the results of FC-LSTM-Combo published in \parencite{unsup_learn_lstm} using their open-source code. After training the model for about \num{1000000} training steps, which took almost one week, the results were not nearly as good as in the paper. Even our model could generate better results after only \num{20000} training iterations.
+A comparison of our best performing model with experimental results of other works is given in Table \ref{tab:mm-comparison}. It can be seen that our model exhibits way less model parameters, especially compared to FC-LSTM approaches. Nevertheless, our ConvLSTM model is able to cut the average pixel-wise test error of the best performing competitive model in halves. The listed results are taken from several published papers. However, we were not able to reproduce the results of FC-LSTM-Combo published in \parencite{unsup_learn_lstm} using their open-source code. After training the model for about \num{1000000} training steps, which took almost one week, the results were not nearly as good as in the paper. Even about \num{20000} training iterations are already sufficient for our model to generate better results.
 
 \begin{table}[htb]
   \small
@@ -571,7 +571,7 @@ A comparison of our best performing model with experimental results of other wor
       3enc-ConvLSTM-SS-3dec(5/64-64-64) & \num{1} & \\ %TODO
     \bottomrule
   \end{tabular}
-  \caption[Result Comparison on Moving MNIST]{Comparison with other networks on Moving MNIST. The numbers in brackets identify the \textit{amount of hidden units} per layer in case of FC-LSTMs, and for ConvLSTMs the \textit{hidden-to-hidden kernel size} followed by the \textit{feature maps per layer} are listed. Further, \textit{3enc} denotes tree convolutional layers in the spatial encoder. We call our model 3enc-ConvLSTM-SS-3dec.}\label{tab:mm-comparison}
+  \caption[Results on Moving MNIST]{Comparison with other networks on Moving MNIST. The numbers in brackets identify the \textit{amount of hidden units} per layer in case of FC-LSTMs, and for ConvLSTMs the \textit{hidden-to-hidden kernel size} followed by the \textit{feature maps per layer} are listed. Further, \textit{3enc} denotes tree convolutional layers in the spatial encoder. We call our model 3enc-ConvLSTM-SS-3dec.}\label{tab:mm-comparison}
 \end{table}
 
 \subsubsection{Qualitative Results}
@@ -636,7 +636,291 @@ A remarkable difference is visible when the outcames of our model is qualitative
 Futher out-of-domain results can be found in Figure \ref{fig:mm-pred-long} in the appendix. It shows the scenario where our model tries to predict a much longer sequence than it has been trained for. Such a scenario is very to realize with our model due to its recurrent encoder-decoder architecture. We therefore unroll the spatio-temporal decoder component for \num{30} time steps in order to verify the long-term stability of the predicted frames. It can be seen that the network is able to continuously produce acceptable results, with the exception of the last five frame in Figure \ref{fig:mm-pred-long1}. From about the \nth{30} predicted future frame, our model then starts to produce very noisy outcomes in almost every case.
 
 
-\section{Experiments on MsPacman}
+\section{Experiments on MsPacman} \label{sec:exp-pac}
+
+The network model is applied on the MsPacman dataset in our second experiment to see how it behaves with data of increased complexity. The effects of perceptual motivated loss terms are investigated more deeply in this dataset, because we strongly belief that their weaknesses in Section \ref{sec:exp-mm} are cause by the unnaturally of binary image data.
+
+
+\subsection{Hyperparamter Tuning}
+
+In order to find good hyperparameters for the network model, we started to use the best performing model of Moving MNIST, but with the four modifications. First, the three layers of the spatial encoder and decoder components are using strides of $s_i=(1, 2, 1)$ instead $s_i=(2, 1, 2)$, where $i$ denotes the index of the convolutional layer, in order to end up with a feature space representation of the same shape as before. This change is is caused by the fact that the model is trained on smaller $32 \times 32$ patches. Second, we use a \textit{tanh} activation function in the output layer so that each generated frame is within the valid scale. Third, a learning rate decay of $\alpha=0.95$ per epoch is used by default. And lastly, the triplet loss function of Section \ref{sec:impl-components} with MAE as the main loss function is used as a starting point in this evaluation, because previous works have shown its advantages in image processing tasks compared to squared error.
+
+We trained several networks with different numbers of recurrent layers, varying initial learning rates $\eta \in \{0.0005, 0.001, 0.005\}$, as well as different weight decays $\lambda \in \{1e^{-6}, 1e^{-5}, 1e^{-4}\} $. While we could see a clear imrovement between the single layer and two-layer ConvLSTM model, there has been no clear benefit from using a third layer. The differences in results when we performed variations in learning rate and weight decay have also been marginal. Eventaully, we ended up with an initial learning rate of $\eta = 0.0005 $ and continued to use the default weight decay of $\lambda = 1e^{-5}$. Further, we used the two-layer model with the main reason to save training time.
+
+
+\subsubsection*{Loss Layer}
+
+Even that we couldn't improve our network's performance by performing variations in several hyperparameters that much, we experienced that variations in the objective function could caused more noticeable differences in both quantitativ and qualitative results. As a consequence, we descided to do a further investigation by using different loss terms. Severals validation results are therefore illustrated in Figure \ref{fig:plot-pac-loss}. 
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/pac/loss/mse/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-triplet-MZ_validation_mse.csv}\modelA
+  \pgfplotstableread{data/pac/loss/mse/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-QQ_validation_mse.csv}\modelB
+  \pgfplotstableread{data/pac/loss/mse/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-VY_validation_mse.csv}\modelC
+  \pgfplotstableread{data/pac/loss/mse/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-LU_validation_mse.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=100000,
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=MSE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MSE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MSE+GDL+SSIM (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-pac-loss-mse}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/pac/loss/mae/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-triplet-MZ_validation_mae.csv}\modelA
+  \pgfplotstableread{data/pac/loss/mae/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-QQ_validation_mae.csv}\modelB
+  \pgfplotstableread{data/pac/loss/mae/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-VY_validation_mae.csv}\modelC
+  \pgfplotstableread{data/pac/loss/mae/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-LU_validation_mae.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        ymin=0,
+        ymax=0.3,
+        xmin=0,
+        xmax=100000,
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=MAE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MSE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MSE+GDL+SSIM (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-pac-loss-mae}
+\end{subfigure}
+\caption[Comparison of Losses on MsPacman]{Comparison of validation results on MsPacman using a 2-layer network with varying loss function combinations. All models have been trained given an input sequence of 8 patches to predict the next 8 frames. The loss values are shown in the graphs represent the per-pixel error.} \label{fig:plot-pac-loss}
+\end{figure}
+
+Boths diagrams show that the use of the triplet loss function leads to better results regarding squared or absolute error. The same is true for the SSIM index, as it can be seen in Figure \ref{fig:plot-pac-loss-ssim}. But overall, the MSE loss function seams to results in a slightly better network performance. Special emphasis should be placed on the fact that for example a network that is trained using the triplet loss MSE+GDL+SSIM performs even better than a model trained with MAE+GDL regarding the MAE loss on the validation set, even that the latter network is explicitely optimized for this objective. Additionally, according the sharpness metric demonstrated in Figure \ref{fig:plot-pac-loss-sdiff}, the predicted frames of both networks that utilize the mean squared error as its main loss function feature sharper edges.
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/pac/loss/sdiff/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-triplet-MZ_validation_sharpdiff.csv}\modelA
+  \pgfplotstableread{data/pac/loss/sdiff/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-QQ_validation_sharpdiff.csv}\modelB
+  \pgfplotstableread{data/pac/loss/sdiff/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-VY_validation_sharpdiff.csv}\modelC
+  \pgfplotstableread{data/pac/loss/sdiff/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-LU_validation_sharpdiff.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+    	log ticks with fixed point,
+        ymin=10,
+        ymax=23,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SharpDiff,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MSE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MSE+GDL+SSIM (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-pac-loss-sdiff}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/pac/loss/ssim/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-triplet-MZ_validation_ssim.csv}\modelA
+  \pgfplotstableread{data/pac/loss/ssim/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-QQ_validation_ssim.csv}\modelB
+  \pgfplotstableread{data/pac/loss/ssim/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-VY_validation_ssim.csv}\modelC
+  \pgfplotstableread{data/pac/loss/ssim/run_pac-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-LU_validation_ssim.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+    	log ticks with fixed point,
+        ymin=0.5,
+        ymax=1.0,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SSIM,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MSE+GDL (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MSE+GDL+SSIM (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-pac-loss-ssim}
+\end{subfigure}
+\caption[Comparison of Image Metrics on MsPacman]{Image metrics computed after each training epoch on the MsPacman dataset. All four networks use a 2-layer ConvLSTM and the same hyperparameters, but a different objective function.} \label{fig:plot-pac-imgmetric}
+\end{figure}
+
+As a final qualitative comparison regading the differences of these objective function, we present two samples of the best and worst performing model in Figure \ref{fig:pac-pred-blurry}. While the network that has generated Figure \ref{fig:pac-pred-sharp_sample} is trained using the MSE-based triplet loss function, so is the other model instance, which has predicted the frames of the third column in Figure \ref{fig:pac-pred-blurry_sample}, trained on a combined MAE+GDL function. By comparing both predictions of this similar scene, the ghost of the latter network does visibly lose its finer details. More precisely, is is predicted as a simple blob without its eyes. 
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/pac/blurry/pred-sharp.png}
+  \caption{}
+  \label{fig:pac-pred-sharp_sample}
+\end{subfigure}%
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/pac/blurry/pred-blurry.png}
+  \caption{}
+  \label{fig:pac-pred-blurry_sample}
+\end{subfigure}
+\caption[Generated MsPacman Patches using Different Loss Functions]{Two predictions showing a similar scene of a moving ghost. The sequence (a) is predicted using a network trained with the MSE-based triplet loss function, whereas the network in (b) is trained on MAE+GDL loss.} \label{fig:pac-pred-blurry}
+\end{figure}
+
+
+\subsection{Results}
+
+Next, we present the results of our best performing two-layer model. This model is configured as described earlier in this section, but takes advantage from the triplet loss function using MSE as its main loss term that produced the most promising results.
+
+
+\subsubsection{Quantitative Results}
+
+%TODO run models, note numbers, explain some insight (huge difference between 1st and frame avg?)
+% tell that threre is unfortunately related project that has published results regarding this dataset, but tell the the adv. TF imple used this dataset, and their presented prediction samples seem to produce better results.
+
+% we disable the movement-ensuring for the test set
+
+\begin{table}[htb]
+  \footnotesize
+  \centering
+  \begin{tabular}{l | r r | r | r r | r}
+    \toprule
+      \textbf{Loss function} & \multicolumn{3}{c}{\textbf{\nth{1} frame}} & \multicolumn{3}{c}{\textbf{sequence avg.}} \\
+      & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} \\
+      & PSNR & $\text{SSIM}_{5}$ & SharpDiff & PSNR & $\text{SSIM}_{5}$ & SharpDiff \\
+    \midrule
+      MAE+GDL & 47.5462 & 0.9854 & 27.0217 & 48.6902 & 0.9817 & 27.8182 \\
+      MAE+GDL+SSIM & 44.8974 & 0.9917 & 26.9131 & 44.6555 & 0.9856 & 27.9516 \\
+      MSE+GDL & 50.5197 & 0.9893 & \textbf{30.0961} & 50.1164 & 0.9833 & \textbf{29.9851} \\
+      MSE+GDL+SSIM & \textbf{50.4655} & \textbf{0.9925} & 28.5023 & \textbf{50.2746} & \textbf{0.9862} & 28.7008 \\
+    \bottomrule
+  \end{tabular}
+  \caption[Metric Results on MsPacman]{Metric results of produced patch sequences using a 2-layer model on MsPacman's test split. The achieved similarity and sharpness of the same model using different loss layers are given for both the first frame only and the average of the whole generated future sequence.}\label{tab:pac-comparison}
+\end{table}
+
+
+\begin{table}[htb]
+  \footnotesize
+  \centering
+  \begin{tabular}{l | r r | r r }
+    \toprule
+      \textbf{Loss function} & \multicolumn{2}{c}{\textbf{\nth{1} frame}} & \multicolumn{2}{c}{\textbf{sequence avg.}} \\
+      & MAE & MSE & MAE & MSE \\
+    \midrule
+      MAE+GDL & 0.0033 & 0.0009 & 0.0041 & 0.0018 \\
+      MAE+GDL+SSIM & 0.0031 & \textbf{0.0005} & 0.0047 & 0.0015 \\
+      MSE+GDL & 0.0025 & 0.0006 & 0.0040 & 0.0016 \\
+      MSE+GDL+SSIM & \textbf{0.0023} & \textbf{0.0005} & \textbf{0.0037} & \textbf{0.0014} \\
+    \bottomrule
+  \end{tabular}
+  \caption[Test Errors on MsPacman]{Absolute and squared error test results on MsPacman dataset using varying loss layers in our 2-layer network.}\label{tab:pac-comparison2}
+\end{table}
+
+
+\subsubsection{Qualitative Results}
+
+% especially motion in still-standing object is very good captured and continued in the future 
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/pac/random/pred-00.png}
+  \caption{}
+  \label{fig:pac-pred-random1}
+\end{subfigure}%
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/pac/random/pred-04.png}
+  \caption{}
+  \label{fig:pac-pred-random2}
+\end{subfigure}
+\caption[TBD]{tbd one good and one bad example. pac disappreas at the crossing.} \label{fig:pac-pred-random}
+\end{figure}
+
+% more examples in fig:pac-pred-random_extra
+
+
+
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=1.0\linewidth]{figures/pred/pac/full/pred-00.png} 
+	\caption[TBD]{tbd full fcn.} \label{fig:pac-pred-full1}
+\end{figure}
+% further full example: fig:pac-pred-full2
+
+% Also long example: fig:pac-pred-full-long
 
 
 
@@ -645,10 +929,74 @@ Futher out-of-domain results can be found in Figure \ref{fig:mm-pred-long} in th
 
 
 
-%\subsection{Experiments on UCF-101}
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\iffalse
+\subsection{Experiments on UCF-101}
+
+
+\begin{table}[htb]
+  \footnotesize
+  \centering
+  \begin{tabular}{l | r r | r | r r | r}
+    \toprule
+      \textbf{Loss function} & \multicolumn{3}{c}{\textbf{\nth{1} frame}} & \multicolumn{3}{c}{\textbf{sequence avg.}} \\
+      & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} \\
+      & PSNR & SSIM & & PSNR & SSIM & \\
+    \midrule
+      singe scale $\ell_2$ & 26.5 & 0.84 & 24.7 & - & - & - \\
+      multi-scale $\ell_1$ & 28.7 & 0.88 & 24.8 & - & - & - \\
+    \midrule
+      MAE+GDL & psnr & ssim & sharp & psnr & ssim & sharp \\
+      MAE+GDL+SSIM & psnr & ssim & sharp & psnr & ssim & sharp \\
+      MSE+GDL & psnr & ssim & sharp & psnr & ssim & sharp \\
+      MSE+GDL+SSIM & psnr & ssim & sharp & psnr & ssim & sharp \\
+    \bottomrule
+  \end{tabular}
+  \caption[TBD]{tbd.}\label{tab:ucf-comparison}
+\end{table}
+\fi
 
 
 %\subsubsection{Visualization of Learned Motion Representation} ??? maybe at least in the attachements?
