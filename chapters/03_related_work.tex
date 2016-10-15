@@ -97,7 +97,7 @@ A possible downside of this model is the fact that is was trained to predict one
 On the opposite side, this work offers several interesting insights to learn from as well. For one thing it emphasizes the power of ConvLSTM cells regarding spatio-temporal learning once more, for another thing it has shown that the use of convolutional percepts as input to the recurrent encoder offers another possibility to improve the results. The latter one also reduces the dimensionality that has to be processed by condensing the input data. The final model architecture that is presented in Chapter \ref{chapter:implementation} will take advantage from both of them.
 
 
-\section{Adversarial Network Approach}
+\section{Adversarial Network Approach} \label{sec:related_gan}
 
 In the final stage of this thesis, we came across a novel approach to train neural networks to perform frame prediction without using recurrent cells. The authors of \parencite{deep_multiscale_video_pred} have used a very simple overcomplete convolutional generator network $ G(X) $ in order to generate a single or multiple frames from an input sequence $ X $. This simple network is displayed in Figure \ref{fig:gan_generator} and consists of convolutional layers only with a constant height and width but variable number of feature maps. Training a model of such a simple architecture has several weaknesses, such as that it could only capture short-range dependencies across the entire input sequence with the size of the kernel due to the fixed size feature maps. Also, default loss functions such as $\ell_1$ or $\ell_2$ during the training experientially lead to blurry results, as previous studies have already shown.
 

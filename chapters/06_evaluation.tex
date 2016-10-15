@@ -636,6 +636,34 @@ A remarkable difference is visible when the outcames of our model is qualitative
 Futher out-of-domain results can be found in Figure \ref{fig:mm-pred-long} in the appendix. It shows the scenario where our model tries to predict a much longer sequence than it has been trained for. Such a scenario is very to realize with our model due to its recurrent encoder-decoder architecture. We therefore unroll the spatio-temporal decoder component for \num{30} time steps in order to verify the long-term stability of the predicted frames. It can be seen that the network is able to continuously produce acceptable results, with the exception of the last five frame in Figure \ref{fig:mm-pred-long1}. From about the \nth{30} predicted future frame, our model then starts to produce very noisy outcomes in almost every case.
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 \section{Experiments on MsPacman} \label{sec:exp-pac}
 
 The network model is applied on the MsPacman dataset in our second experiment to see how it behaves with data of increased complexity. The effects of perceptual motivated loss terms are investigated more deeply in this dataset, because we strongly belief that their weaknesses in Section \ref{sec:exp-mm} are cause by the unnaturally of binary image data.
@@ -845,10 +873,9 @@ Next, we present the test results of our best performing two-layer model. This m
 
 \subsubsection{Quantitative Results}
 
-%TODO explain some insight (huge difference between 1st and frame avg?)
-% tell that threre is unfortunately related project that has published results regarding this dataset, but tell the the adv. TF imple used this dataset, and their presented prediction samples seem to produce better results.
+The image metric results of our network model using the discussed loss function combinations is shown in Table \ref{tab:pac-comparison}. Unfortunately, there is no related project that has published any future frame prediction results on this dataset yet. However, this dataset is indeed used in an independent implementation of \parencite{deep_multiscale_video_pred}. We added the result of some experiments with it for the sake of completion, but these results are hard to compare with ours, because the metrics are calculated on that parts within a frame where motion is actually happening. Additionally, it predicts only one frame given a sequence of four.
 
-The image metric results of our network model using the discussed loss function combinations is shown in Table \ref{tab:pac-comparison}. As it was the case on the validation set, the MSE-based triplet loss function produces the best results in all similarity metrics, regardless of it is about the first predicted frame, or the average of the whole future sequence. However, if we look at the sharpness results, the model instance that utilizes no SSIM term in its objective function is able to produce sharper results according to the metric. This is not surprising, because the GDL term is weighted more in this model, which is the central objective of this metric.
+As it has been the case on the validation set, the MSE-based triplet loss function produces the best results in all similarity metrics, regardless of it is about the first predicted frame, or the average of the whole future sequence. However, if we look at the sharpness results, the model instance that utilizes no SSIM term in its objective function is able to produce sharper results according to the metric. This is not surprising, because the GDL term is weighted more in this model, which is the central objective of this metric.
 
 \begin{table}[htb]
   \footnotesize
@@ -859,16 +886,18 @@ The image metric results of our network model using the discussed loss function 
       & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} \\
       & PSNR & $\text{SSIM}_{5}$ & SharpDiff & PSNR & $\text{SSIM}_{5}$ & SharpDiff \\
     \midrule
+      Adv+GDL \tiny{\parencite{tf_impl_gan}} & 25.3168 & - & 17.2725 & - & - & \\
+    \midrule
       MAE+GDL & 47.5462 & 0.9854 & 27.0217 & 48.6902 & 0.9817 & 27.8182 \\
       MAE+GDL+SSIM & 44.8974 & 0.9917 & 26.9131 & 44.6555 & 0.9856 & 27.9516 \\
       MSE+GDL & 50.5197 & 0.9893 & \textbf{30.0961} & 50.1164 & 0.9833 & \textbf{29.9851} \\
       MSE+GDL+SSIM & \textbf{50.4655} & \textbf{0.9925} & 28.5023 & \textbf{50.2746} & \textbf{0.9862} & 28.7008 \\
     \bottomrule
   \end{tabular}
-  \caption[Metric Results on MsPacman]{Metric results of produced patch sequences using a 2-layer model on MsPacman's test split. The achieved similarity and sharpness of the same model using different loss layers are given for both the first frame only and the average of the whole generated future sequence.}\label{tab:pac-comparison}
+  \caption[Metric Results on MsPacman]{Metric results of produced patch sequences using a 2-layer model on MsPacman's test split. The achieved similarity and sharpness of the same models using different loss layers are given for both the first frame only and the average of the whole generated future sequence. The results of the other approach in the first row are not camparable to ours due to a different evaluation procedure.}\label{tab:pac-comparison}
 \end{table}
 
-Another interesting fact is that the differences between the image metric results of the first predicted frame and the average of all predicted frames are very marginal. This might be due to the reason that the bigger part of each patch is just static, noise-free content. Hence, the actual interesting parts of each frame that include motion have only little effect on the metric results. Furthermore, it is surprising that the sharpness metric results of the first predicted frame are slightly worse compared to the metric's mean over the whole predicted sequence.
+Another interesting fact is that the differences between the image metric results of the first predicted frame and the average of all predicted frames are very marginal. This might be due to the reason that the bigger part of each patch is just static, noise-free content. Hence, the actual interesting parts of each frame that include motion have only little effect on the metric results. Furthermore, it is surprising that the sharpness metric results of the first predicted frame are slightly worse compared to the metric's mean over the whole predicted sequence. 
 
 On the other side, the pixel-wise absolute and squared error results in Table \ref{tab:pac-comparison2} appear more plausible. Here, the differences between the frist frame and the average of the sequence are significantly larger. But one fact remains unchanged: the networks trained on the MSE-based triplet loss function is able to produce the best prediction results. Furthermore, it is interesting to see that both networks that utilize a squared error loss term as their main objective are able to outperform both other model instances regarding the MAE error, despite the fact the other who networks are explicitely optimized for this for this objective. This superiority could be reasoned by the characteristics of the MsPacman dataset.
 
@@ -937,42 +966,6 @@ Finally, the stability of the generated future frames investigated by performing
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-\iffalse
 \subsection{Experiments on UCF-101}
 
 
@@ -985,8 +978,10 @@ Finally, the stability of the generated future frames investigated by performing
       & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} & \multicolumn{2}{c}{\scriptsize{Similarity}} & \scriptsize{Sharpness} \\
       & PSNR & SSIM & & PSNR & SSIM & \\
     \midrule
-      singe scale $\ell_2$ & 26.5 & 0.84 & 24.7 & - & - & - \\
-      multi-scale $\ell_1$ & 28.7 & 0.88 & 24.8 & - & - & - \\
+      single-scale $\ell_2$ \tiny{\parencite{deep_multiscale_video_pred}} & 26.5 & 0.84 & 24.7 & - & - & - \\
+      multi-scale $\ell_1$ \tiny{\parencite{deep_multiscale_video_pred}} & 28.7 & 0.88 & 24.8 & - & - & - \\
+      multi-scale GDL+$\ell_1$ \tiny{\parencite{deep_multiscale_video_pred}} & 29.4 & 0.90 & 25.0 & - & - & - \\
+      multi-scale Adv+GDL \tiny{\parencite{deep_multiscale_video_pred}} & 31.5 & 0.91 & 25.4 & - & - & - \\
     \midrule
       MAE+GDL & psnr & ssim & sharp & psnr & ssim & sharp \\
       MAE+GDL+SSIM & psnr & ssim & sharp & psnr & ssim & sharp \\
@@ -994,9 +989,9 @@ Finally, the stability of the generated future frames investigated by performing
       MSE+GDL+SSIM & psnr & ssim & sharp & psnr & ssim & sharp \\
     \bottomrule
   \end{tabular}
-  \caption[TBD]{tbd.}\label{tab:ucf-comparison}
+  \caption[Metric Results on UCF-101]{Metric results of predicted patch sequences using our approach on the UCF-101 test split. The achieved similarity and sharpness results by using different loss layers are given for both the first frame only and the mean of the generated sequence. The results of both listed appraches are not comparable, because the other one takes only the moving areas of the images into account.}\label{tab:ucf-comparison}
 \end{table}
-\fi
+
 
 
 %\subsubsection{Visualization of Learned Motion Representation} ??? maybe at least in the attachements?
