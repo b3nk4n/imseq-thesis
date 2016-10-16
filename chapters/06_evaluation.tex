@@ -556,7 +556,7 @@ A comparison of our best performing model with experimental results of other wor
     \midrule
       3enc-ConvLSTM-SS-3dec(5/64) & \num{1841793} & 0.0524 \\
       3enc-ConvLSTM-SS-3dec(5/64-64) & \num{3570817} & 0.0414 \\
-      3enc-ConvLSTM-SS-3dec(5/64-64-64) & \num{1} & \\ %TODO
+      3enc-ConvLSTM-SS-3dec(5/64-64-64) & \num{5299841} & \textbf{0.0407} \\
     \bottomrule
   \end{tabular}
   \caption[Results on Moving MNIST]{Comparison with other networks on Moving MNIST. The numbers in brackets identify the \textit{amount of hidden units} per layer in case of FC-LSTMs, and for ConvLSTMs the \textit{hidden-to-hidden kernel size} followed by the \textit{feature maps per layer} are listed. Further, \textit{3enc} denotes tree convolutional layers in the spatial encoder. We call our model 3enc-ConvLSTM-SS-3dec.}\label{tab:mm-comparison}
@@ -748,7 +748,7 @@ Even that we couldn't improve our network's performance by performing variations
   \caption{}
   \label{fig:plot-pac-loss-mae}
 \end{subfigure}
-\caption[Comparison of Losses on MsPacman]{Comparison of validation results on MsPacman using a 2-layer network with varying loss function combinations. All models have been trained given an input sequence of 8 patches to predict the next 8 frames. The loss values are shown in the graphs represent the per-pixel error.} \label{fig:plot-pac-loss}
+\caption[Comparison of Losses on MsPacman]{Comparison of validation results on MsPacman using a 2-layer network with varying loss function combinations. All models have been trained given an input sequence of 8 patches to predict the next 8 frames. The loss values that are shown in the graphs represent the per-pixel error.} \label{fig:plot-pac-loss}
 \end{figure}
 
 Both diagrams show that the use of the triplet loss function leads to better results regarding squared or absolute error. The same is true for the SSIM index, as it can be seen in Figure \ref{fig:plot-pac-loss-ssim}. But overall, the MSE loss function seams to results in a slightly better network performance. Special emphasis should be placed on the fact that for example a network that is trained using the triplet loss MSE+GDL+SSIM performs even better than a model trained with MAE+GDL regarding the MAE loss on the validation set, even that the latter network is explicitly optimized for this objective. Additionally, according the sharpness metric demonstrated in Figure \ref{fig:plot-pac-loss-sdiff}, the predicted frames of both networks that utilize the mean squared error as its main loss function feature sharper edges.
@@ -953,8 +953,206 @@ Finally, the stability of the generated future frames investigated by performing
 
 
 
-
+% 68k training iterations: DQ (when we generated the samples)
 \subsection{Experiments on UCF-101}
+
+
+\subsection{Hyperparamter Tuning}
+
+
+
+\subsubsection*{Loss Layer}
+
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/ucf/loss/mse/run_ucf-ss-3l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-DQ_validation_mse.csv}\modelA
+  \pgfplotstableread{data/ucf/loss/mse/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-LB_validation_mse.csv}\modelB
+  \pgfplotstableread{data/ucf/loss/mse/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-noGDL-IF_validation_mse.csv}\modelC
+  \pgfplotstableread{data/ucf/loss/mse/run_ucf-ss-2l3i5hp-c326496k533s122bn-wd1e-05-mae-VN_validation_mse.csv}\modelD
+  \pgfplotstableread{data/ucf/loss/mse/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-IZ_validation_mse.csv}\modelE
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        xmin=0,
+        xmax=65000,
+        ytick={0.01,0.02,0.05,0.1},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=MSE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!violet] table[x=Step, y=Value]{\modelE};
+      \addlegendentry{MSE+GDL (valid)};
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MAE+GDL+SSIM 3layers (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-ucf-loss-mse}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/ucf/loss/mae/run_ucf-ss-3l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-DQ_validation_mae.csv}\modelA
+  \pgfplotstableread{data/ucf/loss/mae/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-LB_validation_mae.csv}\modelB
+  \pgfplotstableread{data/ucf/loss/mae/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-noGDL-IF_validation_mae.csv}\modelC
+  \pgfplotstableread{data/ucf/loss/mae/run_ucf-ss-2l3i5hp-c326496k533s122bn-wd1e-05-mae-VN_validation_mae.csv}\modelD
+  \pgfplotstableread{data/ucf/loss/mae/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mse-IZ_validation_mae.csv}\modelE
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+        ymode=log,
+    	log ticks with fixed point,
+        xmin=0,
+        xmax=65000,
+        ytick={0.08,0.15,0.25},
+        legend style={legend pos=north east},
+        grid,
+        thick,
+        ylabel=MAE loss,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!violet] table[x=Step, y=Value]{\modelE};
+      \addlegendentry{MSE+GDL (valid)};
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-ucf-loss-mae}
+\end{subfigure}
+\caption[Comparison of Losses on UCF-101]{Comparison of validation results on MsPacman using similar network configurations with varying loss functions. All models have been trained given an input sequence of 10 patches of size $32 \times 32$ to predict the next 10 frames. The loss values shown represent the per-pixel error.} \label{fig:plot-ucf-loss}
+\end{figure}
+
+
+
+
+
+\begin{figure}[htb]
+\centering
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/ucf/loss/sdiff/run_ucf-ss-3l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-DQ_validation_sharpdiff.csv}\modelA
+  \pgfplotstableread{data/ucf/loss/sdiff/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-LB_validation_sharpdiff.csv}\modelB
+  \pgfplotstableread{data/ucf/loss/sdiff/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-noGDL-IF_validation_sharpdiff.csv}\modelC
+  \pgfplotstableread{data/ucf/loss/sdiff/run_ucf-ss-2l3i5hp-c326496k533s122bn-wd1e-05-mae-VN_validation_sharpdiff.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+    	log ticks with fixed point,
+        ymin=10,
+        ymax=15,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SharpDiff,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-ucf-loss-sdiff}
+\end{subfigure}%
+\begin{subfigure}{0.5\textwidth}
+  \centering
+  \pgfplotstableset{col sep=comma}
+  \pgfplotstableread{data/ucf/loss/ssim/run_ucf-ss-3l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-DQ_validation_ssim5.csv}\modelA
+  \pgfplotstableread{data/ucf/loss/ssim/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-triplet-LB_validation_ssim5.csv}\modelB
+  \pgfplotstableread{data/ucf/loss/ssim/run_ucf-ss-2l3i5hp-c326464k533s121bn-wd1e-05-mae-noGDL-IF_validation_ssim5.csv}\modelC
+  \pgfplotstableread{data/ucf/loss/ssim/run_ucf-ss-2l3i5hp-c326496k533s122bn-wd1e-05-mae-VN_validation_ssim5.csv}\modelD
+  \hspace*{-0.6cm}
+  {
+  \begin{tikzpicture}[scale=0.5]
+    \begin{axis}[
+    	log ticks with fixed point,
+        ymin=0.5,
+        ymax=0.7,
+        xmin=0,
+        xmax=65000,
+        legend style={legend pos=south east},
+        grid,
+        thick,
+        ylabel=SSIM,
+        xlabel=step \textit{i},
+        x post scale=1.6,
+      ]
+      \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
+      \addlegendentry{MAE (valid)};
+      \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
+      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
+      \addlegendentry{MAE+GDL+SSIM (valid)};
+      %best
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
+      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+    \end{axis}
+  \end{tikzpicture}
+  }
+  \caption{}
+  \label{fig:plot-ucf-loss-ssim}
+\end{subfigure}
+\caption[Comparison of Image Metrics on UCF-101]{Computed image metrics computed on the UCF-101 dataset. All four networks use the same hyperparameter settings, but differ in the number of recurrent layers, as well as the used objective function.} \label{fig:plot-ucf-imgmetric}
+\end{figure}
+
+
+
+
+
+
+
+
+\subsection{Results}
+
+
+
+
+\subsubsection{Quantitative Results}
+
+
+
+
 
 
 \begin{table}[htb]
@@ -983,6 +1181,90 @@ Finally, the stability of the generated future frames investigated by performing
 
 
 
+
+
+
+
+
+
+\subsubsection{Qualitative Results}
+
+
+
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=1.0\linewidth]{figures/pred/ucf/ucf_compare.png} 
+	\caption[TBD]{tbd.} \label{fig:ucf-comparison}
+\end{figure}
+
+
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-00.png}
+  \caption{}
+  \label{fig:ucf-random1a}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.49\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-04.png}
+  \caption{}
+  \label{fig:ucf-random1b}
+  \vspace{.1cm}
+\end{subfigure}
+\caption[TBD]{tbd.}
+\label{fig:ucf-random1}
+\end{figure}
+
+% \ref{fig:ucf-random2}
+
+
+
+
+\begin{figure}[htpb]
+	\centering
+	\includegraphics[width=1.0\linewidth]{figures/pred/ucf/long/pred-01.png} 
+	\caption[TBD]{tbd.} \label{fig:ucf-long1}
+\end{figure}
+
+% \ref{fig:ucf-long2}
+
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{1.0\textwidth}
+  \centering
+  \includegraphics[width=1.0\linewidth]{figures/pred/ucf/full/pred-00.png}
+  \caption{}
+  \label{fig:ucf-full1a}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{1.0\textwidth}
+  \centering
+  \includegraphics[width=1.0\linewidth]{figures/pred/ucf/full/pred-01.png}
+  \caption{}
+  \label{fig:ucf-full1b}
+  \vspace{.1cm}
+\end{subfigure}
+\caption[TBD]{tbd.}
+\label{fig:ucf-full1}
+\end{figure}
+
+% \ref{fig:ucf-full2}
+
+
+
+
+
+
+
+
+
+
+
+%TODO
 %\subsubsection{Visualization of Learned Motion Representation} ??? maybe at least in the attachements?
-
-
