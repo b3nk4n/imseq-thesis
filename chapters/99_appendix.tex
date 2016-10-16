@@ -114,7 +114,7 @@
   \caption{}
   \label{fig:mm-pred-long2}
 \end{subfigure}
-\caption[Long-Term Prediction on Moving MNIST]{Further out-of-domain runs on Moving MNIST. Our 2-layer model predicts 30 frames ahead, even that it is trained to predict 10 frames only. The spatio-temporal decoder is therefore unrolled for a longer time range.} \label{fig:mm-pred-long}
+\caption[Long-Term Prediction Samples on Moving MNIST]{Further out-of-domain runs on Moving MNIST. Our 2-layer model predicts 30 frames ahead, even that it is trained to predict 10 frames only. The spatio-temporal decoder is therefore unrolled for a longer time range.} \label{fig:mm-pred-long}
 \end{figure}
 
 \begin{figure}[h!tb]
@@ -137,13 +137,14 @@
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=1.0\linewidth]{figures/pred/pac/full/pred-01.png} 
-	\caption[Full Screen Prediction on MsPacman]{Full screen prediction sample using our 2-layer model.} \label{fig:pac-pred-full2}
+	\caption[Full Screen Prediction Sample on MsPacman]{Full screen prediction sample using the 2-layer model.} \label{fig:pac-pred-full2}
 \end{figure}
 
+\vspace{.3cm}
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=1.0\linewidth]{figures/pred/pac/full-long/pred-00.png} 
-	\caption[Long-Term Prediction on MsPacman]{Out-of-domain test using our 2-layer model to predict a longer-term future.} \label{fig:pac-pred-full-long}
+	\caption[Long-Term Prediction Sample on MsPacman]{Out-of-domain test using the 2-layer model to predict a longer-term future.} \label{fig:pac-pred-full-long}
 \end{figure}
 
 
@@ -154,42 +155,42 @@
   \centering
   \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-01.png}
   \caption{}
-  \label{fig:ucf-random1a}
+  \label{fig:ucf-random2a}
   \vspace{.1cm}
 \end{subfigure}
 \begin{subfigure}{0.49\textwidth}
   \centering
   \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-02.png}
   \caption{}
-  \label{fig:ucf-random1b}
+  \label{fig:ucf-random2b}
   \vspace{.1cm}
 \end{subfigure}
 \begin{subfigure}{0.49\textwidth}
   \centering
   \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-03.png}
   \caption{}
-  \label{fig:ucf-random1c}
+  \label{fig:ucf-random2c}
   \vspace{.1cm}
 \end{subfigure}
 \begin{subfigure}{0.49\textwidth}
   \centering
   \includegraphics[width=0.92\linewidth]{figures/pred/ucf/random/pred-05.png}
   \caption{}
-  \label{fig:ucf-random1d}
+  \label{fig:ucf-random2d}
   \vspace{.1cm}
 \end{subfigure}
-\caption[TBD]{tbd.}
-\label{fig:ucf-random1}
+\caption[Random Prediction Samples on UCF-101]{Further prediction samples of our model on UCF-101. From top to bottom: Input and ground truth target; forecasted future frames.}
+\label{fig:ucf-random2}
 \end{figure}
 
-
+\vspace{.2cm}
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=1.0\linewidth]{figures/pred/ucf/long/pred-00.png} 
-	\caption[TBD]{tbd.} \label{fig:ucf-long2}
+	\caption[Random Long-Term Prediction Samples on UCF-101]{Further long-term results on UCF-101 using our 3-layer ConvLSTM model.} \label{fig:ucf-long2}
 \end{figure}
 
-
+\vspace{.2cm}
 \begin{figure}[h!tb]
 \centering
 \begin{subfigure}{1.0\textwidth}
@@ -206,7 +207,7 @@
   \label{fig:ucf-full2b}
   \vspace{.1cm}
 \end{subfigure}
-\caption[TBD]{tbd.}
+\caption[Random Full Frame Prediction Sample on UCF-101]{Further randomly selected full frame predictions of our 3-layer ConvLSTM model using the MAE-based triplet loss function on UCF-101.}
 \label{fig:ucf-full2}
 \end{figure}
 
