@@ -84,7 +84,7 @@ which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \
 	\caption[Schematic Neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
 \end{figure}
 
-Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a classical perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even that its shape looks much simpler, it became the most favorable activation function for intermediate layers in deep neural networks. The reasons are that it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanishing gradient (see Section \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
+Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a classical perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even that its shape looks much simpler, it became one of the most favorable activation function for intermediate layers in deep neural networks\footnote{List of ReLU's strength and weaknesses: \url{http://cs231n.github.io/neural-networks-1/}}. The reasons are that it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanishing gradient (see Section \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
 
 \begin{figure}[htpb]
   \centering
@@ -257,7 +257,7 @@ Each convolutional layer is usually followed by a non-linear activation function
 
 \subsection{Convolution Operation} \label{sec:conv-op}
 
-Generally speaking, a convolution in a mathematical operation on two functions $f(x)$ and $g(x)$. Its operator is typically denoted with an asterisk \parencite[p. 332]{deep_learning} and is defined as:
+Generally speaking, a convolution is a mathematical operation on two functions $f(x)$ and $g(x)$. Its operator is typically denoted with an asterisk \parencite[p. 332]{deep_learning} and is defined as:
 
 \begin{equation} \label{eq:conv-general}
   \big(f \ast g\big)(x) = \int f(\tau) \cdot g(x-\tau) \, d\tau .
@@ -306,7 +306,7 @@ The application of the previously presented convolution operation usually transf
 
 \subsection{Advantages}
 
-The three cenral design ideas are emphasized here to sum up the benefits of a convolutional network. It refers to \textit{sparse connections}, \textit{parameter sharing} and \textit{equivariance to translation} \parencite[p. 336ff.]{deep_learning}. The detailed advantages of these concepts are described in the following sections.
+The three central design ideas are emphasized here to sum up the benefits of a convolutional network. It refers to \textit{sparse connections}, \textit{parameter sharing} and \textit{equivariance to translation} \parencite[p. 336ff.]{deep_learning}. The detailed advantages of these concepts are described in the following sections.
 
 \subsubsection*{Sparse Connections}
 The kernel size used in a convolution is smaller than the input. Consequently, less parameters have to be stored, as well as it can take advantage of local relationships present in the data. This also leads to a higher training efficiency and a radical reduction of memory requirements.
@@ -347,12 +347,12 @@ Regarding the problem of frame prediction that has to be solved within this thes
 
 \section{Recurrent Neural Networks}
 
-All previously presented network architectures suffer from one missing characteristic: their memory is kind of static and predictions are mostly based on the current inputs only. Consequently, they are hard to be applied on problems where data reveals some sequential or temporal properties. Two examples are handwriting recognition, were the understanding of previous words is required to deduce the current word's context. Also in our case, the knowledge of the past image frames is fundamental to be able to predict the future frames that naturally match to the given previous sequence. A framework that addresses this issue is a \textit{recurrent neural network} (RNN). In this section, we give an overview about their structure and formal description, as well as present a succession model that addresses its fundamental problems. It is to add that the whole section is mainly inspired by the great explanations in \parencite{understand_lstm}.
+All previously presented network architectures suffer from one missing characteristic: their memory is kind of static and predictions are mostly based on the current inputs only. Consequently, they are hard to be applied on problems where data reveals some sequential or temporal properties. Two examples are handwriting recognition, were the understanding of previous words is required to deduce the current word's context. Also in our case, the knowledge of the past image frames is fundamental to be able to predict the future frames that naturally match to the given previous sequence. A framework that addresses this issue is a \textit{recurrent neural network} (RNN). In this section, an overview is given about their structure and formal description, as well as a succession model is presented that addresses its fundamental problems. It is to add that the whole section is mainly inspired by the great explanations in \parencite{understand_lstm}.
 
 
 \subsection{Basics}
 
-RNNs are a special class of neural networks that allows its models to form a directed cyclic graph. Thereby, they are able to hold a hidden state that represents the sequential dynamics of the past. Given an input sequence $ \textbf{X} = (\textbf{x}^{(1)}, \textbf{x}^{(2)},..., \textbf{x}^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $\textbf{x}^{(\tau)}$ as its input of this sequence, as well as the hidden state $\textbf{h}^{(\tau-1)}$ of the previous one. These building blocks are typically referred to as a \textit{cell}. Because the first cell has no predecessor, its hidden state input $ \textbf{h}^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, an RNN can be described as follows:
+RNNs are a special class of neural networks that allow its models to form a directed cyclic graph. Thereby, they are able to hold a hidden state that represents the sequential dynamics of the past. Given an input sequence $ \textbf{X} = (\textbf{x}^{(1)}, \textbf{x}^{(2)},..., \textbf{x}^{(\tau)}) $, the $ \tau^{th} $ recurrent building block gets $\textbf{x}^{(\tau)}$ as its input of this sequence, as well as the hidden state $\textbf{h}^{(\tau-1)}$ of the previous one. These building blocks are typically referred to as a \textit{cell}. Because the first cell has no predecessor, its hidden state input $ \textbf{h}^{(0)} $ is usually manually fed with an zero-initialized state vector. Formally, an RNN can be described as follows:
 
 \begin{equation} \label{eq:rnn}
 \begin{aligned}
