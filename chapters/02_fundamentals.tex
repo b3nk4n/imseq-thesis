@@ -581,7 +581,7 @@ The practical use of deep learning in context of image generation tasks received
 A neural networks main driver in respect to learning a good representation is the loss layer. Unfortunately, it found only little attention in most existing studies when applied in image processing tasks, at least until this year \parencite{loss-func-img-proc}. Therefore, this section provides an overview of the main challenges of image similarity assessment and introduces some approved methods, as well as novel approaches when training neural networks in context of pictures.
 
 
-\subsection{Naive Approach}
+\subsection{Naive Approach} \label{sec:img-sim-naive}
 
 The de facto standard loss function to compare a generated image with its ground truth target has been the \textit{pixel-wise squared error} (or $ \ell_{2} $) that was already mentioned in equation \ref{eq:mse}. It is easy to apply and usually provided by any neural network framework out-of-the-box. But as a downside, it suffers from some well-known limitations such as poor correlation with the human sense of perceptual quality \parencite{loss-func-img-proc}. The reason for this are twofold. First, $ \ell_{2} $ makes the assumption of a Gaussian noise model, which has its downsides when being applied to multimodal distributions. Second, it strongly penalizes outliers independently from local characteristics of the image, such as contrast or luminance. In contrary, the visual system of humans perceives noise in a different way.
 
