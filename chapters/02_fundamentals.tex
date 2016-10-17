@@ -478,7 +478,7 @@ As depicted in Figure \ref{fig:lstm}, the internal structure of an LSTM cell loo
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.8\linewidth]{figures/lstm.pdf}
-	\caption[Structure of a LSLTM Cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
+	\caption[Structure of a LSTM Cell]{Structure of a LSTM cell. The flow of the cell state is highlighted in bold. Gated unites are emphasized with a dotted box. (Based on \parencite{understand_lstm})} \label{fig:lstm}
 \end{figure}
 
 As stated before, the fundamental enhancement of LSTMs is the cell state $\textbf{C}^{(\tau)}$, denoted as a bold line in the graphic. From its previous cell state to the next, there are just two interaction points where its content gets manipulated. First, using a pointwise multiplication with the output of the forget gate $\textbf{f}^{(\tau)}$, a specific part of the previous state can be partly or fully deleted. Afterwards, the new candidate cell state $ \hat{\textbf{c}}^{(\tau)} $ is added to it, which is only regulated by the input gate $ \textbf{i}^{(\tau)} $. The third gate $ \textbf{o}^{(\tau)} $ has no effect on the cell state itself and governs the hidden output only.
@@ -505,7 +505,7 @@ An \textit{autoencoder} is a commonly known neural network model that is able to
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.8\linewidth]{figures/encoder_decoder.pdf}
-	\caption[Structure of an Autoencoder]{Simplified structure of a denoising autoencoder in an undercomplete setting to reconstruct images of handwritten numbers from the MNIST dataset.} \label{fig:autoencoder}
+	\caption[Structure of an Autoencoder]{Simplified structure of a denoising autoencoder in an undercomplete setting to reconstruct images of handwritten numbers from the MNIST dataset. The encoder network efficiently encodes the input data in order to come up with a learned representation. This representation can then be processed by the decoder network to reconstruct the noise-free image.} \label{fig:autoencoder}
 \end{figure}
 
 The encoder and decoder components can be of any kind. In the simplest case, a neural network with only one single hidden layer could be used. However, it has been shown that deeper networks are able to yield better representations compared to shallow variants \parencite{autoenc_deeper}. Furthermore, the use of convolutional layers is usually preferred for image processing tasks, referred to as \textit{convolutional autoencoders}.

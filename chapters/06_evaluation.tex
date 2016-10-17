@@ -4,9 +4,9 @@
 
 This chapter presents the evaluation results of our model on all datasets of chapter \ref{chapter:datasets}. Since the model exhibits a vast number of hyper parameters and each training can take several days, performing an extensive grid search is not possible. That is why the model's substantial hyperparameters are explored independently from each other by using the simplest dataset. Afterwards, the acquired knowledge about the model's behavior can then be transferred to the other datasets in order to perform a basic grid search. Beside the quantitative assessment of the model, it is also qualitatively compared to experimental results of related projects at the end of each section.
 
-All experiments are computed on a single Nvidia GeForce GTX Titan X using the TensorFlow open source software library for machine intelligence in version r0.10 with CUDA 7.5.18 and cuDNN 4. This quite new deep learning framework is developed by Google as a second-generation system based on their experiences with DistBelief \parencite{distbelief}. A computation in TensorFlow is expressed as a stateful dataflow graph, where each node represents a mathematical operation and the graph edges a data tensor that can flow from one node to the next \parencite{tensorflow2015-whitepaper}. It has gained increasing attention since its first public release in November 2015.
+All experiments are computed on a single Nvidia GeForce GTX Titan X using the TensorFlow open source software library for machine intelligence in version r0.10 with CUDA 7.5.18 and cuDNN 4. This quite new deep learning framework is developed by Google as a second-generation system based on their experiences with DistBelief \parencite{distbelief}. A computation in TensorFlow is expressed as a stateful dataflow graph, where each node represents a mathematical operation and the graph edges a data tensor that can flow from one node to the next \parencite{tensorflow2015-whitepaper}. It has gained increasing attention since its first public release in November 2015. The training and evaluation code is available open-source \footnote{Repository of the project: \url{https://github.com/bsautermeister/imseq}}.
 
-If not stated differently, the model configuration described in Chapter \ref{chapter:implementation} is used, but with a two-layer ConvLSTM using $3\times3$ input-to-hidden and $5\times5$ hidden-to-hidden kernel size in the internal convolutions. Further, the optional BN-layers within these cells  are deactivated for two reasons. Firstly, first tests have not shown any improvements using them. Secondly, the fact that its TensorFlow implementation back then had the issue\footnote{Further details: \url{https://github.com/tensorflow/tensorflow/issues/4361}} of performing batch statistic updates multiple times when being shared across time resulted in an enormous drop in performance. The use of these batch normalizations within the spatio-temporal encoder and decoder components is therefore kept for future work. Additionally, all weights are initialized using the Xavier method of equation \ref{eq:xavier} and the default weight decay regularization coefficient is set to $\lambda=1e^{-5}$. A batch size of 32 is used during the training process together with Adam optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon =1e^{-8}$) and a default initial learning rate of $\eta = 0.001$. In addition to the learning rate annealing mechanism of this optimizer, the learning rate is also manually decreased once per epoch using a stair-case exponential decay function by a factor of $\alpha=0.9$.
+If not stated differently, the model configuration described in Chapter \ref{chapter:implementation} is used, but with a two-layer ConvLSTM using $3\times3$ input-to-hidden and $5\times5$ hidden-to-hidden kernel size in the internal convolutions. Further, the optional BN-layers within these cells  are deactivated for two reasons. Firstly, first tests have not shown any improvements using them. Secondly, the fact that its TensorFlow implementation back then had the issue\footnote{Further details: \url{https://github.com/tensorflow/tensorflow/issues/4361}} of performing batch statistic updates multiple times when being shared across time resulted in an enormous drop in performance. The use of these batch normalizations within the spatio-temporal encoder and decoder components is therefore kept for future work. Additionally, all weights are initialized using the Xavier method of equation \ref{eq:xavier} and the default weight decay regularization coefficient is set to $\lambda=1e^{-5}$. A batch size of 32 is used during the training process together with Adam optimizer ($\beta_1 = 0.9$, $\beta_2 = 0.999$, $\epsilon =1e^{-8}$) and a default initial learning rate of $\eta = 0.001$. In addition to the learning rate annealing mechanism of this optimizer, the learning rate is manually decreased once per epoch using a stair-case exponential decay function by a factor of $\alpha=0.9$.
 
 Lastly, it has to be mentioned that diagrams, which show results of any kind of objective function, are always shown with its y-axis in logarithmic scale so that fine differences become better recognizable. Unless otherwise specified, all presented losses can be understood as the average per-pixel error across the whole generated future sequence.
 
@@ -20,7 +20,7 @@ The model is incrementally explored in this section in order to understand its b
 
 \subsubsection*{Scheduled Sampling}
 
-The consequences of the used scheduled sampling technique are examined first. Figure \ref{fig:plot-mm-asss} visualizes the training and validation binary cross-entropy using our standard model with either scheduled sampling (SS) or always sampling (AS). The latter method means the approach to always sample from the previously generated frame, which is comparable to SS with a constant sampling probability of $p=0$. It can be seen that there is a huge discrepancy between the training and validation error in the starting phase, where the SS-approach mainly trained on input samples taken from the ground truth. This can be explained that sampling on the ground truth in every time step of the recurrent network tremendously speeds up the convergence of the training loss, because each cell does not have to correct errors of the previous cells. In contrary, the validation loss is very bad in this phase, since the results represent the average out of ten predicted frames and the spatio-temporal decoder suddenly receives its own feature space predictions as input to predict the next frame, which is in contrast to the procedure while training at that point.
+The consequences of the used scheduled sampling technique are examined first. Figure \ref{fig:plot-mm-asss} visualizes the training and validation binary cross-entropy using our standard model with either \textit{scheduled samplin}g (SS) or \textit{always sampling} (AS). The latter method means the approach to always sample from the previously generated frame, which is comparable to SS with a constant sampling probability of $p=0$. It can be seen that there is a huge discrepancy between the training and validation error in the starting phase, where the SS-approach mainly trained on input samples taken from the ground truth. This can be explained that sampling on the ground truth in every time step of the recurrent network tremendously speeds up the convergence of the training loss, because each cell does not have to correct errors of the previous cells. In contrary, the validation loss is very bad in this phase, since the results represent the average out of ten predicted frames and the spatio-temporal decoder suddenly receives its own feature space predictions as input to predict the next frame, which is in contrast to the procedure while training at that point.
 
 \begin{figure}[htb]
   \centering
@@ -44,13 +44,12 @@ The consequences of the used scheduled sampling technique are examined first. Fi
         xlabel=step \textit{i},
         x post scale=1.8,
       ]
-      \addplot[draw=LightGoldenrod, thin, opacity=0.8] table[x=Step, y=Value]{\modelSS};\label{mSS}
+      \addplot[draw=LightGoldenrod, thin] table[x=Step, y=Value]{\modelSS};\label{mSS}
     \end{axis}
     \begin{axis}[
     	axis y line*=left,
     	ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
@@ -58,23 +57,23 @@ The consequences of the used scheduled sampling technique are examined first. Fi
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.8,
       ]
-	  \addlegendimage{/pgfplots/refstyle=mSS}\addlegendentry{Scheduled Sampling}    
+	  \addlegendimage{/pgfplots/refstyle=mSS}\addlegendentry{inverse sigmoid ($\alpha = 1000$)}    
       
       % background
       \addplot[draw=black!10!blue, thin, opacity=0.8] table[x=Step, y=Value]{\modelBB};
-      \addlegendentry{AS (train)}
+      \addlegendentry{AS (training)}
       \addplot[draw=black!10!green, thin, opacity=0.8] table[x=Step, y=Value]{\modelAA};
-      \addlegendentry{SS (train)}
+      \addlegendentry{SS (training)}
       %foreground
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{AS (valid)}
+      \addlegendentry{AS}
       %best
       \addplot[draw=black!30!green] table[dashed, x=Step, y=Value]{\modelA};
-      \addlegendentry{SS (valid)} 
+      \addlegendentry{SS} 
     \end{axis}
     
   \end{tikzpicture}
@@ -102,14 +101,14 @@ But the interesting insight here is that as soon as the scheduled sampling compo
         grid,
         thick,
         ylabel=SharpDiff,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{AS (valid)};
+      \addlegendentry{AS};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{SS (valid)};
+      \addlegendentry{SS};
     \end{axis}
   \end{tikzpicture}
   }
@@ -133,14 +132,14 @@ But the interesting insight here is that as soon as the scheduled sampling compo
         grid,
         thick,
         ylabel=PSNR,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{AS (valid)};
+      \addlegendentry{AS};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{SS (valid)};
+      \addlegendentry{SS};
     \end{axis}
   \end{tikzpicture}
   }
@@ -169,22 +168,21 @@ The use of batch normalization in the spatial encoder and decoder components is 
     \begin{axis}[
         ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{w/o BN (valid)};
+      \addlegendentry{w/o BN};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{with BN (valid)};
+      \addlegendentry{with BN};
     \end{axis}
   \end{tikzpicture}
   }
@@ -208,14 +206,14 @@ The use of batch normalization in the spatial encoder and decoder components is 
         grid,
         thick,
         ylabel=SharpDiff,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{w/o BN (valid)};
+      \addlegendentry{w/o BN};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{with BN (valid)};
+      \addlegendentry{with BN};
     \end{axis}
   \end{tikzpicture}
   }
@@ -248,7 +246,7 @@ The network's learning behavior using two different exponential decay rates is i
         xmax=65000,
         thick,
         ylabel={Learning rate $\eta$},
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.8,
       ]
       \addplot[draw=black!10!blue, very thin, opacity=0.8] table[x=Step, y=Value]{\modelLrB};\label{mB}
@@ -258,7 +256,6 @@ The network's learning behavior using two different exponential decay rates is i
     	axis y line*=left,
     	ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
@@ -266,18 +263,18 @@ The network's learning behavior using two different exponential decay rates is i
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.8,
       ]
-	  \addlegendimage{/pgfplots/refstyle=mB}\addlegendentry{$\eta$-decay=0.90 (valid)}
-      \addlegendimage{/pgfplots/refstyle=mA}\addlegendentry{$\eta$-decay=0.95 (valid)}
+	  \addlegendimage{/pgfplots/refstyle=mB}\addlegendentry{$\eta$-decay=0.90 (training)}
+      \addlegendimage{/pgfplots/refstyle=mA}\addlegendentry{$\eta$-decay=0.95 (training)}
       
       %foreground
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
       \addlegendentry{$\eta$-decay=0.90};
       %best
-      \addplot[draw=black!30!green] table[dashed, x=Step, y=Value]{\modelA};
+      \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
       \addlegendentry{$\eta$-decay=0.90};
     \end{axis}
   \end{tikzpicture}
@@ -303,7 +300,6 @@ Next, the network's behavior with respect to the hidden-to-hidden feature maps i
     \begin{axis}[
         ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
@@ -311,18 +307,18 @@ Next, the network's behavior with respect to the hidden-to-hidden feature maps i
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{32 feature maps (valid)};
+      \addlegendentry{32 ConvLSTM feature maps};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{64 feature maps (valid)};
+      \addlegendentry{64 ConvLSTM feature maps};
       
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{128 feature maps (valid)};
+      \addlegendentry{128 ConvLSTM feature maps};
     \end{axis}
   \end{tikzpicture}
   }
@@ -346,18 +342,18 @@ Next, the network's behavior with respect to the hidden-to-hidden feature maps i
         legend style={legend pos=south east},
         grid,
         thick,
-        ylabel=SSIM,
-        xlabel=step \textit{i},
+        ylabel={$\text{SSIM}_5$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{32 feature maps};
+      \addlegendentry{32 ConvLSTM feature maps};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{64 feature maps};
+      \addlegendentry{64 ConvLSTM feature maps};
       
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{128 feature maps};
+      \addlegendentry{128 ConvLSTM feature maps};
     \end{axis}
   \end{tikzpicture}
   }
@@ -388,7 +384,6 @@ The number of recurrent layers has a very positive effect in order to generate f
     \begin{axis}[
     	ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
@@ -396,8 +391,8 @@ The number of recurrent layers has a very positive effect in order to generate f
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
@@ -431,7 +426,7 @@ The number of recurrent layers has a very positive effect in order to generate f
         grid,
         thick,
         ylabel=PSNR,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
@@ -470,24 +465,23 @@ As a last experiment of the test series, the impact of different loss terms is e
     \begin{axis}[
         ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=65000,
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=BCE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{bce}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{BCE+GDL+SSIM (valid)};
+      \addlegendentry{BCE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{BCE+GDL (valid)};
+      \addlegendentry{BCE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{BCE (valid)};
+      \addlegendentry{BCE};
     \end{axis}
   \end{tikzpicture}
   }
@@ -512,16 +506,16 @@ As a last experiment of the test series, the impact of different loss terms is e
         grid,
         thick,
         ylabel=SharpDiff,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{BCE+GDL+SSIM (valid)};
+      \addlegendentry{BCE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{BCE+GDL (valid)};
+      \addlegendentry{BCE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{BCE (valid)};
+      \addlegendentry{BCE};
     \end{axis}
   \end{tikzpicture}
   }
@@ -683,26 +677,25 @@ Even though network's performance can only marginally be improved by performing 
     \begin{axis}[
         ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=100000,
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=MSE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{mse}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL (valid)};
+      \addlegendentry{MAE+GDL};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MSE+GDL+SSIM (valid)};
+      \addlegendentry{MSE+GDL+SSIM};
     \end{axis}
   \end{tikzpicture}
   }
@@ -722,26 +715,25 @@ Even though network's performance can only marginally be improved by performing 
     \begin{axis}[
         ymode=log,
     	log ticks with fixed point,
-        ymin=0,
         ymax=0.3,
         xmin=0,
         xmax=100000,
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=MAE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{mae}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL (valid)};
+      \addlegendentry{MAE+GDL};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MSE+GDL+SSIM (valid)};
+      \addlegendentry{MSE+GDL+SSIM};
     \end{axis}
   \end{tikzpicture}
   }
@@ -775,18 +767,18 @@ Both diagrams show that the use of the triplet loss function leads to better res
         grid,
         thick,
         ylabel=SharpDiff,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL (valid)};
+      \addlegendentry{MAE+GDL};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MSE+GDL+SSIM (valid)};
+      \addlegendentry{MSE+GDL+SSIM};
     \end{axis}
   \end{tikzpicture}
   }
@@ -812,19 +804,19 @@ Both diagrams show that the use of the triplet loss function leads to better res
         legend style={legend pos=south east},
         grid,
         thick,
-        ylabel=SSIM,
-        xlabel=step \textit{i},
+        ylabel={$\text{SSIM}_5$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL (valid)};
+      \addlegendentry{MAE+GDL};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MSE+GDL+SSIM (valid)};
+      \addlegendentry{MSE+GDL+SSIM};
     \end{axis}
   \end{tikzpicture}
   }
@@ -991,21 +983,21 @@ The absolute and squared pixel-wise prediction errors on the validation set usin
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=MSE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{mse}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!violet] table[x=Step, y=Value]{\modelE};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE (valid)};
+      \addlegendentry{MAE};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addlegendentry{MAE+GDL \tiny{(96 ConvLSTM feature maps)}};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MAE+GDL+SSIM 3layers (valid)};
+      \addlegendentry{MAE+GDL+SSIM \tiny{(3-layer ConvLSTM)}};
     \end{axis}
   \end{tikzpicture}
   }
@@ -1032,21 +1024,21 @@ The absolute and squared pixel-wise prediction errors on the validation set usin
         legend style={legend pos=north east},
         grid,
         thick,
-        ylabel=MAE loss,
-        xlabel=step \textit{i},
+        ylabel={$\mathcal{L}_{\textrm{mae}}$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!violet] table[x=Step, y=Value]{\modelE};
-      \addlegendentry{MSE+GDL (valid)};
+      \addlegendentry{MSE+GDL};
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE (valid)};
+      \addlegendentry{MAE};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addlegendentry{MAE+GDL \tiny{(96 ConvLSTM feature maps)}};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+      \addlegendentry{MAE+GDL+SSIM \tiny{(3-layer ConvLSTM)}};
     \end{axis}
   \end{tikzpicture}
   }
@@ -1082,18 +1074,18 @@ The advantages of a network that is trained using the triplet loss function beco
         grid,
         thick,
         ylabel=SharpDiff,
-        xlabel=step \textit{i},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE (valid)};
+      \addlegendentry{MAE};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addlegendentry{MAE+GDL \tiny{(96 ConvLSTM feature maps)}};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM};
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+      \addlegendentry{MAE+GDL+SSIM \tiny{(3-layer ConvLSTM)}};
     \end{axis}
   \end{tikzpicture}
   }
@@ -1119,19 +1111,19 @@ The advantages of a network that is trained using the triplet loss function beco
         legend style={legend pos=south east},
         grid,
         thick,
-        ylabel=SSIM,
-        xlabel=step \textit{i},
+        ylabel={$\text{SSIM}_5$},
+        xlabel={training steps \textit{i}},
         x post scale=1.6,
       ]
       \addplot[draw=black!30!orange] table[x=Step, y=Value]{\modelC};
-      \addlegendentry{MAE (valid)};
+      \addlegendentry{MAE};
       \addplot[draw=black!30!red] table[x=Step, y=Value]{\modelD};
-      \addlegendentry{MAE+GDL 96filters (valid)};
+      \addlegendentry{MAE+GDL \tiny{(96 ConvLSTM feature maps)}};
       \addplot[draw=black!30!blue] table[x=Step, y=Value]{\modelB};
-      \addlegendentry{MAE+GDL+SSIM (valid)};
+      \addlegendentry{MAE+GDL+SSIM };
       %best
       \addplot[draw=black!30!green] table[x=Step, y=Value]{\modelA};
-      \addlegendentry{MAE+GDL+SSIM 3-layers (valid)};
+      \addlegendentry{MAE+GDL+SSIM \tiny{(3-layer ConvLSTM)}};
     \end{axis}
   \end{tikzpicture}
   }
@@ -1140,9 +1132,6 @@ The advantages of a network that is trained using the triplet loss function beco
 \end{subfigure}
 \caption[Comparison of Image Metrics on UCF-101]{Computed image metrics computed on the UCF-101 dataset. All four networks use the same hyperparameter settings, but differ in the number of recurrent layers, as well as the used objective function.} \label{fig:plot-ucf-imgmetric}
 \end{figure}
-
-
-
 
 
 
