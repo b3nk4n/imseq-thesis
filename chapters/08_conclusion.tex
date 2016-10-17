@@ -13,7 +13,7 @@ We could also figure out that the choice of the appropriate loss function has a 
 Finally, we assume that our model could be currently trained more effectively using a different deep learning framework than TensorFlow, at least at the time of this writing. This can be argued with the fact that the current batch normalization layer in this framework currently depends on some operations where no GPU kernel is implemented yet. Such a bottleneck might be the root cause why the training process of our model is so slow that it requires up to four days to train the network for only \num{100000} steps. But this will certainly change in one of its next releases.
 
 
-\section{Future work}
+\section{Future Work}
 
 There are at least the following five proposals for future work:
 

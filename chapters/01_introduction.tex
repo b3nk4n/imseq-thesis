@@ -28,9 +28,7 @@ Throughout this work, we would like to investigate whether deep learning techniq
 
 Like in the first example of object recognition on static pictures, this task might sound trivial for humans once more, since we already have built an intuition regarding motion and our environment. When we have a look at the image sequence in Figure \ref{fig:intro-seq}, we have a strong idea about how this sequence might continue. At least for a couple of time steps. The boy in the foreground probably will lift his left foot towards the ball, while the ball continues to fall down due to gravitation. In contrast, the background will stay almost unchanged.
 
-Developing a deep learning approach to tackle this is indeed a non-trivial task, since it has to model both spatial and temporal features in combination. Additionally, related issues like evolving an effective training process or quantifying the perceptual image similarity between predicted and the ground truth frames have to be addressed as well. Moreover, existing state-of-the-art implementations that deal with frame prediction have to be reviewed and analyzed in detail in order to learn from their strength and weaknesses.
-%TODO : non-trivial: multi-step prediction: size of search space grows exponential
-%                    spatio-temoral data: take advantage fo the spatio-temp correlation within the data
+Developing a deep learning approach to tackle this is indeed a non-trivial task, since it has to model both spatial and temporal features in combination, as well as the search space grows exponential in case of multi-step forecasting. Additionally, related issues like evolving an effective training process or quantifying the perceptual image similarity between predicted and the ground truth frames have to be addressed as well. Moreover, existing state-of-the-art implementations that deal with frame prediction have to be reviewed and analyzed in detail in order to learn from their strength and weaknesses.
 
 
 \section{Contributions}
