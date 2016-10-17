@@ -24,7 +24,7 @@ The perceptron itself has quite a simple structure. It is usually visualized as 
   \end{cases}
 \end{equation}
 
-Even that its formulation is that simple, it can represent complex decision-making when multiple elements are stacked together, known as a multilayer perceptron (MLP). Such a network forms a \textit{directed acyclic graph} (DAG) and is illustrated in Figure \ref{fig:mlp}.
+Even though its formulation is that simple, it can represent complex decision-making when multiple elements are stacked together, known as a multilayer perceptron (MLP). Such a network forms a \textit{directed acyclic graph} (DAG) and is illustrated in Figure \ref{fig:mlp}.
 
 \begin{figure}[htpb]
 	\centering
@@ -38,7 +38,7 @@ Afterwards, the input layer can be fed with a data example and apply equation \r
 
 \subsection{Network Training}
 
-The final goal of training such a network is to end up with a model that generalizes on any kind of data from the same type \parencite[p. 2]{pattern_and_ml}. Data that is used during this process is called \textit{training set}, the other portion of data that evaluates its generalization capabilities \textit{test set}. Additionally, a third split is preferably used during the training process of the networks to select the best performing approach. It is known as the \textit{validation set}. Since the ground truth outcome of each data example during the training phase is known, we can quantify the outcomes using a loss function\footnote{Often called cost function, objective function or error function as well.}, such as \textit{mean absolute error} (MAE)\footnote{Also known as $ \ell_1 $ when it does not average over all examples, but often used as a synonym. In this work, the averaged variants for all presented functions are always used. Additionally, we also average across the image pixels when any loss function is applied on images to achieve pixel-wise results that are independent regarding the image dimensions later on in context of frame prediction.}:
+The final goal of training such a network is to end up with a model that generalizes on any kind of data from the same type \parencite[p. 2]{pattern_and_ml}. Data that is used during this process is called \textit{training set}, the other portion of data that evaluates its generalization capabilities \textit{test set}. Additionally, a third split is preferably used during the training process of the networks to select the best performing approach. It is known as the \textit{validation set}. Since the ground truth outcome of each data example during the training phase is known, we can quantify the outcomes using a loss function\footnote{Often called cost function, objective function or error function as well.}, such as \textit{mean absolute error} (MAE)\footnote{Also known as $ \ell_1 $ when it does not average over all examples, but often used as a synonym. In this work, the averaged variants for all presented functions are always used. Additionally, the final implementation averages across the image pixels when any loss function is applied on images to achieve pixel-wise results that are independent regarding the image dimensions later on in context of frame prediction.}:
 
 \begin{equation} \label{eq:mae}
   \mathcal{L}_{\textrm{mae}}(\textbf{w}, \textbf{b})=\frac{1}{n} \sum\limits_{\textbf{x}} | y(\textbf{x}) - t(\textbf{x}) | ,
@@ -84,7 +84,7 @@ which allow $ x_{i}, y \in \mathbb{R} $ by wrapping its term with a non-linear \
 	\caption[Schematic Neuron]{Schematic structure of a neuron with its $ n $ inputs $x_{i}$, weights $w_{i}$, bias $ b $ and activation function $\phi(z)$.} \label{fig:neuron}
 \end{figure}
 
-Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a classical perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even that its shape looks much simpler, it became one of the most favorable activation function for intermediate layers in deep neural networks\footnote{List of ReLU's strength and weaknesses: \url{http://cs231n.github.io/neural-networks-1/}}. The reasons are that it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanishing gradient (see Section \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
+Note that the sigmoid function's shape is a smoothed out variant of the \textit{step function} \parencite{neural_nets_deep_learning}, which can be used to make a neuron act like a classical perceptron. Additionally, the rectifier differs to both other activation functions in that it is one-sided and partly linear. Even though its shape looks much simpler, it became one of the most favorable activation function for intermediate layers in deep neural networks\footnote{List of ReLU's strength and weaknesses: \url{http://cs231n.github.io/neural-networks-1/}}. The reasons are that it allows faster computation, sparse activation\footnote{{A sparse activation means that only half of the neurons have an initial non-zero output, when a uniform initialization is used.}}, reduces the likelihood of vanishing gradient (see Section \ref{sec:rnn-drawbacks}) and is more biologically plausible \parencite{relu}.
 
 \begin{figure}[htpb]
   \centering
@@ -117,7 +117,7 @@ Note that the sigmoid function's shape is a smoothed out variant of the \textit{
 
 \subsubsection{Initialization}
 
-Before starting the training process, an initial value is assigned to each variable $ \textbf{w} $ and $ \textbf{b} $. This is done by pure randomness, using for example a uniform or Gaussian distribution. But if we start with weights that are too small, the signal could decrease so much that it is too small to be useful. On the other side, when we initialize our parameters with high values, the signal can end up to explode while propagating through the network \parencite{understand_xavier}. In consequence, a good initialization can have a radical effect on how fast the network will learn useful patterns.
+Before starting the training process, an initial value is assigned to each variable $ \textbf{w} $ and $ \textbf{b} $. This is done by pure randomness, using for example a uniform or Gaussian distribution. But if we start with weights that are too small, the signal could decrease so much that it is too small to be useful. On the other side, when the parameters are initialized with high values, the signal can end up to explode while propagating through the network \parencite{understand_xavier}. In consequence, a good initialization can have a radical effect on how fast the network will learn useful patterns.
 
 For this purpose, some best practices have been developed. One famous example used in our final model is \textit{Xavier initialization}\footnote{Also known as Glorot initialization.} (see eq. \ref{eq:xavier}). Its formulation is based on the number of input and output neurons and uses sampling from a uniform distribution with zero mean and all biases set to zero \parencite{xavier-init}:
 
@@ -265,7 +265,7 @@ Generally speaking, a convolution is a mathematical operation on two functions $
 
 In terminology of convolutional networks, the function $f$ is termed as the \textit{input} and the filter $g$ is referred to as the \textit{kernel}. Moreover, the output of $ (f \ast g)(x) $ is called a \textit{feature map}.
 
-As we are mainly dealing with discrete 2D images in this thesis, the formulation of equation \ref{eq:conv-general} can be discretized and reformulated as:
+As this thesis is mainly dealing with discrete 2D images, the formulation of equation \ref{eq:conv-general} can be discretized and reformulated as:
 
 \begin{equation} \label{eq:conv-2d}
   \big(\textbf{I} \ast \textbf{K}\big)(x,y) = \sum\limits_{r=1}^{h} \sum\limits_{c=1}^{w} \textbf{I}_{c,r} \cdot \textbf{K}_{x-c,y-r} ,
@@ -409,7 +409,7 @@ In addition, the framework for recurrent models is very flexible as well. Depend
   \caption{}
   \label{fig:rnn-many2many}
 \end{subfigure}
-\caption[RNN Input-Output Modes]{Visualization of different recurrent network input-output modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Red squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks or the direct input and output. (Based on \parencite{rnn-effectiveness})}
+\caption[RNN Input-Output Modes]{Visualization of different recurrent network input-output modes: (a) one-to-many, (b) many-to-one, (c) many-to-many. Green squares denote the inputs, gray squares the recurrent cells and all outputs are colored in blue. Input and output squares can be understood as either further neural networks or the direct input and output. (Based on \parencite{rnn-effectiveness})}
 \label{fig:rnn-modes}
 \end{figure}
 
@@ -537,12 +537,12 @@ where $ \tilde{x} $ is the randomly corrupted version of the ground truth input 
 
 \subsection{Recurrent Encoder-Decoder Models} \label{sec:rnn_enc_dec}
 
-The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model has been firstly introduced independently from each other in \parencite{brnn_fist} and \parencite{brnn_second}. Further, it has been used in  \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementations, as well as it could be applied in a non-autoencoder fashion, the more general name \textit{recurrent encoder-decoder} model is used here as well. This name is also used in several follow-up works.} for the first time in context of image processing. But since then, it has been applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
+The general idea of the encoder-decoder framework can also be applied to recurrent networks. Thus, it can build a complex representation by incorporating a whole sequence of inputs. To our knowledge, the \textit{recurrent encoder-decoder} model was firstly introduced independently from each other in \parencite{brnn_fist} and \parencite{brnn_second}. Further, it was used in  \parencite{unsup_learn_lstm}\footnote{The authors call this recurrent framework the \textit{LSTM autoencoder model} within their publication. But due to the fact that it can be generalized to another recurrent cell implementations, as well as it could be applied in a non-autoencoder fashion, the more general name \textit{recurrent encoder-decoder} model is used here as well. This name is also used in several follow-up works.} for the first time in context of image processing. But since then, it is applied in numerous subsequent works \parencite{rnn-enc-dec1}, \parencite{rnn-enc-dec2}. Figure \ref{fig:rnn-autoencoder} shows an example of such a model in context of a recurrent autoencoder.
 
 \begin{figure}[htpb]
 	\centering
 	\includegraphics[width=.9\linewidth]{figures/rnn_autoencoder.pdf}
-	\caption[Recurrent Autoencoder Model]{Basic structure of a conditional recurrent autoencoder. The inputs (red) are processed by the encoder RNN to learn the representation of the data in sequence. Then, the decoder RNN takes over to infer the reconstructions (blue) of the inputs in reverse order. (Based on \parencite{unsup_learn_lstm})} \label{fig:rnn-autoencoder}
+	\caption[Recurrent Autoencoder Model]{Basic structure of a conditional recurrent autoencoder. The inputs (green) are processed by the encoder RNN to learn the representation of the data in sequence. Then, the decoder RNN takes over to infer the reconstructions (blue) of the inputs in reverse order. (Based on \parencite{unsup_learn_lstm})} \label{fig:rnn-autoencoder}
 \end{figure}
 
 The encoder RNN builds the representation based on all inputs of the sequence and therefore takes advantage of its temporal or ordinal structure. Afterwards, the learned representation is used to initialize the hidden state $ \textbf{h}_{\textrm{dec}}^{(0)} $ of the decoder, in opposite to the otherwise customary zero initialization. The decoder RNN takes then over and outputs the prediction of the target sequence. Obviously, both the encoder and decoder recurrent networks could be extended to consist of multiple layers or bidirectional connections as well.
@@ -599,10 +599,10 @@ The de facto standard loss function to compare a generated image with its ground
   \caption{}
   \label{fig:chess2}
 \end{subfigure}
-\caption[Example of $ \ell_{2} $ Weakness]{Example to demonstrate the weakness of $ \ell_{2} $ in context of perceptual image similarity.} \label{fig:chessfield}
+\caption[Example of $ \ell_{2} $ Weakness]{Example to demonstrate the weakness of $ \ell_{2} $ and MSE error in context of perceptual image similarity.} \label{fig:chessfield}
 \end{figure}
 
-As an extreme but simple example, consider two images containing a chess field of black and white pixels as shown in Figure \ref{fig:chessfield}. From an aerial perspective, both images look completely identical, because it is perceived as a gray surface. Additionally, even when we look at it from a closer distance, we would still evaluate them as quite similar. This is for the very reason that both images provide the same colors, structure, sharpness or contrast. Unfortunately, assessing both images using the given squared error function results in the maximum possible difference. The reason for this is because it considers the squared differences of related pixels only. Even that this specific weakness is not solved by using the $ \ell_{1} $ loss, several studies have shown that the usage of the absolute error function slightly reduces the blur effect on edges in image generation processes of natural images \parencite{loss-func-img-proc} \parencite{deep_multiscale_video_pred}. Some example image reconstructions comparing the use of different loss functions are show in Figure \ref{fig:percept-vs-lp}.
+As an extreme but simple example, consider two images containing a chess field of black and white pixels as shown in Figure \ref{fig:chessfield}. From an aerial perspective, both images look completely identical, because it is perceived as a gray surface. Additionally, even when we look at it from a closer distance, we would still evaluate them as quite similar. This is for the very reason that both images provide the same colors, structure, sharpness or contrast. Unfortunately, assessing both images using the given squared error function results in the maximum possible difference. The reason for this is because it considers the squared differences of related pixels only. Even though this specific weakness is not solved by using the $ \ell_{1} $ loss, several studies have shown that the usage of the absolute error function slightly reduces the blur effect on edges in image generation processes of natural images \parencite{loss-func-img-proc} \parencite{deep_multiscale_video_pred}. Some example image reconstructions comparing the use of different loss functions are show in Figure \ref{fig:percept-vs-lp}.
 
 \begin{figure}[htpb]
 \centering
@@ -625,7 +625,7 @@ As an extreme but simple example, consider two images containing a chess field o
 
 \subsection{Perceptual Quality Metrics} \label{sec:img_metrics}
 
-The example in the previous section has shown that the consideration of the human visual perception is very important when assessing image similarity. With this in mind, a couple of metrics have been developed to evaluate image quality differences between two images. These metrics can be used either for a quantitative evaluation of generated results, or even as a loss function by doing some minor modifications to fulfill the required properties. Beside neural network training, these metrics have been originally invented to measure the quality of image compression codecs such as JPEG\footnote{JPEG: stands for \textit{Joint Photographic Experts Group} and is the name of the committee that created this compression standard for digital pictures.}.
+The example in the previous section has shown that the consideration of the human visual perception is very important when assessing image similarity. With this in mind, a couple of metrics were developed to evaluate image quality differences between two images. These metrics can be used either for a quantitative evaluation of generated results, or even as a loss function by doing some minor modifications to fulfill the required properties. Beside neural network training, these metrics were originally invented to measure the quality of image compression codecs such as JPEG\footnote{JPEG: stands for \textit{Joint Photographic Experts Group} and is the name of the committee that created this compression standard for digital pictures.}.
 
 In the following sections, $ \textbf{x} $ will denote the ground truth image and $ \textbf{y} $ its generated reconstruction to compare with.
 
@@ -671,7 +671,7 @@ The SSIM index can be computed using a sliding window approach \parencite{ssim-s
 
 \subsubsection*{Multi-Scale Structural Similarity}
 
-Further studies have shown that the viewing conditions can have a tremendous influence on the perceived image similarity. Therefore, the SSIM index has been extended to incorporate the image on $ M $ different scales, where $ M=1 $ indicates the full-size image that is iteratively downsampled by a factor of two. This metric is known as the \textit{multi-scale structural similarity} (MS-SSIM) index for images \parencite{ms-ssim}. It is given by:
+A further study has shown that the viewing conditions can have a tremendous influence on the perceived image similarity \parencite{ms-ssim}. Therefore, the SSIM index is extended to incorporate the image on $ M $ different scales, where $ M=1 $ indicates the full-size image that is iteratively downsampled by a factor of two. This metric is known as the \textit{multi-scale structural similarity} (MS-SSIM) index for images. It is given by:
 
 \begin{equation} \label{eq:ms-ssim}
 \textrm{MS-SSIM}(\textbf{x}, \textbf{y}) = \big[ l_M(\textbf{x}, \textbf{y})\big]^{\alpha_M} \cdot \prod\limits_{j=1}^{M} \big[c_j(\textbf{x}, \textbf{y}) \big]^{\beta_j} \cdot \big[ s_j(\textbf{x}, \textbf{y}) \big]^{\gamma_j} ,
@@ -708,7 +708,7 @@ Of course, the same principle can be applied to end up with the multi-scale stru
 \mathcal{L}_{\textrm{ms-ssim}}(\textbf{x}, \textbf{y}) = 1 - \textrm{MS-SSIM}(\textbf{x}, \textbf{y}).
 \end{equation}
 
-Both error functions have been evaluated in context of image generation super-resolution or JPEG artifact removal in \parencite{learning-perc-sim} and \parencite{loss-func-img-proc}. The latter suggests to combine each of them with $ \ell_1 $ to get the best of both worlds.
+Both error functions were evaluated in context of image generation super-resolution or JPEG artifact removal in \parencite{learning-perc-sim} and \parencite{loss-func-img-proc}. The latter suggests to combine each of them with $ \ell_1 $ to get the best of both worlds.
 
 \subsubsection*{Gradient Difference Loss} \label{sec:gdl}
 
