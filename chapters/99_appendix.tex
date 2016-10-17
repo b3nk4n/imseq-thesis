@@ -212,6 +212,132 @@
 \end{figure}
 
 
+\clearpage
+\section{Learned Representations}
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{1.0\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/mm/inputs.png}
+  \caption{input sequence}
+  \label{fig:mm-lrep-inputs}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/mm/1c.png}
+  \caption{C \tiny{(\nth{1} layer)}}
+  \label{fig:mm-lrep1}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/mm/1h.png}
+  \caption{h \tiny{(\nth{1} layer)}}
+  \label{fig:mm-lrep2}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/mm/2c.png}
+  \caption{C \tiny{(\nth{2} layer)}}
+  \label{fig:mm-lrep3}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/mm/2h.png}
+  \caption{h \tiny{(\nth{2} layer)}}
+  \label{fig:mm-lrep4}
+  \vspace{.1cm}
+\end{subfigure}
+\caption[Encoded Representation in Moving MNIST]{Example of the encoded representation using a 2-layer network in Moving MNIST, separated by each layer, cell state C and hidden output h. Each tensor of shape $16 \times 16 \times 64$ is visualized by splitting each single feature map.}
+\label{fig:mm-lrep}
+\end{figure}
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{1.0\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/pac/inputs.png}
+  \caption{input sequence}
+  \label{fig:pac-lrep-inputs}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/pac/1c.png}
+  \caption{C \tiny{(\nth{1} layer)}}
+  \label{fig:pac-lrep1}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/pac/1h.png}
+  \caption{h \tiny{(\nth{1} layer)}}
+  \label{fig:pac-lrep2}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/pac/2c.png}
+  \caption{C \tiny{(\nth{2} layer)}}
+  \label{fig:pac-lrep3}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/pac/2h.png}
+  \caption{h \tiny{(\nth{2} layer)}}
+  \label{fig:pac-lrep4}
+  \vspace{.1cm}
+\end{subfigure}
+\caption[Encoded Representation in MsPacman]{Encoded representation example using a 2-layer network in the MsPacman dataset, separated by each ConvLSTM layer, cell state C and hidden output h. Each tensor representation of shape $16 \times 16 \times 64$ can be illustrated by showing each feature map separately.}
+\label{fig:pac-lrep}
+\end{figure}
+
+\begin{figure}[h!tb]
+\centering
+\begin{subfigure}{1.0\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/ucf/inputs.png}
+  \caption{input sequence}
+  \label{fig:ucf-lrep-inputs}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/ucf/1c.png}
+  \caption{C \tiny{(\nth{1} layer)}}
+  \label{fig:ucf-lrep1}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/ucf/1h.png}
+  \caption{h \tiny{(\nth{1} layer)}}
+  \label{fig:ucf-lrep2}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/ucf/2c.png}
+  \caption{C \tiny{(\nth{2} layer)}}
+  \label{fig:ucf-lrep3}
+  \vspace{.1cm}
+\end{subfigure}
+\begin{subfigure}{0.24\textwidth}
+  \centering
+  \includegraphics[width=0.92\linewidth]{figures/learned_rep/ucf/2h.png}
+  \caption{h \tiny{(\nth{2} layer)}}
+  \label{fig:ucf-lrep4}
+  \vspace{.1cm}
+\end{subfigure}
+\caption[Encoded Representation in UCF-101]{Example of an encoded representation using the 2-layer ConvLSTM model in UCF-101, separated by each layer, cell state C and hidden output h. Tensors of shape $16 \times 16 \times 64$ are visualized by splitting each single feature map, resulting in 64 grayscale images.}
+\label{fig:ucf-lrep}
+\end{figure}
+
 
 \clearpage
 \section{Code Listings}
